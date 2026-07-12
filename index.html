@@ -1,0 +1,390 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>משחק עוגיות</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/firebase/9.22.1/firebase-app-compat.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/firebase/9.22.1/firebase-database-compat.min.js"></script>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: Arial, sans-serif; background: linear-gradient(45deg, #FF6B6B, #4ECDC4, #45B7D1); min-height: 100vh; display: flex; direction: rtl; }
+        .login-screen { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0, 0, 0, 0.8); display: flex; justify-content: center; align-items: center; z-index: 10000; }
+        .login-form { background: white; padding: 40px; border-radius: 20px; text-align: center; box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3); min-width: 350px; }
+        .login-form h2 { color: #2C3E50; margin-bottom: 25px; font-size: 2rem; }
+        .login-form input { width: 100%; padding: 12px; margin: 10px 0; border: 2px solid #ddd; border-radius: 10px; font-size: 1rem; text-align: center; }
+        .login-form button { background: #4ECDC4; color: white; padding: 12px 25px; border: none; border-radius: 10px; font-size: 1.1rem; cursor: pointer; margin: 10px 5px; transition: all 0.3s ease; }
+        .login-form button:hover { transform: translateY(-2px); box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2); }
+        .remember-me { display: flex; align-items: center; justify-content: center; margin: 15px 0; }
+        .remember-me input { width: auto; margin-left: 8px; }
+        .settings-button { position: fixed; top: 20px; right: 20px; background: #34495E; color: white; padding: 10px 20px; border: none; border-radius: 15px; font-size: 1rem; cursor: pointer; z-index: 1000; }
+        .modal { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0, 0, 0, 0.8); display: none; justify-content: center; align-items: center; z-index: 5000; }
+        .modal-content { background: white; padding: 30px; border-radius: 20px; text-align: center; box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3); max-width: 500px; max-height: 80vh; overflow-y: auto; }
+        .modal-content h3 { color: #2C3E50; margin-bottom: 20px; font-size: 1.8rem; }
+        .modal-content input { width: 100%; padding: 12px; margin: 10px 0; border: 2px solid #ddd; border-radius: 10px; }
+        .modal-content button { background: #4ECDC4; color: white; padding: 12px 25px; border: none; border-radius: 10px; cursor: pointer; margin: 10px 5px; }
+        .game-container { display: flex; width: 100%; min-height: 100vh; }
+        .main-game { flex: 1; padding: 20px; display: flex; flex-direction: column; align-items: center; justify-content: center; position: relative; }
+        .stats { background: rgba(255, 255, 255, 0.25); border-radius: 25px; padding: 25px; margin-bottom: 30px; text-align: center; border: 2px solid rgba(255, 255, 255, 0.3); min-width: 300px; }
+        .cookie-count { font-size: 3.5rem; font-weight: bold; color: #FF8C00; margin-bottom: 10px; animation: pulse 2s infinite; }
+        @keyframes pulse { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.05); } }
+        .cookies-per-second { font-size: 1.3rem; color: #2C3E50; font-weight: bold; background: rgba(255, 255, 255, 0.7); padding: 8px 16px; border-radius: 15px; }
+        .cookie-container { position: relative; margin: 30px 0; }
+        .cookie { width: 250px; height: 250px; background: radial-gradient(circle at 30% 30%, #DEB887, #D2691E, #8B4513); border-radius: 50%; cursor: pointer; border: 8px solid #654321; box-shadow: 0 15px 30px rgba(0, 0, 0, 0.3); animation: cookieFloat 4s ease-in-out infinite; }
+        @keyframes cookieFloat { 0%, 100% { transform: translateY(0px); } 50% { transform: translateY(-10px); } }
+        .cookie:hover { transform: scale(1.1); box-shadow: 0 0 20px rgba(255, 215, 0, 0.5); }
+        .cookie:active { transform: scale(0.9); }
+        .click-effect { position: absolute; color: #FFD700; font-size: 2.5rem; font-weight: bold; pointer-events: none; animation: floatUp 1.2s ease-out forwards; z-index: 1000; }
+        @keyframes floatUp { 0% { opacity: 1; transform: translateY(0) scale(1); } 100% { opacity: 0; transform: translateY(-120px) scale(1.5); } }
+        .shop { width: 400px; background: rgba(255, 255, 255, 0.15); border-left: 2px solid rgba(255, 255, 255, 0.3); padding: 20px; overflow-y: auto; max-height: 100vh; }
+        .shop h2 { color: #2C3E50; font-size: 2.2rem; margin-bottom: 20px; text-align: center; }
+        .shop-section { margin-bottom: 25px; }
+        .shop-section h3 { color: #34495E; font-size: 1.4rem; margin-bottom: 15px; text-align: center; background: rgba(255, 255, 255, 0.2); padding: 10px; border-radius: 10px; }
+        .shop-item { background: rgba(255, 255, 255, 0.2); border-radius: 15px; padding: 15px; margin-bottom: 12px; border: 2px solid rgba(255, 255, 255, 0.3); transition: all 0.3s ease; cursor: pointer; }
+        .shop-item:hover { background: rgba(255, 255, 255, 0.3); transform: translateY(-3px); }
+        .shop-item.disabled { opacity: 0.4; cursor: not-allowed; }
+        .item-name { font-size: 1.2rem; font-weight: bold; color: #2C3E50; }
+        .item-count { background: linear-gradient(45deg, #FF6B6B, #4ECDC4); color: white; padding: 4px 12px; border-radius: 15px; font-size: 0.9rem; font-weight: bold; }
+        .item-description { font-size: 0.95rem; color: #34495E; margin-bottom: 10px; }
+        .item-price { font-size: 1.1rem; font-weight: bold; color: #E67E22; text-align: center; background: rgba(255, 255, 255, 0.4); padding: 8px; border-radius: 10px; margin-top: 10px; }
+        .error-message { color: #E74C3C; font-weight: bold; margin: 10px 0; }
+        .success-message { color: #27AE60; font-weight: bold; margin: 10px 0; }
+        .close-button { background: #E74C3C !important; }
+        @media (max-width: 768px) { .game-container { flex-direction: column; } .shop { width: 100%; } .cookie { width: 180px; height: 180px; } }
+    </style>
+</head>
+<body>
+    <div class="login-screen" id="loginScreen">
+        <div class="login-form">
+            <h2>משחק עוגיות</h2>
+            <input type="text" id="usernameInput" placeholder="שם משתמש" maxlength="20">
+            <input type="password" id="passwordInput" placeholder="סיסמה">
+            <div class="remember-me">
+                <input type="checkbox" id="rememberMe">
+                <label for="rememberMe">זכור אותי</label>
+            </div>
+            <button onclick="login()">התחבר</button>
+            <button onclick="register()">הרשם</button>
+            <div id="loginMessage"></div>
+        </div>
+    </div>
+
+    <button class="settings-button" onclick="openSettings()">הגדרות</button>
+
+    <div class="modal" id="settingsModal">
+        <div class="modal-content">
+            <h3>הגדרות</h3>
+            <button onclick="logout()">התנתק</button>
+            <button class="close-button" onclick="closeModal()">סגור</button>
+            <div id="settingsMessage"></div>
+        </div>
+    </div>
+
+    <div class="game-container">
+        <div class="main-game">
+            <div class="stats">
+                <div class="cookie-count" id="cookieCount">0</div>
+                <div class="cookies-per-second" id="cpsDisplay">0 עוגיות לשנייה</div>
+            </div>
+            <div class="cookie-container">
+                <div class="cookie" id="cookie"></div>
+            </div>
+        </div>
+        
+        <div class="shop">
+            <h2>חנות</h2>
+            <div class="shop-section">
+                <h3>מבנים</h3>
+                <div id="buildingItems"></div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const firebaseConfig = {
+            apiKey: "AIzaSyBZKyN8w32w1pn4hf28Fv9LecsTDgjZRTs",
+            authDomain: "my-login-system-d583d.firebaseapp.com",
+            databaseURL: "https://my-login-system-d583d-default-rtdb.europe-west1.firebasedatabase.app",
+            projectId: "my-login-system-d583d",
+            storageBucket: "my-login-system-d583d.firebasestorage.app",
+            messagingSenderId: "873530338056",
+            appId: "1:873530338056:web:1d2911d1cb9a0000271abd"
+        };
+
+        let database;
+        let firebaseInit = false;
+        
+        try {
+            firebase.initializeApp(firebaseConfig);
+            database = firebase.database();
+            firebaseInit = true;
+        } catch (err) {
+            console.log("Firebase error:", err);
+        }
+
+        let cookies = 0;
+        let cookiesPerSecond = 0;
+        let clickPower = 1;
+        let currentUser = null;
+        let users = {};
+
+        const buildings = {
+            cursor: { name: "סמן", emoji: "👆", baseCost: 15, cps: 0.1, count: 0 },
+            grandma: { name: "סבתא", emoji: "👵", baseCost: 100, cps: 1, count: 0 },
+            farm: { name: "חווה", emoji: "🚜", baseCost: 1100, cps: 8, count: 0 },
+            mine: { name: "מכרה", emoji: "⛏", baseCost: 12000, cps: 47, count: 0 },
+            factory: { name: "מפעל", emoji: "🏭", baseCost: 130000, cps: 260, count: 0 }
+        };
+
+        function formatNum(num) {
+            if (num < 1000) return Math.floor(num).toString();
+            if (num < 1000000) return (num / 1000).toFixed(1) + "K";
+            if (num < 1000000000) return (num / 1000000).toFixed(1) + "M";
+            return (num / 1000000000).toFixed(1) + "B";
+        }
+
+        function updateDisplay() {
+            document.getElementById("cookieCount").textContent = formatNum(cookies);
+            document.getElementById("cpsDisplay").textContent = formatNum(cookiesPerSecond) + " עוגיות לשנייה";
+        }
+
+        function calcCPS() {
+            cookiesPerSecond = 0;
+            for (let key in buildings) {
+                cookiesPerSecond = cookiesPerSecond + (buildings[key].count * buildings[key].cps);
+            }
+        }
+
+        function getCost(build) {
+            return Math.floor(build.baseCost * Math.pow(1.15, build.count));
+        }
+
+        function makeShop() {
+            const cont = document.getElementById("buildingItems");
+            cont.innerHTML = "";
+            
+            for (let key in buildings) {
+                const build = buildings[key];
+                const cost = getCost(build);
+                const afford = cookies >= cost;
+                
+                const itm = document.createElement("div");
+                itm.className = afford ? "shop-item" : "shop-item disabled";
+                
+                let html = "<div><span class='item-name'>" + build.emoji + " " + build.name + "</span> <span class='item-count'>" + build.count + "</span></div>";
+                html = html + "<div class='item-description'>לשנייה: " + formatNum(build.cps) + "</div>";
+                html = html + "<div class='item-price'>עוגיות: " + formatNum(cost) + "</div>";
+                
+                itm.innerHTML = html;
+                
+                if (afford) {
+                    itm.onclick = function() { buyBuild(key); };
+                }
+                
+                cont.appendChild(itm);
+            }
+        }
+
+        function buyBuild(key) {
+            const build = buildings[key];
+            const cost = getCost(build);
+            
+            if (cookies >= cost) {
+                cookies = cookies - cost;
+                build.count = build.count + 1;
+                calcCPS();
+                updateDisplay();
+                makeShop();
+                showClick(event.clientX, event.clientY);
+            }
+        }
+
+        function showClick(x, y) {
+            const eff = document.createElement("div");
+            eff.className = "click-effect";
+            eff.textContent = "+" + formatNum(clickPower);
+            eff.style.left = (x - 25) + "px";
+            eff.style.top = (y - 25) + "px";
+            document.body.appendChild(eff);
+            
+            setTimeout(function() {
+                if (document.body.contains(eff)) {
+                    document.body.removeChild(eff);
+                }
+            }, 1200);
+        }
+
+        async function login() {
+            const user = document.getElementById("usernameInput").value.trim();
+            const pass = document.getElementById("passwordInput").value;
+            const msg = document.getElementById("loginMessage");
+
+            if (!user || !pass) {
+                msg.innerHTML = "<div class='error-message'>הזן שם וסיסמה</div>";
+                return;
+            }
+
+            let found = false;
+            let data = null;
+
+            if (firebaseInit) {
+                try {
+                    const snap = await database.ref("users/" + user).once("value");
+                    if (snap.exists()) {
+                        data = snap.val();
+                        found = true;
+                    }
+                } catch (e) {
+                    console.log("Firebase error:", e);
+                }
+            }
+
+            if (!found && users[user]) {
+                data = users[user];
+                found = true;
+            }
+
+            if (found && data.password === pass) {
+                currentUser = user;
+                users[user] = data;
+                cookies = data.cookies || 0;
+                
+                for (let key in buildings) {
+                    if (data.buildings && data.buildings[key]) {
+                        buildings[key].count = data.buildings[key].count || 0;
+                    }
+                }
+                
+                calcCPS();
+                updateDisplay();
+                makeShop();
+                document.getElementById("loginScreen").style.display = "none";
+            } else {
+                msg.innerHTML = "<div class='error-message'>שם או סיסמה שגויים</div>";
+            }
+        }
+
+        async function register() {
+            const user = document.getElementById("usernameInput").value.trim();
+            const pass = document.getElementById("passwordInput").value;
+            const msg = document.getElementById("loginMessage");
+
+            if (!user || !pass) {
+                msg.innerHTML = "<div class='error-message'>הזן שם וסיסמה</div>";
+                return;
+            }
+
+            if (user.length < 3) {
+                msg.innerHTML = "<div class='error-message'>שם קצר מדי</div>";
+                return;
+            }
+
+            let found = false;
+            
+            if (firebaseInit) {
+                try {
+                    const snap = await database.ref("users/" + user).once("value");
+                    found = snap.exists();
+                } catch (e) {
+                    console.log("Firebase error:", e);
+                }
+            }
+
+            if (!found && users[user]) {
+                found = true;
+            }
+
+            if (found) {
+                msg.innerHTML = "<div class='error-message'>שם קיים כבר</div>";
+                return;
+            }
+
+            const newUser = {
+                password: pass,
+                cookies: 0,
+                buildings: JSON.parse(JSON.stringify(buildings))
+            };
+
+            users[user] = newUser;
+            currentUser = user;
+
+            if (firebaseInit) {
+                try {
+                    await database.ref("users/" + user).set(newUser);
+                } catch (e) {
+                    console.log("Firebase error:", e);
+                }
+            }
+
+            cookies = 0;
+            calcCPS();
+            updateDisplay();
+            makeShop();
+            msg.innerHTML = "<div class='success-message'>הרשמה הצליחה</div>";
+            setTimeout(function() {
+                document.getElementById("loginScreen").style.display = "none";
+            }, 1000);
+        }
+
+        function openSettings() {
+            if (!currentUser) {
+                alert("התחבר קודם");
+                return;
+            }
+            document.getElementById("settingsModal").style.display = "flex";
+        }
+
+        function closeModal() {
+            document.getElementById("settingsModal").style.display = "none";
+        }
+
+        function logout() {
+            if (confirm("בטוח")) {
+                currentUser = null;
+                cookies = 0;
+                for (let key in buildings) {
+                    buildings[key].count = 0;
+                }
+                calcCPS();
+                updateDisplay();
+                document.getElementById("loginScreen").style.display = "flex";
+                document.getElementById("settingsModal").style.display = "none";
+                document.getElementById("usernameInput").value = "";
+                document.getElementById("passwordInput").value = "";
+            }
+        }
+
+        const cookieEl = document.getElementById("cookie");
+        cookieEl.addEventListener("click", function(e) {
+            cookies = cookies + clickPower;
+            updateDisplay();
+            showClick(e.clientX, e.clientY);
+            
+            if (firebaseInit && currentUser) {
+                database.ref("users/" + currentUser + "/cookies").set(cookies);
+            }
+        });
+
+        setInterval(function() {
+            cookies = cookies + (cookiesPerSecond / 10);
+            updateDisplay();
+            
+            if (firebaseInit && currentUser) {
+                database.ref("users/" + currentUser + "/cookies").set(Math.floor(cookies));
+            }
+        }, 100);
+
+        setInterval(function() {
+            makeShop();
+        }, 1000);
+
+        window.onload = function() {
+            if (localStorage.getItem("cookieUsers")) {
+                users = JSON.parse(localStorage.getItem("cookieUsers"));
+            }
+            updateDisplay();
+            makeShop();
+        };
+    </script>
+</body>
+</html>
