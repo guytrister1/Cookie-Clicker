@@ -15,6 +15,7 @@
         .login-form input { width: 100%; padding: 12px; margin: 10px 0; border: 2px solid #ddd; border-radius: 10px; font-size: 1rem; text-align: center; }
         .login-form button { background: #4ECDC4; color: white; padding: 12px 25px; border: none; border-radius: 10px; font-size: 1.1rem; cursor: pointer; margin: 10px 5px; transition: all 0.3s ease; }
         .login-form button:hover { transform: translateY(-2px); box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2); }
+        .login-form button:disabled { opacity: 0.6; cursor: not-allowed; transform: none; }
         .remember-me { display: flex; align-items: center; justify-content: center; margin: 15px 0; }
         .remember-me input { width: auto; margin-left: 8px; }
         .settings-button { position: fixed; top: 20px; right: 20px; background: #34495E; color: white; padding: 10px 20px; border: none; border-radius: 15px; font-size: 1rem; cursor: pointer; z-index: 1000; }
@@ -49,6 +50,7 @@
         .item-price { font-size: 1.1rem; font-weight: bold; color: #E67E22; text-align: center; background: rgba(255, 255, 255, 0.4); padding: 8px; border-radius: 10px; margin-top: 10px; }
         .error-message { color: #E74C3C; font-weight: bold; margin: 10px 0; }
         .success-message { color: #27AE60; font-weight: bold; margin: 10px 0; }
+        .info-message { color: #2980B9; font-weight: bold; margin: 10px 0; }
         .close-button { background: #E74C3C !important; }
         @media (max-width: 768px) { .game-container { flex-direction: column; } .shop { width: 100%; } .cookie { width: 180px; height: 180px; } }
     </style>
@@ -63,8 +65,8 @@
                 <input type="checkbox" id="rememberMe">
                 <label for="rememberMe">זכור אותי</label>
             </div>
-            <button onclick="login()">התחבר</button>
-            <button onclick="register()">הרשם</button>
+            <button id="loginBtn" onclick="login()">התחבר</button>
+            <button id="registerBtn" onclick="register()">הרשם</button>
             <div id="loginMessage"></div>
         </div>
     </div>
@@ -120,6 +122,15 @@
             firebaseInit = true;
         } catch (err) {
             console.log("Firebase error:", err);
+        }
+
+        // עוטף כל קריאה ל-Firebase בטיימאאוט - אם החיבור נחסם (Ad-blocker / כללי אבטחה / רשת)
+        // הקריאה תיכשל אחרי כמה שניות במקום להיתקע לנצח בלי משוב למשתמש
+        function withTimeout(promise, ms) {
+            return Promise.race([
+                promise,
+                new Promise((_, reject) => setTimeout(() => reject(new Error("timeout")), ms))
+            ]);
         }
 
         let cookies = 0;
@@ -178,14 +189,14 @@
                 itm.innerHTML = html;
                 
                 if (afford) {
-                    itm.onclick = function() { buyBuild(key); };
+                    itm.addEventListener("click", function(e) { buyBuild(key, e); });
                 }
                 
                 cont.appendChild(itm);
             }
         }
 
-        function buyBuild(key) {
+        function buyBuild(key, e) {
             const build = buildings[key];
             const cost = getCost(build);
             
@@ -195,7 +206,7 @@
                 calcCPS();
                 updateDisplay();
                 makeShop();
-                showClick(event.clientX, event.clientY);
+                showClick(e.clientX, e.clientY);
             }
         }
 
@@ -218,24 +229,33 @@
             const user = document.getElementById("usernameInput").value.trim();
             const pass = document.getElementById("passwordInput").value;
             const msg = document.getElementById("loginMessage");
+            const loginBtn = document.getElementById("loginBtn");
+            const registerBtn = document.getElementById("registerBtn");
 
             if (!user || !pass) {
                 msg.innerHTML = "<div class='error-message'>הזן שם וסיסמה</div>";
                 return;
             }
 
+            loginBtn.disabled = true;
+            registerBtn.disabled = true;
+            msg.innerHTML = "<div class='info-message'>מתחבר...</div>";
+
             let found = false;
             let data = null;
 
             if (firebaseInit) {
                 try {
-                    const snap = await database.ref("users/" + user).once("value");
+                    const snap = await withTimeout(database.ref("users/" + user).once("value"), 7000);
                     if (snap.exists()) {
                         data = snap.val();
                         found = true;
                     }
                 } catch (e) {
                     console.log("Firebase error:", e);
+                    if (e.message === "timeout") {
+                        msg.innerHTML = "<div class='error-message'>אין תגובה מהשרת - בודק משתמש מקומי</div>";
+                    }
                 }
             }
 
@@ -250,9 +270,7 @@
                 cookies = data.cookies || 0;
                 
                 for (let key in buildings) {
-                    if (data.buildings && data.buildings[key]) {
-                        buildings[key].count = data.buildings[key].count || 0;
-                    }
+                    buildings[key].count = (data.buildings && data.buildings[key]) ? (data.buildings[key].count || 0) : 0;
                 }
                 
                 calcCPS();
@@ -262,12 +280,17 @@
             } else {
                 msg.innerHTML = "<div class='error-message'>שם או סיסמה שגויים</div>";
             }
+
+            loginBtn.disabled = false;
+            registerBtn.disabled = false;
         }
 
         async function register() {
             const user = document.getElementById("usernameInput").value.trim();
             const pass = document.getElementById("passwordInput").value;
             const msg = document.getElementById("loginMessage");
+            const loginBtn = document.getElementById("loginBtn");
+            const registerBtn = document.getElementById("registerBtn");
 
             if (!user || !pass) {
                 msg.innerHTML = "<div class='error-message'>הזן שם וסיסמה</div>";
@@ -279,14 +302,21 @@
                 return;
             }
 
+            loginBtn.disabled = true;
+            registerBtn.disabled = true;
+            msg.innerHTML = "<div class='info-message'>נרשם...</div>";
+
             let found = false;
             
             if (firebaseInit) {
                 try {
-                    const snap = await database.ref("users/" + user).once("value");
+                    const snap = await withTimeout(database.ref("users/" + user).once("value"), 7000);
                     found = snap.exists();
                 } catch (e) {
                     console.log("Firebase error:", e);
+                    if (e.message === "timeout") {
+                        msg.innerHTML = "<div class='error-message'>אין תגובה מהשרת - ממשיך עם שמירה מקומית</div>";
+                    }
                 }
             }
 
@@ -296,6 +326,8 @@
 
             if (found) {
                 msg.innerHTML = "<div class='error-message'>שם קיים כבר</div>";
+                loginBtn.disabled = false;
+                registerBtn.disabled = false;
                 return;
             }
 
@@ -310,13 +342,16 @@
 
             if (firebaseInit) {
                 try {
-                    await database.ref("users/" + user).set(newUser);
+                    await withTimeout(database.ref("users/" + user).set(newUser), 7000);
                 } catch (e) {
                     console.log("Firebase error:", e);
                 }
             }
 
             cookies = 0;
+            for (let key in buildings) {
+                buildings[key].count = 0;
+            }
             calcCPS();
             updateDisplay();
             makeShop();
@@ -324,6 +359,9 @@
             setTimeout(function() {
                 document.getElementById("loginScreen").style.display = "none";
             }, 1000);
+
+            loginBtn.disabled = false;
+            registerBtn.disabled = false;
         }
 
         function openSettings() {
@@ -351,6 +389,7 @@
                 document.getElementById("settingsModal").style.display = "none";
                 document.getElementById("usernameInput").value = "";
                 document.getElementById("passwordInput").value = "";
+                document.getElementById("loginMessage").innerHTML = "";
             }
         }
 
@@ -379,9 +418,6 @@
         }, 1000);
 
         window.onload = function() {
-            if (localStorage.getItem("cookieUsers")) {
-                users = JSON.parse(localStorage.getItem("cookieUsers"));
-            }
             updateDisplay();
             makeShop();
         };
