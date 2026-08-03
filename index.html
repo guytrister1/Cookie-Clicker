@@ -1489,21 +1489,35 @@ function openAdminModal() {
         document.getElementById("adminPasswordInput").value = "";
     }
 }
+var ADMIN_PASSWORD_HASH = "כאן_יבוא_ה-HASH";
+
+async function sha256Hex(str) {
+    var enc = new TextEncoder();
+    var data = enc.encode(str);
+    var hashBuffer = await crypto.subtle.digest("SHA-256", data);
+    var hashArray = Array.from(new Uint8Array(hashBuffer));
+    return hashArray.map(function(b) { return b.toString(16).padStart(2, "0"); }).join("");
+}
+
 function verifyAdmin() {
     var pass = document.getElementById("adminPasswordInput").value;
     var msg = document.getElementById("adminMessage");
-    if (pass === "גיארון7865") {
-        msg.innerHTML = "<div class='success-message'>גישה אושרה!</div>";
-        isAdminSession = true;
-        if (currentUid) {
-            usersCache[currentUid].adminVerified = true;
-            withTimeout(database.ref("users/" + currentUid + "/adminVerified").set(true), 10000).catch(function(e){ console.log(e); });
+    msg.innerHTML = "<div class='info-message'>בודק...</div>";
+
+    sha256Hex(pass).then(function(hash) {
+        if (hash === ADMIN_PASSWORD_HASH) {
+            msg.innerHTML = "<div class='success-message'>גישה אושרה!</div>";
+            isAdminSession = true;
+            if (currentUid) {
+                usersCache[currentUid].adminVerified = true;
+                withTimeout(database.ref("users/" + currentUid + "/adminVerified").set(true), 10000).catch(function(e){ console.log(e); });
+            }
+            showAdminSections();
+            renderChat();
+        } else {
+            msg.innerHTML = "<div class='error-message'>סיסמה שגויה</div>";
         }
-        showAdminSections();
-        renderChat();
-    } else {
-        msg.innerHTML = "<div class='error-message'>סיסמה שגויה</div>";
-    }
+    });
 }
 
 function findUserByUsername(username) {
