@@ -905,7 +905,7 @@ function finishLogin(uid, data) {
     prestigeLevel = data.prestigeLevel || 0;
     prestigeMultiplier = data.prestigeMultiplier || 1;
     currentClub = data.club || null;
-    isAdminSession = localStorage.getItem("adminVerified_" + uid) === "1";
+    isAdminSession = data.adminVerified === true;
 
     for (var k in buildings) buildings[k].count = (data.buildings && data.buildings[k]) ? (data.buildings[k].count||0) : 0;
     for (var k2 in clickUpgrades) clickUpgrades[k2].level = (data.clickUpgrades && data.clickUpgrades[k2]) ? (data.clickUpgrades[k2].level||0) : 0;
@@ -1112,7 +1112,10 @@ function verifyAdmin() {
         document.getElementById("moderationListsSection").style.display = "block";
         msg.innerHTML = "<div class='success-message'>גישה אושרה!</div>";
         isAdminSession = true;
-        if (currentUid) localStorage.setItem("adminVerified_" + currentUid, "1");
+        if (currentUid) {
+            usersCache[currentUid].adminVerified = true;
+            withTimeout(database.ref("users/" + currentUid + "/adminVerified").set(true), 10000).catch(function(e){ console.log(e); });
+        }
         loadModerationLists();
         renderChat();
     } else {
