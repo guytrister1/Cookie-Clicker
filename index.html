@@ -547,6 +547,31 @@ function isEventActive(type) {
 function getEventData(type) {
     return isEventActive(type) ? activeEvents[type] : null;
 }
+    function setupModerationListenerForSelf() {
+    if (!firebaseInit || !currentUid) return;
+
+    database.ref("moderation/bans/" + currentUid).on("value", function(snap) {
+        if (!snap.exists()) return;
+        var ban = snap.val();
+        if (ban.until === null || ban.until > Date.now()) {
+            var untilText = ban.until === null ? "לצמיתות" : ("עד " + new Date(ban.until).toLocaleString("he-IL"));
+            alert("🚫 נחסמת מהמשחק " + untilText);
+            saveUserData().finally(function() {
+                auth.signOut().then(function() { resetLocalState(); });
+            });
+        }
+    });
+
+    database.ref("moderation/pendingWarnings/" + currentUid).on("value", function(snap) {
+        if (!snap.exists()) return;
+        var messages = [];
+        snap.forEach(function(child) { messages.push(child.val().message); });
+        if (messages.length === 0) return;
+        document.getElementById("warningPopupText").textContent = messages.join(" | ");
+        document.getElementById("warningPopupModal").style.display = "flex";
+        database.ref("moderation/pendingWarnings/" + currentUid).remove();
+    });
+}
 
 function calcClickPower() {
     clickPower = 1;
@@ -1868,6 +1893,7 @@ function startGameLoops() {
     loopsStarted = true;
     makeFloatingCookies();
     setupChatListener();
+    setupModerationListenerForSelf();
     setupEventListener();
     setupBroadcastListener();
     renderChat();
