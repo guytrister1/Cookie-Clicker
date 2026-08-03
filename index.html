@@ -1622,6 +1622,7 @@ function joinClub() {
     withTimeout(database.ref("clubs/" + code).once("value"), 10000).then(function(snap) {
         if (!snap.exists()) { msg.innerHTML = "<div class='error-message'>מועדון לא נמצא</div>"; return; }
         var club = snap.val();
+        if (!club.members) club.members = [];
         club.members.push({ uid: currentUid, username: currentUsername, role:"חבר רגיל", joinDate:Date.now() });
         clubsCache[code] = club;
         return withTimeout(database.ref("clubs/" + code).set(club), 10000).then(function() {
@@ -1638,7 +1639,6 @@ function joinClub() {
         msg.innerHTML = "<div class='error-message'>שגיאה: " + (e.message||e.code) + "</div>";
     });
 }
-
 function createClub() {
     var name = document.getElementById("clubNameInput").value.trim();
     var msg = document.getElementById("createClubMessage");
