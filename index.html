@@ -784,11 +784,27 @@ function debugForceLeaveClub() {
     var msg = document.getElementById("debugMessage");
     if (!currentUid) { msg.innerHTML = "<div class='error-message'>התחבר קודם</div>"; return; }
 
+    var clubCode = currentClub || (usersCache[currentUid] && usersCache[currentUid].club);
+
     currentClub = null;
     if (usersCache[currentUid]) usersCache[currentUid].club = null;
     updateClubButtons();
 
-    withTimeout(database.ref("users/" + currentUid + "/club").set(null), 10000).then(function() {
+    var p = withTimeout(database.ref("users/" + currentUid + "/club").set(null), 10000);
+
+    if (clubCode) {
+        p = p.then(function() {
+            return withTimeout(database.ref("clubs/" + clubCode).once("value"), 10000);
+        }).then(function(snap) {
+            if (!snap.exists()) return;
+            var club = snap.val();
+            club.members = (club.members || []).filter(function(m) { return m.uid !== currentUid; });
+            return withTimeout(database.ref("clubs/" + clubCode + "/members").set(club.members), 10000);
+        });
+        delete clubsCache[clubCode];
+    }
+
+    p.then(function() {
         msg.innerHTML = "<div class='success-message'>עזבת את המועדון בהצלחה!</div>";
     }).catch(function(e) {
         msg.innerHTML = "<div class='error-message'>שגיאה: " + (e.message||e.code) + "</div>";
