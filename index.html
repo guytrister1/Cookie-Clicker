@@ -26,6 +26,7 @@ body { font-family:Arial, sans-serif; background:linear-gradient(45deg,#FF6B6B,#
 .club-button:hover, .donate-button:hover { transform:translateY(-2px); }
 .settings-button { position:fixed; top:20px; right:20px; background:linear-gradient(45deg,#34495E,#2C3E50); color:white; padding:10px 20px; border:none; border-radius:15px; font-size:1rem; font-weight:bold; cursor:pointer; z-index:1000; }
 .admin-button { position:fixed; top:80px; right:20px; background:linear-gradient(45deg,#9B59B6,#8E44AD); color:white; padding:10px 20px; border:none; border-radius:15px; font-size:1rem; font-weight:bold; cursor:pointer; z-index:1000; border:2px solid rgba(255,255,255,0.3); }
+.debug-button { position:fixed; top:140px; right:20px; background:linear-gradient(45deg,#7F8C8D,#2C3E50); color:white; padding:10px 20px; border:none; border-radius:15px; font-size:1rem; font-weight:bold; cursor:pointer; z-index:1000; border:2px dashed rgba(255,255,255,0.4); }
 .modal { position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.8); display:none; justify-content:center; align-items:center; z-index:5000; }
 .modal-content { background:rgba(255,255,255,0.95); padding:30px; border-radius:20px; text-align:center; box-shadow:0 20px 60px rgba(0,0,0,0.3); min-width:350px; max-width:500px; max-height:80vh; overflow-y:auto; }
 .modal-content h3 { color:#2C3E50; margin-bottom:20px; font-size:1.8rem; }
@@ -157,6 +158,16 @@ body { font-family:Arial, sans-serif; background:linear-gradient(45deg,#FF6B6B,#
 
 <button class="settings-button" onclick="openSettingsModal()">⚙️ הגדרות</button>
 <button class="admin-button" onclick="openAdminModal()">👑 מסך יוצר</button>
+<button class="debug-button" onclick="openDebugModal()">🐛 מצב באגים</button>
+
+<div class="modal" id="debugModal">
+    <div class="modal-content">
+        <h3>🐛 מצב באגים</h3>
+        <button class="danger-button" onclick="debugForceLeaveClub()">עזוב מועדון</button>
+        <button class="close-button" onclick="closeModal('debugModal')">סגור</button>
+        <div id="debugMessage"></div>
+    </div>
+</div>
 
 <div class="modal" id="joinClubModal">
     <div class="modal-content">
@@ -762,6 +773,26 @@ function prestige() {
         showAchievement({ name:"איפוס יוקרה!", desc:"רמה "+prestigeLevel, emoji:"⭐" });
         saveUserData();
     }
+}
+
+// ---------- DEBUG ----------
+function openDebugModal() {
+    document.getElementById("debugMessage").innerHTML = "";
+    document.getElementById("debugModal").style.display = "flex";
+}
+function debugForceLeaveClub() {
+    var msg = document.getElementById("debugMessage");
+    if (!currentUid) { msg.innerHTML = "<div class='error-message'>התחבר קודם</div>"; return; }
+
+    currentClub = null;
+    if (usersCache[currentUid]) usersCache[currentUid].club = null;
+    updateClubButtons();
+
+    withTimeout(database.ref("users/" + currentUid + "/club").set(null), 10000).then(function() {
+        msg.innerHTML = "<div class='success-message'>עזבת את המועדון בהצלחה!</div>";
+    }).catch(function(e) {
+        msg.innerHTML = "<div class='error-message'>שגיאה: " + (e.message||e.code) + "</div>";
+    });
 }
 
 // ---------- BROADCAST (הודעה מהאדמין לכולם) ----------
