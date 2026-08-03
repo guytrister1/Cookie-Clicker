@@ -33,8 +33,11 @@ body { font-family:Arial, sans-serif; background:linear-gradient(45deg,#FF6B6B,#
 .modal-content button { background:linear-gradient(45deg,#4ECDC4,#45B7D1); color:white; padding:12px 25px; border:none; border-radius:10px; font-size:1.05rem; cursor:pointer; margin:8px 5px; }
 .modal-content button:disabled { opacity:0.6; cursor:not-allowed; }
 .close-button { background:linear-gradient(45deg,#E74C3C,#C0392B) !important; }
+.danger-button { background:linear-gradient(45deg,#C0392B,#922B21) !important; }
 .settings-section, .admin-section { background:rgba(0,0,0,0.05); padding:18px; margin:12px 0; border-radius:15px; }
 .settings-section h4, .admin-section h4 { color:#2C3E50; margin-bottom:12px; font-size:1.2rem; }
+.danger-section { background:rgba(231,76,60,0.08); border:2px solid rgba(231,76,60,0.25); }
+.danger-section h4 { color:#C0392B; }
 .gender-selector { display:flex; justify-content:center; gap:15px; margin:12px 0; }
 .gender-option { display:flex; align-items:center; gap:6px; padding:8px 14px; background:rgba(0,0,0,0.05); border-radius:10px; cursor:pointer; border:2px solid transparent; }
 .gender-option.selected { background:rgba(52,152,219,0.3); border-color:#3498DB; }
@@ -51,11 +54,14 @@ body { font-family:Arial, sans-serif; background:linear-gradient(45deg,#FF6B6B,#
 .chat-container.minimized { height:48px; overflow:hidden; }
 .chat-header { background:linear-gradient(45deg,#4ECDC4,#45B7D1); color:white; padding:12px 15px; border-radius:13px 13px 0 0; display:flex; justify-content:space-between; cursor:pointer; font-weight:bold; }
 .chat-messages { flex:1; padding:10px; overflow-y:auto; background:rgba(255,255,255,0.85); }
-.chat-message { margin-bottom:6px; padding:6px 10px; border-radius:10px; font-size:0.85rem; }
+.msg-row { display:flex; align-items:flex-end; gap:4px; margin-bottom:6px; }
+.chat-message { padding:6px 10px; border-radius:10px; font-size:0.85rem; }
 .chat-message.own { background:linear-gradient(45deg,#4ECDC4,#45B7D1); color:white; margin-left:18px; }
 .chat-message.other { background:rgba(0,0,0,0.06); margin-right:18px; }
-.chat-message.sys { background:linear-gradient(45deg,#F39C12,#E67E22); color:white; text-align:center; }
-.message-sender { font-weight:bold; font-size:0.75rem; opacity:0.8; }
+.chat-message.sys { background:linear-gradient(45deg,#F39C12,#E67E22); color:white; text-align:center; margin-bottom:6px; }
+.message-sender { font-weight:bold; font-size:0.72rem; opacity:0.75; margin-bottom:2px; }
+.msg-dots-btn { background:rgba(0,0,0,0.08); border:none; border-radius:8px; cursor:pointer; font-size:1rem; color:#555; padding:2px 7px; align-self:center; flex-shrink:0; }
+.msg-dots-btn:hover { background:rgba(0,0,0,0.2); }
 .chat-input-container { display:flex; padding:8px; gap:6px; }
 .chat-input { flex:1; padding:8px 12px; border:2px solid #ddd; border-radius:20px; font-size:0.85rem; }
 .chat-send-btn { background:linear-gradient(45deg,#4ECDC4,#45B7D1); color:white; border:none; padding:8px 14px; border-radius:20px; cursor:pointer; }
@@ -210,6 +216,12 @@ body { font-family:Arial, sans-serif; background:linear-gradient(45deg,#FF6B6B,#
             </div>
             <button id="changeGenderBtn" onclick="changeGender()">עדכן מגדר</button>
         </div>
+        <div class="settings-section danger-section">
+            <h4>🗑️ מחיקת חשבון</h4>
+            <p style="font-size:0.85rem; color:#922B21; margin-bottom:10px;">פעולה זו תמחק לצמיתות את החשבון וההתקדמות שלך. לא ניתן לבטל!</p>
+            <input type="password" id="deleteAccountPasswordInput" placeholder="הזן סיסמה לאישור">
+            <button class="danger-button" id="deleteAccountBtn" onclick="deleteMyAccount()">מחק את החשבון שלי לצמיתות</button>
+        </div>
         <button class="close-button" onclick="doLogout()">🚪 התנתק</button>
         <button class="close-button" onclick="closeModal('settingsModal')">סגור</button>
         <div id="settingsMessage"></div>
@@ -231,8 +243,78 @@ body { font-family:Arial, sans-serif; background:linear-gradient(45deg,#FF6B6B,#
             <input type="number" id="cookieAmountInput" placeholder="כמות עוגיות" min="1">
             <button id="adminTransferBtn" onclick="adminTransferCookies()">העבר עוגיות</button>
         </div>
+        <div class="admin-section danger-section" id="adminDeleteSection" style="display:none;">
+            <h4>🗑️ מחיקת שחקן</h4>
+            <p style="font-size:0.85rem; color:#922B21; margin-bottom:10px;">מוחק את נתוני המשחק של השחקן. לא ניתן לבטל!</p>
+            <input type="text" id="deleteTargetPlayerInput" placeholder="שם השחקן למחיקה">
+            <button class="danger-button" id="adminDeleteBtn" onclick="adminDeleteUser()">מחק שחקן</button>
+        </div>
+        <div class="admin-section" id="moderationListsSection" style="display:none;">
+            <h4>📋 ניהול קהילה</h4>
+            <button onclick="loadModerationLists()">🔄 רענן רשימות</button>
+            <div style="text-align:right; margin-top:12px;">
+                <strong>🚫 באנים פעילים:</strong>
+                <div id="bansListDiv" style="margin-top:6px;"></div>
+            </div>
+            <div style="text-align:right; margin-top:12px;">
+                <strong>🔇 חסימות צ'אט פעילות:</strong>
+                <div id="mutesListDiv" style="margin-top:6px;"></div>
+            </div>
+            <div style="text-align:right; margin-top:12px;">
+                <strong>⚠️ שחקנים עם אזהרות:</strong>
+                <div id="warningsListDiv" style="margin-top:6px;"></div>
+            </div>
+        </div>
         <button class="close-button" onclick="closeModal('adminModal')">סגור</button>
         <div id="adminMessage"></div>
+    </div>
+</div>
+
+<div class="modal" id="moderationModal">
+    <div class="modal-content">
+        <h3>🛡️ פעולת מנהל</h3>
+        <div class="current-info">שחקן: <span id="modTargetName"></span></div>
+
+        <div class="admin-section danger-section">
+            <h4>🚫 חסימת כניסה למשחק (באן)</h4>
+            <div style="display:flex; gap:5px;">
+                <input type="number" id="banDaysInput" placeholder="ימים" min="0" style="width:33%;">
+                <input type="number" id="banHoursInput" placeholder="שעות" min="0" style="width:33%;">
+                <input type="number" id="banMinutesInput" placeholder="דקות" min="0" style="width:33%;">
+            </div>
+            <button class="danger-button" onclick="applyBan(false)">חסום לזמן שנבחר</button>
+            <button class="danger-button" onclick="applyBan(true)">חסום לצמיתות</button>
+            <button onclick="removeBan()">הסר חסימה</button>
+        </div>
+
+        <div class="admin-section danger-section">
+            <h4>🔇 חסימת צ'אט (Mute)</h4>
+            <div style="display:flex; gap:5px;">
+                <input type="number" id="muteDaysInput" placeholder="ימים" min="0" style="width:33%;">
+                <input type="number" id="muteHoursInput" placeholder="שעות" min="0" style="width:33%;">
+                <input type="number" id="muteMinutesInput" placeholder="דקות" min="0" style="width:33%;">
+            </div>
+            <button class="danger-button" onclick="applyMute(false)">חסום צ'אט לזמן שנבחר</button>
+            <button class="danger-button" onclick="applyMute(true)">חסום צ'אט לצמיתות</button>
+            <button onclick="removeMute()">הסר חסימת צ'אט</button>
+        </div>
+
+        <div class="admin-section">
+            <h4>⚠️ שליחת אזהרה</h4>
+            <input type="text" id="warnTextInput" placeholder="תוכן האזהרה">
+            <button class="danger-button" onclick="sendWarning()">שלח אזהרה</button>
+        </div>
+
+        <button class="close-button" onclick="closeModal('moderationModal')">סגור</button>
+        <div id="moderationMessage"></div>
+    </div>
+</div>
+
+<div class="modal" id="warningPopupModal">
+    <div class="modal-content">
+        <h3>⚠️ אזהרה!</h3>
+        <div id="warningPopupText" style="font-size:1.1rem; color:#C0392B; font-weight:bold; margin:15px 0;"></div>
+        <button class="close-button" onclick="closeModal('warningPopupModal')">הבנתי</button>
     </div>
 </div>
 
@@ -280,8 +362,9 @@ var firebaseConfig = {
     projectId: "logi2-467e6",
     storageBucket: "logi2-467e6.firebasestorage.app",
     messagingSenderId: "263662852070",
-    appId: "1:263662852070:web:ed2c3cdb5eca7b2ef62827"
+    appId: "1:263662852070:web:ed2c3cdb5eca7b2ef82827"
 };
+
 var database, auth;
 var firebaseInit = false;
 try {
@@ -308,7 +391,6 @@ function withTimeout(promise, ms) {
     ]);
 }
 
-// שם משתמש -> אימייל מזויף שרק Firebase Auth רואה. המשתמש עצמו לעולם לא מזין/רואה אימייל.
 function emailFor(username) {
     return username.toLowerCase().replace(/[^a-z0-9\u0590-\u05FF]/g, "") + "@cookiegame.local";
 }
@@ -321,8 +403,10 @@ var currentUid = null, currentUsername = null, currentClub = null;
 var usersCache = {};
 var clubsCache = {};
 var chatMessages = [];
-var selectedDonationTarget = null; // {uid, username}
+var selectedDonationTarget = null;
 var unlockedAchievements = [];
+var isAdminSession = false;
+var moderationTargetUid = null, moderationTargetName = null;
 
 var buildings = {
     cursor: { name:"סמן אוטומטי", emoji:"👆", description:"לוחץ אוטומטית", baseCost:15, cps:0.1, count:0 },
@@ -551,7 +635,174 @@ function prestige() {
     }
 }
 
-// ---------- AUTH (Firebase Authentication עם אימייל מזויף) ----------
+// ---------- MODERATION (חסימות / התראות) ----------
+function checkPendingWarnings(uid) {
+    return withTimeout(database.ref("moderation/pendingWarnings/" + uid).once("value"), 10000).then(function(snap) {
+        if (!snap.exists()) return;
+        var messages = [];
+        snap.forEach(function(child) { messages.push(child.val().message); });
+        document.getElementById("warningPopupText").textContent = messages.join(" | ");
+        document.getElementById("warningPopupModal").style.display = "flex";
+        return withTimeout(database.ref("moderation/pendingWarnings/" + uid).remove(), 10000);
+    }).catch(function(e) { console.log("Warning check failed:", e); });
+}
+
+function checkBanThenProceed(uid, data, msgEl) {
+    return withTimeout(database.ref("moderation/bans/" + uid).once("value"), 10000).then(function(banSnap) {
+        if (banSnap.exists()) {
+            var ban = banSnap.val();
+            if (ban.until === null || ban.until > Date.now()) {
+                auth.signOut();
+                var untilText = ban.until === null ? "לצמיתות" : ("עד " + new Date(ban.until).toLocaleString("he-IL"));
+                if (msgEl) msgEl.innerHTML = "<div class='error-message'>🚫 החשבון חסום " + untilText + "</div>";
+                throw new Error("banned");
+            }
+        }
+        finishLogin(uid, data);
+        return checkPendingWarnings(uid);
+    });
+}
+
+function openModerationModal(uid, username) {
+    moderationTargetUid = uid; moderationTargetName = username;
+    document.getElementById("modTargetName").textContent = username;
+    document.getElementById("banDaysInput").value = "";
+    document.getElementById("banHoursInput").value = "";
+    document.getElementById("banMinutesInput").value = "";
+    document.getElementById("muteDaysInput").value = "";
+    document.getElementById("muteHoursInput").value = "";
+    document.getElementById("muteMinutesInput").value = "";
+    document.getElementById("warnTextInput").value = "";
+    document.getElementById("moderationMessage").innerHTML = "";
+    document.getElementById("moderationModal").style.display = "flex";
+}
+
+function msFromDuration(prefix) {
+    var d = parseInt(document.getElementById(prefix+"DaysInput").value)||0;
+    var h = parseInt(document.getElementById(prefix+"HoursInput").value)||0;
+    var mnt = parseInt(document.getElementById(prefix+"MinutesInput").value)||0;
+    return (d*86400 + h*3600 + mnt*60) * 1000;
+}
+
+function applyBan(permanent) {
+    var msg = document.getElementById("moderationMessage");
+    var durationMs = permanent ? 0 : msFromDuration("ban");
+    if (!permanent && durationMs <= 0) { msg.innerHTML = "<div class='error-message'>בחר משך זמן</div>"; return; }
+    var until = permanent ? null : (Date.now() + durationMs);
+    var data = { username: moderationTargetName, until: until, bannedAt: Date.now(), bannedBy: currentUsername };
+    withTimeout(database.ref("moderation/bans/" + moderationTargetUid).set(data), 10000).then(function() {
+        msg.innerHTML = "<div class='success-message'>השחקן נחסם" + (permanent ? " לצמיתות" : "") + "!</div>";
+        loadModerationLists();
+    }).catch(function(e) { msg.innerHTML = "<div class='error-message'>שגיאה: " + (e.message||e.code) + "</div>"; });
+}
+
+function removeBan() {
+    var msg = document.getElementById("moderationMessage");
+    withTimeout(database.ref("moderation/bans/" + moderationTargetUid).remove(), 10000).then(function() {
+        msg.innerHTML = "<div class='success-message'>החסימה הוסרה!</div>";
+        loadModerationLists();
+    }).catch(function(e) { msg.innerHTML = "<div class='error-message'>שגיאה: " + (e.message||e.code) + "</div>"; });
+}
+
+function applyMute(permanent) {
+    var msg = document.getElementById("moderationMessage");
+    var durationMs = permanent ? 0 : msFromDuration("mute");
+    if (!permanent && durationMs <= 0) { msg.innerHTML = "<div class='error-message'>בחר משך זמן</div>"; return; }
+    var until = permanent ? null : (Date.now() + durationMs);
+    var data = { username: moderationTargetName, until: until, mutedAt: Date.now(), mutedBy: currentUsername };
+    withTimeout(database.ref("moderation/mutes/" + moderationTargetUid).set(data), 10000).then(function() {
+        msg.innerHTML = "<div class='success-message'>הצ'אט נחסם" + (permanent ? " לצמיתות" : "") + "!</div>";
+        loadModerationLists();
+    }).catch(function(e) { msg.innerHTML = "<div class='error-message'>שגיאה: " + (e.message||e.code) + "</div>"; });
+}
+
+function removeMute() {
+    var msg = document.getElementById("moderationMessage");
+    withTimeout(database.ref("moderation/mutes/" + moderationTargetUid).remove(), 10000).then(function() {
+        msg.innerHTML = "<div class='success-message'>חסימת הצ'אט הוסרה!</div>";
+        loadModerationLists();
+    }).catch(function(e) { msg.innerHTML = "<div class='error-message'>שגיאה: " + (e.message||e.code) + "</div>"; });
+}
+
+function sendWarning() {
+    var text = document.getElementById("warnTextInput").value.trim();
+    var msg = document.getElementById("moderationMessage");
+    if (!text) { msg.innerHTML = "<div class='error-message'>הזן תוכן אזהרה</div>"; return; }
+    var warningData = { username: moderationTargetName, message: text, at: Date.now(), by: currentUsername };
+    var uid = moderationTargetUid;
+    withTimeout(database.ref("moderation/warnings/" + uid).push(warningData), 10000).then(function() {
+        return withTimeout(database.ref("moderation/pendingWarnings/" + uid).push(warningData), 10000);
+    }).then(function() {
+        msg.innerHTML = "<div class='success-message'>האזהרה נשלחה!</div>";
+        document.getElementById("warnTextInput").value = "";
+        loadModerationLists();
+    }).catch(function(e) { msg.innerHTML = "<div class='error-message'>שגיאה: " + (e.message||e.code) + "</div>"; });
+}
+
+function loadModerationLists() {
+    withTimeout(database.ref("moderation/bans").once("value"), 10000).then(function(snap) {
+        var div = document.getElementById("bansListDiv");
+        div.innerHTML = "";
+        if (!snap.exists()) { div.innerHTML = "<div style='color:#888;'>אין באנים פעילים</div>"; return; }
+        snap.forEach(function(child) {
+            var b = child.val();
+            var row = document.createElement("div");
+            row.className = "player-item";
+            row.innerHTML = "<div class='player-name'>" + b.username + " - " + (b.until===null?"לצמיתות":new Date(b.until).toLocaleString("he-IL")) + "</div>";
+            var btn = document.createElement("button");
+            btn.textContent = "הסר";
+            btn.className = "danger-button";
+            btn.style.marginTop = "5px";
+            var uidKey = child.key;
+            btn.onclick = function() {
+                withTimeout(database.ref("moderation/bans/" + uidKey).remove(), 10000).then(loadModerationLists);
+            };
+            row.appendChild(btn);
+            div.appendChild(row);
+        });
+    }).catch(function(e){ console.log(e); });
+
+    withTimeout(database.ref("moderation/mutes").once("value"), 10000).then(function(snap) {
+        var div = document.getElementById("mutesListDiv");
+        div.innerHTML = "";
+        if (!snap.exists()) { div.innerHTML = "<div style='color:#888;'>אין חסימות צ'אט פעילות</div>"; return; }
+        snap.forEach(function(child) {
+            var m = child.val();
+            var row = document.createElement("div");
+            row.className = "player-item";
+            row.innerHTML = "<div class='player-name'>" + m.username + " - " + (m.until===null?"לצמיתות":new Date(m.until).toLocaleString("he-IL")) + "</div>";
+            var btn = document.createElement("button");
+            btn.textContent = "הסר";
+            btn.className = "danger-button";
+            btn.style.marginTop = "5px";
+            var uidKey = child.key;
+            btn.onclick = function() {
+                withTimeout(database.ref("moderation/mutes/" + uidKey).remove(), 10000).then(loadModerationLists);
+            };
+            row.appendChild(btn);
+            div.appendChild(row);
+        });
+    }).catch(function(e){ console.log(e); });
+
+    withTimeout(database.ref("moderation/warnings").once("value"), 10000).then(function(snap) {
+        var div = document.getElementById("warningsListDiv");
+        div.innerHTML = "";
+        if (!snap.exists()) { div.innerHTML = "<div style='color:#888;'>אין שחקנים עם אזהרות</div>"; return; }
+        snap.forEach(function(child) {
+            var warningsObj = child.val();
+            var list = Object.keys(warningsObj).map(function(k){ return warningsObj[k]; });
+            var uname = list.length ? list[0].username : child.key;
+            var row = document.createElement("div");
+            row.className = "player-item";
+            var html = "<div class='player-name'>" + uname + " (" + list.length + " אזהרות)</div>";
+            list.forEach(function(w) {
+                html += "<div style='font-size:0.8rem; color:#555; margin-top:3px;'>" + new Date(w.at).toLocaleString("he-IL") + ": " + w.message + "</div>";
+            });
+            row.innerHTML = html;
+            div.appendChild(row);
+        });
+    }).catch(function(e){ console.log(e); });
+}
 
 function login() {
     var username = document.getElementById("usernameInput").value.trim();
@@ -575,11 +826,13 @@ function login() {
         return withTimeout(database.ref("users/" + cred.user.uid).once("value"), 10000);
     }).then(function(snap) {
         if (!snap.exists()) throw new Error("no-data");
-        finishLogin(auth.currentUser.uid, snap.val());
+        return checkBanThenProceed(auth.currentUser.uid, snap.val(), msg);
     }).catch(function(e) {
         console.log("Login error:", e);
         var code = e.code || e.message;
-        if (code === "auth/user-not-found" || code === "auth/wrong-password" || code === "auth/invalid-credential" || code === "auth/invalid-login-credentials") {
+        if (code === "banned") {
+            // ההודעה כבר הוצגה בתוך checkBanThenProceed
+        } else if (code === "auth/user-not-found" || code === "auth/wrong-password" || code === "auth/invalid-credential" || code === "auth/invalid-login-credentials") {
             msg.innerHTML = "<div class='error-message'>שם משתמש או סיסמה שגויים</div>";
         } else if (code === "timeout") {
             msg.innerHTML = "<div class='error-message'>אין תגובה מהשרת - נסה שוב</div>";
@@ -652,6 +905,7 @@ function finishLogin(uid, data) {
     prestigeLevel = data.prestigeLevel || 0;
     prestigeMultiplier = data.prestigeMultiplier || 1;
     currentClub = data.club || null;
+    isAdminSession = localStorage.getItem("adminVerified_" + uid) === "1";
 
     for (var k in buildings) buildings[k].count = (data.buildings && data.buildings[k]) ? (data.buildings[k].count||0) : 0;
     for (var k2 in clickUpgrades) clickUpgrades[k2].level = (data.clickUpgrades && data.clickUpgrades[k2]) ? (data.clickUpgrades[k2].level||0) : 0;
@@ -666,20 +920,25 @@ function doLogout() {
     if (!confirm("להתנתק?")) return;
     saveUserData().finally(function() {
         auth.signOut().then(function() {
-            currentUid = null; currentUsername = null; currentClub = null; selectedDonationTarget = null;
-            cookies=0; cookiesPerSecond=0; clickPower=1; prestigeLevel=0; prestigeMultiplier=1;
-            totalCookiesBaked=0; goldenCookieClicks=0; totalClicks=0; unlockedAchievements=[];
-            for (var k in buildings) buildings[k].count = 0;
-            for (var k2 in clickUpgrades) clickUpgrades[k2].level = 0;
-            for (var k3 in upgrades) upgrades[k3].purchased = false;
-            document.querySelectorAll(".modal").forEach(function(m){ m.style.display="none"; });
-            document.getElementById("loginScreen").style.display = "flex";
-            document.getElementById("usernameInput").value = "";
-            document.getElementById("passwordInput").value = "";
-            document.getElementById("loginMessage").innerHTML = "";
-            updateClubButtons();
+            resetLocalState();
         });
     });
+}
+
+function resetLocalState() {
+    currentUid = null; currentUsername = null; currentClub = null; selectedDonationTarget = null;
+    cookies=0; cookiesPerSecond=0; clickPower=1; prestigeLevel=0; prestigeMultiplier=1;
+    totalCookiesBaked=0; goldenCookieClicks=0; totalClicks=0; unlockedAchievements=[];
+    isAdminSession = false;
+    for (var k in buildings) buildings[k].count = 0;
+    for (var k2 in clickUpgrades) clickUpgrades[k2].level = 0;
+    for (var k3 in upgrades) upgrades[k3].purchased = false;
+    document.querySelectorAll(".modal").forEach(function(m){ m.style.display="none"; });
+    document.getElementById("loginScreen").style.display = "flex";
+    document.getElementById("usernameInput").value = "";
+    document.getElementById("passwordInput").value = "";
+    document.getElementById("loginMessage").innerHTML = "";
+    updateClubButtons();
 }
 
 function saveUserData() {
@@ -697,13 +956,48 @@ function saveUserData() {
     return withTimeout(database.ref("users/" + currentUid).update(u), 10000).catch(function(e){ console.log("Save error:", e); });
 }
 
-// אימות מחדש נדרש ע"י Firebase לפני שינוי אימייל/סיסמה
 function reauth(currentPassword) {
     var cred = firebase.auth.EmailAuthProvider.credential(emailFor(currentUsername), currentPassword);
     return withTimeout(auth.currentUser.reauthenticateWithCredential(cred), 10000);
 }
 
-// ---------- SETTINGS ----------
+function deleteMyAccount() {
+    var pass = document.getElementById("deleteAccountPasswordInput").value;
+    var msg = document.getElementById("settingsMessage");
+    if (!pass) { msg.innerHTML = "<div class='error-message'>הזן סיסמה לאישור</div>"; return; }
+    if (!confirm("בטוח לגמרי? זה ימחק את החשבון וההתקדמות שלך לצמיתות ולא ניתן לבטל!")) return;
+
+    msg.innerHTML = "<div class='info-message'>מוחק חשבון...</div>";
+    var uidToDelete = currentUid;
+
+    reauth(pass).then(function() {
+        if (currentClub && clubsCache[currentClub]) {
+            var club = clubsCache[currentClub];
+            if (club.founderUid === uidToDelete) {
+                return withTimeout(database.ref("clubs/" + currentClub).remove(), 10000);
+            } else {
+                club.members = club.members.filter(function(m) { return m.uid !== uidToDelete; });
+                return withTimeout(database.ref("clubs/" + currentClub + "/members").set(club.members), 10000);
+            }
+        }
+        return Promise.resolve();
+    }).then(function() {
+        return withTimeout(database.ref("users/" + uidToDelete).remove(), 10000);
+    }).then(function() {
+        return withTimeout(database.ref("notifications/" + uidToDelete).remove(), 10000).catch(function(){});
+    }).then(function() {
+        return withTimeout(auth.currentUser.delete(), 10000);
+    }).then(function() {
+        alert("החשבון נמחק לצמיתות.");
+        resetLocalState();
+    }).catch(function(e) {
+        console.log(e);
+        var code = e.code || e.message;
+        if (code === "auth/wrong-password") msg.innerHTML = "<div class='error-message'>סיסמה שגויה</div>";
+        else msg.innerHTML = "<div class='error-message'>שגיאה: " + code + "</div>";
+    });
+}
+
 function openSettingsModal() {
     if (!currentUid) { alert("התחבר קודם"); return; }
     document.getElementById("currentUsername").textContent = currentUsername;
@@ -716,6 +1010,7 @@ function openSettingsModal() {
     document.getElementById("currentPasswordInput").value = "";
     document.getElementById("newPasswordInput").value = "";
     document.getElementById("confirmPasswordInput").value = "";
+    document.getElementById("deleteAccountPasswordInput").value = "";
     document.getElementById("settingsMessage").innerHTML = "";
     document.getElementById("settingsModal").style.display = "flex";
 }
@@ -742,7 +1037,6 @@ function changeUsername() {
     reauth(pass).then(function() {
         return withTimeout(auth.currentUser.updateEmail(newEmail), 10000);
     }).then(function() {
-        var oldName = currentUsername;
         currentUsername = newName;
         return withTimeout(database.ref("users/" + currentUid + "/username").set(newName), 10000).then(function() {
             if (currentClub && clubsCache[currentClub]) {
@@ -801,11 +1095,12 @@ function changeGender() {
     });
 }
 
-// ---------- ADMIN ----------
 function openAdminModal() {
     document.getElementById("adminModal").style.display = "flex";
     document.getElementById("adminPasswordInput").value = "";
     document.getElementById("adminActionsSection").style.display = "none";
+    document.getElementById("adminDeleteSection").style.display = "none";
+    document.getElementById("moderationListsSection").style.display = "none";
     document.getElementById("adminMessage").innerHTML = "";
 }
 function verifyAdmin() {
@@ -813,13 +1108,18 @@ function verifyAdmin() {
     var msg = document.getElementById("adminMessage");
     if (pass === "גיארון7865") {
         document.getElementById("adminActionsSection").style.display = "block";
+        document.getElementById("adminDeleteSection").style.display = "block";
+        document.getElementById("moderationListsSection").style.display = "block";
         msg.innerHTML = "<div class='success-message'>גישה אושרה!</div>";
+        isAdminSession = true;
+        if (currentUid) localStorage.setItem("adminVerified_" + currentUid, "1");
+        loadModerationLists();
+        renderChat();
     } else {
         msg.innerHTML = "<div class='error-message'>סיסמה שגויה</div>";
     }
 }
 
-// מחפש שחקן לפי שם-משתמש בתוך כל רשומות users/ (כי המפתח הוא uid ולא השם)
 function findUserByUsername(username) {
     return withTimeout(database.ref("users").once("value"), 10000).then(function(snap) {
         var result = null;
@@ -869,7 +1169,47 @@ function adminTransferCookies() {
     });
 }
 
-// ---------- CLUBS ----------
+function adminDeleteUser() {
+    var target = document.getElementById("deleteTargetPlayerInput").value.trim();
+    var msg = document.getElementById("adminMessage");
+    if (!target) { msg.innerHTML = "<div class='error-message'>הזן שם שחקן</div>"; return; }
+    if (!confirm("בטוח שברצונך למחוק את נתוני המשחק של '" + target + "'? לא ניתן לבטל!")) return;
+
+    msg.innerHTML = "<div class='info-message'>מוחק שחקן...</div>";
+
+    findUserByUsername(target).then(function(found) {
+        if (!found) { msg.innerHTML = "<div class='error-message'>שחקן '" + target + "' לא נמצא</div>"; return; }
+        var uid = found.uid;
+        var data = found.data;
+
+        var p = Promise.resolve();
+        if (data.club) {
+            p = withTimeout(database.ref("clubs/" + data.club).once("value"), 10000).then(function(clubSnap) {
+                if (!clubSnap.exists()) return;
+                var club = clubSnap.val();
+                if (club.founderUid === uid) {
+                    return withTimeout(database.ref("clubs/" + data.club).remove(), 10000);
+                } else {
+                    club.members = (club.members || []).filter(function(m) { return m.uid !== uid; });
+                    return withTimeout(database.ref("clubs/" + data.club + "/members").set(club.members), 10000);
+                }
+            });
+        }
+
+        return p.then(function() {
+            return withTimeout(database.ref("users/" + uid).remove(), 10000);
+        }).then(function() {
+            return withTimeout(database.ref("notifications/" + uid).remove(), 10000).catch(function(){});
+        }).then(function() {
+            msg.innerHTML = "<div class='success-message'>נתוני '" + target + "' נמחקו בהצלחה!</div>";
+            document.getElementById("deleteTargetPlayerInput").value = "";
+        });
+    }).catch(function(e) {
+        console.log(e);
+        msg.innerHTML = "<div class='error-message'>שגיאה: " + (e.message||e.code) + "</div>";
+    });
+}
+
 function openJoinClubModal() { document.getElementById("joinClubModal").style.display = "flex"; }
 function openCreateClubModal() { document.getElementById("createClubModal").style.display = "flex"; }
 function closeModal(id) { document.getElementById(id).style.display = "none"; }
@@ -1002,24 +1342,48 @@ function sendMessage() {
     var input = document.getElementById("chatInput");
     var text = input.value.trim();
     if (!text || !currentUid) return;
-    var m = { senderUid: currentUid, senderName: currentUsername, message: text, timestamp: Date.now() };
-    input.value = "";
-    withTimeout(database.ref("chat/" + Date.now()).set(m), 10000).catch(function(e) { console.log(e); });
+    withTimeout(database.ref("moderation/mutes/" + currentUid).once("value"), 8000).then(function(snap) {
+        if (snap.exists()) {
+            var mute = snap.val();
+            if (mute.until === null || mute.until > Date.now()) {
+                var untilText = mute.until === null ? "לצמיתות" : ("עד " + new Date(mute.until).toLocaleString("he-IL"));
+                alert("🔇 הצ'אט שלך חסום " + untilText);
+                return;
+            }
+        }
+        var m = { senderUid: currentUid, senderName: currentUsername, message: text, timestamp: Date.now() };
+        input.value = "";
+        withTimeout(database.ref("chat/" + Date.now()).set(m), 10000).catch(function(e) { console.log(e); });
+    }).catch(function(e) { console.log(e); });
 }
 function renderChat() {
     var box = document.getElementById("chatMessages");
     box.innerHTML = "";
     chatMessages.slice(-20).forEach(function(m) {
-        var d = document.createElement("div");
         if (m.isSystemMessage) {
+            var d = document.createElement("div");
             d.className = "chat-message sys";
             d.textContent = m.message;
-        } else {
-            d.className = "chat-message " + (m.senderUid === currentUid ? "own" : "other");
-            var senderHtml = m.senderUid !== currentUid ? "<div class='message-sender'>" + m.senderName + "</div>" : "";
-            d.innerHTML = senderHtml + "<div>" + m.message + "</div>";
+            box.appendChild(d);
+            return;
         }
-        box.appendChild(d);
+        var row = document.createElement("div");
+        row.className = "msg-row";
+        var bubble = document.createElement("div");
+        bubble.className = "chat-message " + (m.senderUid === currentUid ? "own" : "other");
+        bubble.innerHTML = "<div class='message-sender'>" + m.senderName + "</div><div>" + m.message + "</div>";
+        row.appendChild(bubble);
+        if (isAdminSession && m.senderUid !== currentUid) {
+            var dotsBtn = document.createElement("button");
+            dotsBtn.className = "msg-dots-btn";
+            dotsBtn.textContent = "⋮";
+            dotsBtn.title = "פעולות מנהל";
+            dotsBtn.addEventListener("click", (function(uid, uname) {
+                return function() { openModerationModal(uid, uname); };
+            })(m.senderUid, m.senderName));
+            row.appendChild(dotsBtn);
+        }
+        box.appendChild(row);
     });
     box.scrollTop = box.scrollHeight;
 }
@@ -1134,12 +1498,13 @@ function startGameLoops() {
 updateDisplay();
 makeShop();
 
-// זיהוי session קיים (זה מה שמחליף את מנגנון "זכור אותי" הישן - Firebase Auth שומר את זה בעצמו)
 if (firebaseInit) {
     auth.onAuthStateChanged(function(user) {
         if (user && !currentUid) {
             withTimeout(database.ref("users/" + user.uid).once("value"), 10000).then(function(snap) {
-                if (snap.exists()) finishLogin(user.uid, snap.val());
+                if (snap.exists()) {
+                    return checkBanThenProceed(user.uid, snap.val(), document.getElementById("loginMessage"));
+                }
             }).catch(function(e) { console.log("Auto-login failed:", e); });
         }
     });
