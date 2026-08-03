@@ -66,8 +66,10 @@ body { font-family:Arial, sans-serif; background:linear-gradient(45deg,#FF6B6B,#
 .chat-input-container { display:flex; padding:8px; gap:6px; }
 .chat-input { flex:1; padding:8px 12px; border:2px solid #ddd; border-radius:20px; font-size:0.85rem; }
 .chat-send-btn { background:linear-gradient(45deg,#4ECDC4,#45B7D1); color:white; border:none; padding:8px 14px; border-radius:20px; cursor:pointer; }
-.event-banner { position:fixed; top:0; left:50%; transform:translateX(-50%); background:linear-gradient(45deg,#F39C12,#E67E22); color:white; padding:10px 25px; border-radius:0 0 15px 15px; font-weight:bold; font-size:1rem; z-index:4000; box-shadow:0 5px 20px rgba(0,0,0,0.3); display:none; text-align:center; }
+.event-banner { position:fixed; top:0; left:50%; transform:translateX(-50%); background:linear-gradient(45deg,#F39C12,#E67E22); color:white; padding:8px 20px; border-radius:0 0 15px 15px; font-weight:bold; font-size:0.9rem; z-index:4000; box-shadow:0 5px 20px rgba(0,0,0,0.3); display:none; text-align:center; max-width:90vw; }
 .event-banner.show { display:block; }
+.event-banner-line { margin:2px 0; }
+.event-active-tag { background:#27AE60; color:white; font-size:0.75rem; padding:2px 8px; border-radius:8px; margin-right:5px; }
 .game-container { display:flex; width:100%; min-height:100vh; }
 .main-game { flex:1; padding:20px; display:flex; flex-direction:column; align-items:center; justify-content:center; position:relative; }
 .stats { background:rgba(255,255,255,0.25); border-radius:25px; padding:25px; margin-bottom:25px; text-align:center; border:2px solid rgba(255,255,255,0.3); min-width:300px; }
@@ -241,7 +243,7 @@ body { font-family:Arial, sans-serif; background:linear-gradient(45deg,#FF6B6B,#
     <div class="modal-content">
         <h3>👑 מסך יוצר המשחק</h3>
         <div class="admin-warning">⚠️ אזור מוגבל ליוצרים בלבד ⚠️</div>
-        <div class="admin-section">
+        <div class="admin-section" id="adminAuthSection">
             <h4>🔐 אימות</h4>
             <input type="password" id="adminPasswordInput" placeholder="סיסמת יוצר">
             <button id="verifyAdminBtn" onclick="verifyAdmin()">אמת גישה</button>
@@ -266,14 +268,16 @@ body { font-family:Arial, sans-serif; background:linear-gradient(45deg,#FF6B6B,#
             <div style="text-align:right; margin-top:12px;"><strong>⚠️ שחקנים עם אזהרות:</strong><div id="warningsListDiv" style="margin-top:6px;"></div></div>
         </div>
         <div class="admin-section" id="eventsSection" style="display:none;">
-            <h4>🎉 ניהול אירועים</h4>
-            <div style="text-align:right; margin-bottom:10px;"><strong>מצב נוכחי:</strong> <span id="currentEventStatus">אין אירוע פעיל</span></div>
+            <h4>🎉 ניהול אירועים (ניתן להפעיל כמה ביחד)</h4>
+            <div style="text-align:right; margin-bottom:10px;"><strong>אירועים פעילים כרגע:</strong></div>
+            <div id="currentEventsStatus" style="margin-bottom:15px;"></div>
 
             <div style="margin-bottom:15px; text-align:right;">
                 <strong>🌟 גשם עוגיות זהב</strong>
                 <input type="number" id="rainDurationInput" placeholder="משך בדקות" min="1" value="10">
                 <input type="number" id="rainBonusInput" placeholder="בונוס קבוע לכל עוגיית זהב" min="1" value="1000000000">
                 <button onclick="startRainEvent()">הפעל</button>
+                <button class="danger-button" onclick="endEvent('golden_rain')">עצור</button>
             </div>
 
             <div style="margin-bottom:15px; text-align:right;">
@@ -281,6 +285,7 @@ body { font-family:Arial, sans-serif; background:linear-gradient(45deg,#FF6B6B,#
                 <input type="number" id="cpsDurationInput" placeholder="משך בדקות" min="1" value="10">
                 <select id="cpsMultiplierSelect"><option value="2">x2</option><option value="3">x3</option></select>
                 <button onclick="startCpsEvent()">הפעל</button>
+                <button class="danger-button" onclick="endEvent('double_cps')">עצור</button>
             </div>
 
             <div style="margin-bottom:15px; text-align:right;">
@@ -288,16 +293,18 @@ body { font-family:Arial, sans-serif; background:linear-gradient(45deg,#FF6B6B,#
                 <input type="number" id="discountDurationInput" placeholder="משך בדקות" min="1" value="10">
                 <input type="number" id="discountPercentInput" placeholder="אחוז הנחה" min="1" max="90" value="30">
                 <button onclick="startDiscountEvent()">הפעל</button>
+                <button class="danger-button" onclick="endEvent('shop_discount')">עצור</button>
             </div>
 
             <div style="margin-bottom:15px; text-align:right;">
-                <strong>👆 כפל כוח לחיצה (בונוס קבוע לשדרוגי לחיצה שנקנים בזמן האירוע)</strong>
+                <strong>👆 כפל כוח לחיצה (בונוס קבוע לשדרוגים שנקנים בזמן האירוע)</strong>
                 <input type="number" id="clickDurationInput" placeholder="משך בדקות" min="1" value="10">
                 <select id="clickMultiplierSelect"><option value="2">x2</option><option value="3">x3</option></select>
                 <button onclick="startClickEvent()">הפעל</button>
+                <button class="danger-button" onclick="endEvent('double_click')">עצור</button>
             </div>
 
-            <button class="danger-button" onclick="endEventNow()">⏹️ סיים אירוע נוכחי מיידית</button>
+            <button class="danger-button" onclick="endAllEvents()">⏹️ עצור את כל האירועים</button>
 
             <div class="settings-section" style="margin-top:20px;">
                 <h4>🎁 מתנה לכל השחקנים</h4>
@@ -449,7 +456,7 @@ var selectedDonationTarget = null;
 var unlockedAchievements = [];
 var isAdminSession = false;
 var moderationTargetUid = null, moderationTargetName = null;
-var activeEvent = null;
+var activeEvents = {}; // מפתח = סוג האירוע, ערך = נתוני האירוע. מאפשר כמה אירועים בו-זמנית
 
 var buildings = {
     cursor: { name:"סמן אוטומטי", emoji:"👆", description:"לוחץ אוטומטית", baseCost:15, cps:0.1, count:0, extraCps:0 },
@@ -507,7 +514,11 @@ function formatNum(num) {
 }
 
 function isEventActive(type) {
-    return activeEvent && activeEvent.type === type && activeEvent.endTime > Date.now();
+    var ev = activeEvents[type];
+    return ev && ev.endTime > Date.now();
+}
+function getEventData(type) {
+    return isEventActive(type) ? activeEvents[type] : null;
 }
 
 function calcClickPower() {
@@ -533,23 +544,21 @@ function updateDisplay() {
 
 function getCost(b) {
     var base = Math.floor(b.baseCost * Math.pow(1.15, b.count));
-    if (isEventActive("shop_discount")) {
-        return Math.floor(base * (1 - activeEvent.discount / 100));
-    }
+    var discountEv = getEventData("shop_discount");
+    if (discountEv) return Math.floor(base * (1 - discountEv.discount / 100));
     return base;
 }
 function getClickCost(u) {
     var base = Math.floor(u.baseCost * Math.pow(2, u.level));
-    if (isEventActive("shop_discount")) {
-        return Math.floor(base * (1 - activeEvent.discount / 100));
-    }
+    var discountEv = getEventData("shop_discount");
+    if (discountEv) return Math.floor(base * (1 - discountEv.discount / 100));
     return base;
 }
 
 function makeShop() {
-    var discountActive = isEventActive("shop_discount");
-    var cpsEventActive = isEventActive("double_cps");
-    var clickEventActive = isEventActive("double_click");
+    var discountEv = getEventData("shop_discount");
+    var cpsEv = getEventData("double_cps");
+    var clickEv = getEventData("double_click");
 
     var bc = document.getElementById("buildingItems");
     bc.innerHTML = "";
@@ -560,8 +569,8 @@ function makeShop() {
             var itm = document.createElement("div");
             itm.className = afford ? "shop-item" : "shop-item disabled";
             var html = "<div class='item-header'><span class='item-name'>"+b.emoji+" "+b.name+"</span><span class='item-count'>"+b.count+"</span></div><div class='item-description'>"+b.description+"</div><div class='item-production'>מייצר סה\"כ: "+formatNum(totalProd)+"/שנייה</div>";
-            if (cpsEventActive) html += "<div class='item-bonus-tag'>⚡ יחידה שתיקנה עכשיו: בונוס x"+activeEvent.multiplier+" לצמיתות!</div>";
-            html += "<div class='item-price"+(discountActive?" discounted":"")+"'>💰 "+formatNum(cost)+"</div>";
+            if (cpsEv) html += "<div class='item-bonus-tag'>⚡ יחידה שתיקנה עכשיו: בונוס x"+cpsEv.multiplier+" לצמיתות!</div>";
+            html += "<div class='item-price"+(discountEv?" discounted":"")+"'>💰 "+formatNum(cost)+"</div>";
             itm.innerHTML = html;
             if (afford) itm.addEventListener("click", function(){ buyBuilding(key); });
             bc.appendChild(itm);
@@ -575,8 +584,8 @@ function makeShop() {
             var itm = document.createElement("div");
             itm.className = afford ? "shop-item" : "shop-item disabled";
             var html = "<div class='item-header'><span class='item-name'>"+u.emoji+" "+u.name+"</span><span class='item-count'>רמה "+u.level+"</span></div><div class='item-description'>"+u.description+"</div>";
-            if (clickEventActive) html += "<div class='item-bonus-tag'>⚡ רמה שתיקנה עכשיו: בונוס x"+activeEvent.multiplier+" לצמיתות!</div>";
-            html += "<div class='item-price"+(discountActive?" discounted":"")+"'>💰 "+formatNum(cost)+"</div>";
+            if (clickEv) html += "<div class='item-bonus-tag'>⚡ רמה שתיקנה עכשיו: בונוס x"+clickEv.multiplier+" לצמיתות!</div>";
+            html += "<div class='item-price"+(discountEv?" discounted":"")+"'>💰 "+formatNum(cost)+"</div>";
             itm.innerHTML = html;
             if (afford) itm.addEventListener("click", function(){ buyClickUpgrade(key2); });
             cc.appendChild(itm);
@@ -612,8 +621,9 @@ function buyBuilding(key) {
     var b = buildings[key], cost = getCost(b);
     if (cookies >= cost) {
         cookies -= cost; b.count++; totalCookiesBaked += cost;
-        if (isEventActive("double_cps")) {
-            b.extraCps = (b.extraCps || 0) + b.cps * (activeEvent.multiplier - 1);
+        var cpsEv = getEventData("double_cps");
+        if (cpsEv) {
+            b.extraCps = (b.extraCps || 0) + b.cps * (cpsEv.multiplier - 1);
         }
         calcClickPower(); calcCPS(); updateDisplay(); makeShop(); checkAchievements(); saveUserData();
     }
@@ -622,8 +632,9 @@ function buyClickUpgrade(key) {
     var u = clickUpgrades[key], cost = getClickCost(u);
     if (cookies >= cost) {
         cookies -= cost; u.level++; totalCookiesBaked += cost;
-        if (isEventActive("double_click")) {
-            u.extraClick = (u.extraClick || 0) + u.clickBonus * (activeEvent.multiplier - 1);
+        var clickEv = getEventData("double_click");
+        if (clickEv) {
+            u.extraClick = (u.extraClick || 0) + u.clickBonus * (clickEv.multiplier - 1);
         }
         calcClickPower(); updateDisplay(); makeShop(); checkAchievements(); saveUserData();
     }
@@ -682,8 +693,8 @@ function makeFloatingCookies() {
     }
 }
 function spawnGoldenCookie() {
-    var rainActive = isEventActive("golden_rain");
-    var cooldown = rainActive ? 3000 : 30000;
+    var rainEv = getEventData("golden_rain");
+    var cooldown = rainEv ? 3000 : 30000;
     if (Date.now() - lastGoldenCookie < cooldown) return;
 
     var wrap = document.createElement("div");
@@ -701,9 +712,10 @@ function spawnGoldenCookie() {
 
     gc.onclick = function(e) {
         goldenCookieClicks++;
+        var currentRainEv = getEventData("golden_rain");
         var bonus;
-        if (rainActive && activeEvent.fixedBonus) {
-            bonus = activeEvent.fixedBonus;
+        if (currentRainEv && currentRainEv.fixedBonus) {
+            bonus = currentRainEv.fixedBonus;
         } else {
             bonus = Math.floor(cookies*0.15) + Math.floor(cookiesPerSecond*77);
         }
@@ -736,38 +748,52 @@ function prestige() {
     }
 }
 
-// ---------- EVENTS ----------
+// ---------- EVENTS (תומך בכמה אירועים בו-זמנית) ----------
 function setupEventListener() {
     if (!firebaseInit) return;
     database.ref("events/active").on("value", function(snap) {
-        activeEvent = snap.exists() ? snap.val() : null;
+        activeEvents = snap.exists() ? snap.val() : {};
         updateEventBanner();
         makeShop();
     });
     setInterval(function() {
         updateEventBanner();
-        if (activeEvent && activeEvent.endTime <= Date.now()) {
-            activeEvent = null;
-            makeShop();
+        var changed = false;
+        for (var type in activeEvents) {
+            if (activeEvents[type].endTime <= Date.now()) { delete activeEvents[type]; changed = true; }
         }
+        if (changed) makeShop();
     }, 1000);
 }
 
 function updateEventBanner() {
     var banner = document.getElementById("eventBanner");
-    var statusSpan = document.getElementById("currentEventStatus");
-    if (!activeEvent || activeEvent.endTime <= Date.now()) {
+    var statusDiv = document.getElementById("currentEventsStatus");
+    var activeList = [];
+    for (var type in activeEvents) {
+        var ev = activeEvents[type];
+        if (ev.endTime > Date.now()) activeList.push(ev);
+    }
+
+    if (activeList.length === 0) {
         banner.classList.remove("show");
-        if (statusSpan) statusSpan.textContent = "אין אירוע פעיל";
+        if (statusDiv) statusDiv.innerHTML = "<div style='color:#888;'>אין אירועים פעילים</div>";
         return;
     }
-    var remainingMs = activeEvent.endTime - Date.now();
-    var mins = Math.floor(remainingMs / 60000);
-    var secs = Math.floor((remainingMs % 60000) / 1000);
-    var timeStr = mins + ":" + (secs < 10 ? "0" : "") + secs;
-    banner.textContent = activeEvent.message + " ⏱️ " + timeStr;
+
+    var bannerHtml = "";
+    var statusHtml = "";
+    activeList.forEach(function(ev) {
+        var remainingMs = ev.endTime - Date.now();
+        var mins = Math.floor(remainingMs / 60000);
+        var secs = Math.floor((remainingMs % 60000) / 1000);
+        var timeStr = mins + ":" + (secs < 10 ? "0" : "") + secs;
+        bannerHtml += "<div class='event-banner-line'>" + ev.message + " ⏱️ " + timeStr + "</div>";
+        statusHtml += "<div class='player-item'><span class='event-active-tag'>פעיל</span>" + ev.message + " (נותרו " + timeStr + ")</div>";
+    });
+    banner.innerHTML = bannerHtml;
     banner.classList.add("show");
-    if (statusSpan) statusSpan.textContent = activeEvent.message + " (נותרו " + timeStr + ")";
+    if (statusDiv) statusDiv.innerHTML = statusHtml;
 }
 
 function startEvent(type, durationInputId, extra, message) {
@@ -778,7 +804,7 @@ function startEvent(type, durationInputId, extra, message) {
     var eventData = { type: type, message: message, endTime: Date.now() + durationMinutes * 60000, startedBy: currentUsername };
     for (var key in extra) { eventData[key] = extra[key]; }
 
-    withTimeout(database.ref("events/active").set(eventData), 10000).then(function() {
+    withTimeout(database.ref("events/active/" + type).set(eventData), 10000).then(function() {
         return withTimeout(database.ref("chat/" + Date.now() + "_event").set({
             senderName: "מערכת", message: message + " (" + durationMinutes + " דקות)", timestamp: Date.now(), isSystemMessage: true
         }), 10000);
@@ -813,10 +839,19 @@ function startDiscountEvent() {
     startEvent("shop_discount", "discountDurationInput", { discount: discount }, "💰 הנחת חנות של " + discount + "% פעילה!");
 }
 
-function endEventNow() {
+function endEvent(type) {
+    var msg = document.getElementById("eventsMessage");
+    withTimeout(database.ref("events/active/" + type).remove(), 10000).then(function() {
+        msg.innerHTML = "<div class='success-message'>האירוע הופסק!</div>";
+    }).catch(function(e) {
+        msg.innerHTML = "<div class='error-message'>שגיאה: " + (e.message||e.code) + "</div>";
+    });
+}
+
+function endAllEvents() {
     var msg = document.getElementById("eventsMessage");
     withTimeout(database.ref("events/active").remove(), 10000).then(function() {
-        msg.innerHTML = "<div class='success-message'>האירוע הופסק!</div>";
+        msg.innerHTML = "<div class='success-message'>כל האירועים הופסקו!</div>";
     }).catch(function(e) {
         msg.innerHTML = "<div class='error-message'>שגיאה: " + (e.message||e.code) + "</div>";
     });
@@ -1320,30 +1355,41 @@ function changeGender() {
     });
 }
 
+// ---------- ADMIN (לא צריך להזין סיסמה שוב אם כבר אומת ב-session הנוכחי) ----------
+function showAdminSections() {
+    document.getElementById("adminAuthSection").style.display = "none";
+    document.getElementById("adminActionsSection").style.display = "block";
+    document.getElementById("adminDeleteSection").style.display = "block";
+    document.getElementById("moderationListsSection").style.display = "block";
+    document.getElementById("eventsSection").style.display = "block";
+    loadModerationLists();
+}
+
 function openAdminModal() {
     document.getElementById("adminModal").style.display = "flex";
-    document.getElementById("adminPasswordInput").value = "";
-    document.getElementById("adminActionsSection").style.display = "none";
-    document.getElementById("adminDeleteSection").style.display = "none";
-    document.getElementById("moderationListsSection").style.display = "none";
-    document.getElementById("eventsSection").style.display = "none";
     document.getElementById("adminMessage").innerHTML = "";
+    if (isAdminSession) {
+        showAdminSections();
+    } else {
+        document.getElementById("adminAuthSection").style.display = "block";
+        document.getElementById("adminActionsSection").style.display = "none";
+        document.getElementById("adminDeleteSection").style.display = "none";
+        document.getElementById("moderationListsSection").style.display = "none";
+        document.getElementById("eventsSection").style.display = "none";
+        document.getElementById("adminPasswordInput").value = "";
+    }
 }
 function verifyAdmin() {
     var pass = document.getElementById("adminPasswordInput").value;
     var msg = document.getElementById("adminMessage");
     if (pass === "גיארון7865") {
-        document.getElementById("adminActionsSection").style.display = "block";
-        document.getElementById("adminDeleteSection").style.display = "block";
-        document.getElementById("moderationListsSection").style.display = "block";
-        document.getElementById("eventsSection").style.display = "block";
         msg.innerHTML = "<div class='success-message'>גישה אושרה!</div>";
         isAdminSession = true;
         if (currentUid) {
             usersCache[currentUid].adminVerified = true;
             withTimeout(database.ref("users/" + currentUid + "/adminVerified").set(true), 10000).catch(function(e){ console.log(e); });
         }
-        loadModerationLists();
+        showAdminSections();
         renderChat();
     } else {
         msg.innerHTML = "<div class='error-message'>סיסמה שגויה</div>";
