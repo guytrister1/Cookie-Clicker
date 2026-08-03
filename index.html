@@ -1695,7 +1695,13 @@ function startGameLoops() {
         updateDisplay(); checkAchievements();
     }, 100);
     setInterval(function() { makeShop(); }, 1000);
-    setInterval(function() { if (Math.random() < 0.3 && cookiesPerSecond > 0) spawnGoldenCookie(); }, 10000);
+   setInterval(function() {
+    if (isEventActive("golden_rain")) {
+        if (Math.random() < 0.85) spawnGoldenCookie();
+    } else if (Math.random() < 0.3 && cookiesPerSecond > 0) {
+        spawnGoldenCookie();
+    }
+}, 2000);
     setInterval(function() { saveUserData(); }, 30000);
 }
 
