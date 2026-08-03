@@ -509,27 +509,27 @@ var clickUpgrades = {
 };
 
 var upgrades = {
-    reinforcedIndex: { name:"אצבע מחוזקת", emoji:"💪", description:"כפולה x2 לסמנים", cost:100, condition:function(){return buildings.cursor.count>=1;}, effect:function(){buildings.cursor.cps*=2;}, purchased:false },
-    carpalTunnel: { name:"מניעת פציעה", emoji:"🖱", description:"כפולה x2 לסמנים", cost:500, condition:function(){return buildings.cursor.count>=5;}, effect:function(){buildings.cursor.cps*=2;}, purchased:false },
-    ambidextrous: { name:"דו-צדדי", emoji:"👐", description:"כפולה x2 לסמנים", cost:10000, condition:function(){return buildings.cursor.count>=25;}, effect:function(){buildings.cursor.cps*=2;}, purchased:false },
-    grandmaRecipes: { name:"מתכונים מסבתא", emoji:"📧", description:"כפולה x2 לסבתות", cost:1000, condition:function(){return buildings.grandma.count>=1;}, effect:function(){buildings.grandma.cps*=2;}, purchased:false },
-    rollingPins: { name:"מערוכי מתכת", emoji:"🍴", description:"כפולה x2 לסבתות", cost:5000, condition:function(){return buildings.grandma.count>=5;}, effect:function(){buildings.grandma.cps*=2;}, purchased:false },
-    lubrication: { name:"שיפור מכונות", emoji:"🛠", description:"כפולה x2 למפעלים", cost:650000, condition:function(){return buildings.factory.count>=1;}, effect:function(){buildings.factory.cps*=2;}, purchased:false },
-    goldenTouch: { name:"מגע הזהב", emoji:"✨", description:"כפולה x3 לכל הייצור", cost:10000000, condition:function(){return goldenCookieClicks>=5;}, effect:function(){for(var k in buildings){buildings[k].cps*=3;}}, purchased:false }
+    reinforcedIndex: { name:"אצבע מחוזקת", emoji:"💪", description:"כפולה x2 לסמנים", cost:100, condition:function(){ return buildings.cursor.count>=1; }, effect:function(){ buildings.cursor.cps*=2; }, purchased:false },
+    carpalTunnel: { name:"מניעת פציעה", emoji:"🖱", description:"כפולה x2 לסמנים", cost:500, condition:function(){ return buildings.cursor.count>=5; }, effect:function(){ buildings.cursor.cps*=2; }, purchased:false },
+    ambidextrous: { name:"דו-צדדי", emoji:"👐", description:"כפולה x2 לסמנים", cost:10000, condition:function(){ return buildings.cursor.count>=25; }, effect:function(){ buildings.cursor.cps*=2; }, purchased:false },
+    grandmaRecipes: { name:"מתכונים מסבתא", emoji:"📧", description:"כפולה x2 לסבתות", cost:1000, condition:function(){ return buildings.grandma.count>=1; }, effect:function(){ buildings.grandma.cps*=2; }, purchased:false },
+    rollingPins: { name:"מערוכי מתכת", emoji:"🍴", description:"כפולה x2 לסבתות", cost:5000, condition:function(){ return buildings.grandma.count>=5; }, effect:function(){ buildings.grandma.cps*=2; }, purchased:false },
+    lubrication: { name:"שיפור מכונות", emoji:"🛠", description:"כפולה x2 למפעלים", cost:650000, condition:function(){ return buildings.factory.count>=1; }, effect:function(){ buildings.factory.cps*=2; }, purchased:false },
+    goldenTouch: { name:"מגע הזהב", emoji:"✨", description:"כפולה x3 לכל הייצור", cost:10000000, condition:function(){ return goldenCookieClicks>=5; }, effect:function(){ for (var k in buildings) { buildings[k].cps*=3; } }, purchased:false }
 };
 
 var achievements = [
-    { id:"first_click", name:"הלחיצה הראשונה", emoji:"👆", desc:"לחצת על העוגייה!", condition:function(){return totalCookiesBaked>=1;} },
-    { id:"hundred", name:"מאה עוגיות", emoji:"💯", desc:"100 עוגיות!", condition:function(){return totalCookiesBaked>=100;} },
-    { id:"first_building", name:"הבנייה הראשונה", emoji:"🏗", desc:"קנית בניין!", condition:function(){for(var k in buildings){if(buildings[k].count>0)return true;}return false;} },
-    { id:"thousand", name:"אלף עוגיות", emoji:"🎯", desc:"1,000 עוגיות!", condition:function(){return totalCookiesBaked>=1000;} },
-    { id:"ten_thousand", name:"עשרת אלפים", emoji:"🏆", desc:"10,000 עוגיות!", condition:function(){return totalCookiesBaked>=10000;} },
-    { id:"hundred_thousand", name:"מאה אלף", emoji:"🎖", desc:"100,000 עוגיות!", condition:function(){return totalCookiesBaked>=100000;} },
-    { id:"million", name:"מיליון עוגיות", emoji:"💎", desc:"מיליון עוגיות!", condition:function(){return totalCookiesBaked>=1000000;} },
-    { id:"first_golden", name:"עוגיית הזהב", emoji:"🌟", desc:"לחצת על עוגיית זהב!", condition:function(){return goldenCookieClicks>=1;} },
-    { id:"golden_master", name:"מאסטר הזהב", emoji:"👑", desc:"10 עוגיות זהב!", condition:function(){return goldenCookieClicks>=10;} },
-    { id:"hundred_buildings", name:"מאה בניינים", emoji:"🏙", desc:"100 בניינים!", condition:function(){var s=0;for(var k in buildings){s+=buildings[k].count;}return s>=100;} },
-    { id:"first_prestige", name:"יוקרה ראשונה", emoji:"⭐", desc:"איפוס יוקרה!", condition:function(){return prestigeLevel>=1;} }
+    { id:"first_click", name:"הלחיצה הראשונה", emoji:"👆", desc:"לחצת על העוגייה!", condition:function(){ return totalCookiesBaked>=1; } },
+    { id:"hundred", name:"מאה עוגיות", emoji:"💯", desc:"100 עוגיות!", condition:function(){ return totalCookiesBaked>=100; } },
+    { id:"first_building", name:"הבנייה הראשונה", emoji:"🏗", desc:"קנית בניין!", condition:function(){ for (var k in buildings) { if (buildings[k].count>0) return true; } return false; } },
+    { id:"thousand", name:"אלף עוגיות", emoji:"🎯", desc:"1,000 עוגיות!", condition:function(){ return totalCookiesBaked>=1000; } },
+    { id:"ten_thousand", name:"עשרת אלפים", emoji:"🏆", desc:"10,000 עוגיות!", condition:function(){ return totalCookiesBaked>=10000; } },
+    { id:"hundred_thousand", name:"מאה אלף", emoji:"🎖", desc:"100,000 עוגיות!", condition:function(){ return totalCookiesBaked>=100000; } },
+    { id:"million", name:"מיליון עוגיות", emoji:"💎", desc:"מיליון עוגיות!", condition:function(){ return totalCookiesBaked>=1000000; } },
+    { id:"first_golden", name:"עוגיית הזהב", emoji:"🌟", desc:"לחצת על עוגיית זהב!", condition:function(){ return goldenCookieClicks>=1; } },
+    { id:"golden_master", name:"מאסטר הזהב", emoji:"👑", desc:"10 עוגיות זהב!", condition:function(){ return goldenCookieClicks>=10; } },
+    { id:"hundred_buildings", name:"מאה בניינים", emoji:"🏙", desc:"100 בניינים!", condition:function(){ var s=0; for (var k in buildings) { s+=buildings[k].count; } return s>=100; } },
+    { id:"first_prestige", name:"יוקרה ראשונה", emoji:"⭐", desc:"איפוס יוקרה!", condition:function(){ return prestigeLevel>=1; } }
 ];
 
 function formatNum(num) {
@@ -546,42 +546,6 @@ function isEventActive(type) {
 }
 function getEventData(type) {
     return isEventActive(type) ? activeEvents[type] : null;
-}
-   function setupModerationListenerForSelf() {
-    if (!firebaseInit || !currentUid) return;
-
-    database.ref("moderation/bans/" + currentUid).on("value", function(snap) {
-        if (!snap.exists()) return;
-        var ban = snap.val();
-        if (ban.until === -1 || ban.until > Date.now()) {
-            var untilText = ban.until === -1 ? "לצמיתות" : ("עד " + new Date(ban.until).toLocaleString("he-IL"));
-            alert("🚫 נחסמת מהמשחק " + untilText);
-            saveUserData().finally(function() {
-                auth.signOut().then(function() { resetLocalState(); });
-            });
-        }
-    });
-
-    database.ref("moderation/pendingWarnings/" + currentUid).on("value", function(snap) {
-        if (!snap.exists()) return;
-        var messages = [];
-        snap.forEach(function(child) { messages.push(child.val().message); });
-        if (messages.length === 0) return;
-        document.getElementById("warningPopupText").textContent = messages.join(" | ");
-        document.getElementById("warningPopupModal").style.display = "flex";
-        database.ref("moderation/pendingWarnings/" + currentUid).remove();
-    });
-}
-
-    database.ref("moderation/pendingWarnings/" + currentUid).on("value", function(snap) {
-        if (!snap.exists()) return;
-        var messages = [];
-        snap.forEach(function(child) { messages.push(child.val().message); });
-        if (messages.length === 0) return;
-        document.getElementById("warningPopupText").textContent = messages.join(" | ");
-        document.getElementById("warningPopupModal").style.display = "flex";
-        database.ref("moderation/pendingWarnings/" + currentUid).remove();
-    });
 }
 
 function calcClickPower() {
@@ -718,7 +682,7 @@ function showClickEffect(x, y, amountText) {
     eff.textContent = amountText ? amountText : ("+" + formatNum(clickPower*prestigeMultiplier));
     eff.style.left = (x-25)+"px"; eff.style.top = (y-25)+"px";
     document.body.appendChild(eff);
-    setTimeout(function(){ if(document.body.contains(eff)) document.body.removeChild(eff); }, 1200);
+    setTimeout(function(){ if (document.body.contains(eff)) document.body.removeChild(eff); }, 1200);
 }
 function makeParticles(x, y, color) {
     for (var i=0;i<8;i++) {
@@ -727,7 +691,7 @@ function makeParticles(x, y, color) {
         p.style.left = x+"px"; p.style.top = y+"px";
         p.style.transform = "translate("+((Math.random()-0.5)*100)+"px,"+((Math.random()-0.5)*100)+"px)";
         document.body.appendChild(p);
-        setTimeout(function(){ if(document.body.contains(p)) document.body.removeChild(p); }, 2000);
+        setTimeout(function(){ if (document.body.contains(p)) document.body.removeChild(p); }, 2000);
     }
 }
 function checkAchievements() {
@@ -793,7 +757,7 @@ function spawnGoldenCookie() {
     };
 
     document.body.appendChild(wrap);
-    setTimeout(function(){ if(document.body.contains(wrap)) document.body.removeChild(wrap); }, 13000);
+    setTimeout(function(){ if (document.body.contains(wrap)) document.body.removeChild(wrap); }, 13000);
 }
 function prestige() {
     if (totalCookiesBaked < 1000000) {
@@ -847,7 +811,7 @@ function debugForceLeaveClub() {
     });
 }
 
-// ---------- BROADCAST (הודעה מהאדמין לכולם) ----------
+// ---------- BROADCAST ----------
 function setupBroadcastListener() {
     if (!firebaseInit) return;
     database.ref("broadcast/message").on("value", function(snap) {
@@ -1675,6 +1639,7 @@ function joinClub() {
         msg.innerHTML = "<div class='error-message'>שגיאה: " + (e.message||e.code) + "</div>";
     });
 }
+
 function createClub() {
     var name = document.getElementById("clubNameInput").value.trim();
     var msg = document.getElementById("createClubMessage");
@@ -1710,7 +1675,7 @@ function leaveClub() {
         if (!confirm("אתה המייסד. עזיבה תמחק את המועדון. להמשיך?")) return;
         p = withTimeout(database.ref("clubs/" + currentClub).remove(), 10000).then(function() { delete clubsCache[currentClub]; });
     } else {
-        club.members = club.members.filter(function(m) { return m.uid !== currentUid; });
+        club.members = (club.members || []).filter(function(m) { return m.uid !== currentUid; });
         p = withTimeout(database.ref("clubs/" + currentClub + "/members").set(club.members), 10000);
     }
     p.then(function() {
@@ -1728,6 +1693,7 @@ function showClubInfo() {
     withTimeout(database.ref("clubs/" + currentClub).once("value"), 10000).then(function(snap) {
         if (!snap.exists()) return;
         var club = snap.val();
+        if (!club.members) club.members = [];
         clubsCache[currentClub] = club;
         document.getElementById("clubInfoName").textContent = "🏆 " + club.name;
         document.getElementById("clubInfoCode").textContent = "קוד: " + club.code;
@@ -1904,9 +1870,9 @@ function startGameLoops() {
     loopsStarted = true;
     makeFloatingCookies();
     setupChatListener();
-    setupModerationListenerForSelf();
     setupEventListener();
     setupBroadcastListener();
+    setupModerationListenerForSelf();
     renderChat();
     updateClubButtons();
 
@@ -1924,6 +1890,32 @@ function startGameLoops() {
         }
     }, 5000);
     setInterval(function() { saveUserData(); }, 30000);
+}
+
+function setupModerationListenerForSelf() {
+    if (!firebaseInit || !currentUid) return;
+
+    database.ref("moderation/bans/" + currentUid).on("value", function(snap) {
+        if (!snap.exists()) return;
+        var ban = snap.val();
+        if (ban.until === -1 || ban.until > Date.now()) {
+            var untilText = ban.until === -1 ? "לצמיתות" : ("עד " + new Date(ban.until).toLocaleString("he-IL"));
+            alert("🚫 נחסמת מהמשחק " + untilText);
+            saveUserData().finally(function() {
+                auth.signOut().then(function() { resetLocalState(); });
+            });
+        }
+    });
+
+    database.ref("moderation/pendingWarnings/" + currentUid).on("value", function(snap) {
+        if (!snap.exists()) return;
+        var messages = [];
+        snap.forEach(function(child) { messages.push(child.val().message); });
+        if (messages.length === 0) return;
+        document.getElementById("warningPopupText").textContent = messages.join(" | ");
+        document.getElementById("warningPopupModal").style.display = "flex";
+        database.ref("moderation/pendingWarnings/" + currentUid).remove();
+    });
 }
 
 updateDisplay();
