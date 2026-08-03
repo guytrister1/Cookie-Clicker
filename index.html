@@ -30,6 +30,7 @@ body { font-family:Arial, sans-serif; background:linear-gradient(45deg,#FF6B6B,#
 .modal-content { background:rgba(255,255,255,0.95); padding:30px; border-radius:20px; text-align:center; box-shadow:0 20px 60px rgba(0,0,0,0.3); min-width:350px; max-width:500px; max-height:80vh; overflow-y:auto; }
 .modal-content h3 { color:#2C3E50; margin-bottom:20px; font-size:1.8rem; }
 .modal-content input { width:100%; padding:12px; margin:10px 0; border:2px solid #ddd; border-radius:10px; font-size:1rem; text-align:center; }
+.modal-content textarea { width:100%; padding:12px; margin:10px 0; border:2px solid #ddd; border-radius:10px; font-size:1rem; text-align:center; resize:vertical; min-height:60px; font-family:Arial, sans-serif; }
 .modal-content select { width:100%; padding:10px; margin:8px 0; border-radius:8px; border:2px solid #ddd; }
 .modal-content button { background:linear-gradient(45deg,#4ECDC4,#45B7D1); color:white; padding:12px 25px; border:none; border-radius:10px; font-size:1.05rem; cursor:pointer; margin:8px 5px; }
 .modal-content button:disabled { opacity:0.6; cursor:not-allowed; }
@@ -70,6 +71,10 @@ body { font-family:Arial, sans-serif; background:linear-gradient(45deg,#FF6B6B,#
 .event-banner.show { display:block; }
 .event-banner-line { margin:2px 0; }
 .event-active-tag { background:#27AE60; color:white; font-size:0.75rem; padding:2px 8px; border-radius:8px; margin-right:5px; }
+.announcement-banner { position:fixed; top:0; left:50%; transform:translateX(-50%); background:linear-gradient(45deg,#2980B9,#8E44AD); color:white; padding:12px 30px; border-radius:0 0 18px 18px; font-weight:bold; font-size:1rem; z-index:4500; box-shadow:0 8px 25px rgba(0,0,0,0.4); display:none; text-align:center; max-width:85vw; }
+.announcement-banner.show { display:flex; align-items:center; gap:12px; }
+.announcement-close-btn { background:rgba(255,255,255,0.25); border:none; color:white; border-radius:50%; width:24px; height:24px; cursor:pointer; font-size:0.9rem; flex-shrink:0; }
+.announcement-close-btn:hover { background:rgba(255,255,255,0.45); }
 .game-container { display:flex; width:100%; min-height:100vh; }
 .main-game { flex:1; padding:20px; display:flex; flex-direction:column; align-items:center; justify-content:center; position:relative; }
 .stats { background:rgba(255,255,255,0.25); border-radius:25px; padding:25px; margin-bottom:25px; text-align:center; border:2px solid rgba(255,255,255,0.3); min-width:300px; }
@@ -122,6 +127,10 @@ body { font-family:Arial, sans-serif; background:linear-gradient(45deg,#FF6B6B,#
 </head>
 <body>
 <div class="event-banner" id="eventBanner"></div>
+<div class="announcement-banner" id="announcementBanner">
+    <span id="announcementText"></span>
+    <button class="announcement-close-btn" onclick="dismissAnnouncement()">✕</button>
+</div>
 
 <div class="login-screen" id="loginScreen">
     <div class="login-form">
@@ -247,6 +256,12 @@ body { font-family:Arial, sans-serif; background:linear-gradient(45deg,#FF6B6B,#
             <h4>🔐 אימות</h4>
             <input type="password" id="adminPasswordInput" placeholder="סיסמת יוצר">
             <button id="verifyAdminBtn" onclick="verifyAdmin()">אמת גישה</button>
+        </div>
+        <div class="admin-section" id="adminBroadcastSection" style="display:none;">
+            <h4>📢 הודעה לכל השחקנים</h4>
+            <textarea id="broadcastTextInput" placeholder="תוכן ההודעה שתופיע לכולם למעלה במסך" maxlength="200"></textarea>
+            <button onclick="sendBroadcast()">שלח לכולם</button>
+            <button class="danger-button" onclick="clearBroadcast()">נקה הודעה מכולם</button>
         </div>
         <div class="admin-section" id="adminActionsSection" style="display:none;">
             <h4>💰 העברת עוגיות</h4>
@@ -456,7 +471,8 @@ var selectedDonationTarget = null;
 var unlockedAchievements = [];
 var isAdminSession = false;
 var moderationTargetUid = null, moderationTargetName = null;
-var activeEvents = {}; // מפתח = סוג האירוע, ערך = נתוני האירוע. מאפשר כמה אירועים בו-זמנית
+var activeEvents = {};
+var dismissedAnnouncementTimestamp = 0;
 
 var buildings = {
     cursor: { name:"סמן אוטומטי", emoji:"👆", description:"לוחץ אוטומטית", baseCost:15, cps:0.1, count:0, extraCps:0 },
@@ -748,7 +764,52 @@ function prestige() {
     }
 }
 
-// ---------- EVENTS (תומך בכמה אירועים בו-זמנית) ----------
+// ---------- BROADCAST (הודעה מהאדמין לכולם) ----------
+function setupBroadcastListener() {
+    if (!firebaseInit) return;
+    database.ref("broadcast/message").on("value", function(snap) {
+        if (!snap.exists()) {
+            hideAnnouncement();
+            return;
+        }
+        var data = snap.val();
+        if (data.timestamp <= dismissedAnnouncementTimestamp) {
+            hideAnnouncement();
+            return;
+        }
+        document.getElementById("announcementText").textContent = "הודעה מ" + data.sender + ": " + data.message;
+        document.getElementById("announcementBanner").classList.add("show");
+    });
+}
+function hideAnnouncement() {
+    document.getElementById("announcementBanner").classList.remove("show");
+}
+function dismissAnnouncement() {
+    dismissedAnnouncementTimestamp = Date.now();
+    hideAnnouncement();
+}
+function sendBroadcast() {
+    var text = document.getElementById("broadcastTextInput").value.trim();
+    var msg = document.getElementById("adminMessage");
+    if (!text) { msg.innerHTML = "<div class='error-message'>הזן תוכן הודעה</div>"; return; }
+    var data = { sender: currentUsername, message: text, timestamp: Date.now() };
+    withTimeout(database.ref("broadcast/message").set(data), 10000).then(function() {
+        msg.innerHTML = "<div class='success-message'>ההודעה נשלחה לכולם!</div>";
+        document.getElementById("broadcastTextInput").value = "";
+    }).catch(function(e) {
+        msg.innerHTML = "<div class='error-message'>שגיאה: " + (e.message||e.code) + "</div>";
+    });
+}
+function clearBroadcast() {
+    var msg = document.getElementById("adminMessage");
+    withTimeout(database.ref("broadcast/message").remove(), 10000).then(function() {
+        msg.innerHTML = "<div class='success-message'>ההודעה הוסרה מכולם!</div>";
+    }).catch(function(e) {
+        msg.innerHTML = "<div class='error-message'>שגיאה: " + (e.message||e.code) + "</div>";
+    });
+}
+
+// ---------- EVENTS ----------
 function setupEventListener() {
     if (!firebaseInit) return;
     database.ref("events/active").on("value", function(snap) {
@@ -1355,9 +1416,10 @@ function changeGender() {
     });
 }
 
-// ---------- ADMIN (לא צריך להזין סיסמה שוב אם כבר אומת ב-session הנוכחי) ----------
+// ---------- ADMIN ----------
 function showAdminSections() {
     document.getElementById("adminAuthSection").style.display = "none";
+    document.getElementById("adminBroadcastSection").style.display = "block";
     document.getElementById("adminActionsSection").style.display = "block";
     document.getElementById("adminDeleteSection").style.display = "block";
     document.getElementById("moderationListsSection").style.display = "block";
@@ -1372,6 +1434,7 @@ function openAdminModal() {
         showAdminSections();
     } else {
         document.getElementById("adminAuthSection").style.display = "block";
+        document.getElementById("adminBroadcastSection").style.display = "none";
         document.getElementById("adminActionsSection").style.display = "none";
         document.getElementById("adminDeleteSection").style.display = "none";
         document.getElementById("moderationListsSection").style.display = "none";
@@ -1759,6 +1822,7 @@ function startGameLoops() {
     makeFloatingCookies();
     setupChatListener();
     setupEventListener();
+    setupBroadcastListener();
     renderChat();
     updateClubButtons();
 
@@ -1771,10 +1835,10 @@ function startGameLoops() {
     setInterval(function() {
         if (isEventActive("golden_rain")) {
             if (Math.random() < 0.85) spawnGoldenCookie();
-        } else if (Math.random() < 0.3 && cookiesPerSecond > 0) {
+        } else if (Math.random() < 0.06 && cookiesPerSecond > 0) {
             spawnGoldenCookie();
         }
-    }, 2000);
+    }, 5000);
     setInterval(function() { saveUserData(); }, 30000);
 }
 
