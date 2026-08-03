@@ -30,6 +30,7 @@ body { font-family:Arial, sans-serif; background:linear-gradient(45deg,#FF6B6B,#
 .modal-content { background:rgba(255,255,255,0.95); padding:30px; border-radius:20px; text-align:center; box-shadow:0 20px 60px rgba(0,0,0,0.3); min-width:350px; max-width:500px; max-height:80vh; overflow-y:auto; }
 .modal-content h3 { color:#2C3E50; margin-bottom:20px; font-size:1.8rem; }
 .modal-content input { width:100%; padding:12px; margin:10px 0; border:2px solid #ddd; border-radius:10px; font-size:1rem; text-align:center; }
+.modal-content select { width:100%; padding:10px; margin:8px 0; border-radius:8px; border:2px solid #ddd; }
 .modal-content button { background:linear-gradient(45deg,#4ECDC4,#45B7D1); color:white; padding:12px 25px; border:none; border-radius:10px; font-size:1.05rem; cursor:pointer; margin:8px 5px; }
 .modal-content button:disabled { opacity:0.6; cursor:not-allowed; }
 .close-button { background:linear-gradient(45deg,#E74C3C,#C0392B) !important; }
@@ -65,6 +66,8 @@ body { font-family:Arial, sans-serif; background:linear-gradient(45deg,#FF6B6B,#
 .chat-input-container { display:flex; padding:8px; gap:6px; }
 .chat-input { flex:1; padding:8px 12px; border:2px solid #ddd; border-radius:20px; font-size:0.85rem; }
 .chat-send-btn { background:linear-gradient(45deg,#4ECDC4,#45B7D1); color:white; border:none; padding:8px 14px; border-radius:20px; cursor:pointer; }
+.event-banner { position:fixed; top:0; left:50%; transform:translateX(-50%); background:linear-gradient(45deg,#F39C12,#E67E22); color:white; padding:10px 25px; border-radius:0 0 15px 15px; font-weight:bold; font-size:1rem; z-index:4000; box-shadow:0 5px 20px rgba(0,0,0,0.3); display:none; text-align:center; }
+.event-banner.show { display:block; }
 .game-container { display:flex; width:100%; min-height:100vh; }
 .main-game { flex:1; padding:20px; display:flex; flex-direction:column; align-items:center; justify-content:center; position:relative; }
 .stats { background:rgba(255,255,255,0.25); border-radius:25px; padding:25px; margin-bottom:25px; text-align:center; border:2px solid rgba(255,255,255,0.3); min-width:300px; }
@@ -94,6 +97,7 @@ body { font-family:Arial, sans-serif; background:linear-gradient(45deg,#FF6B6B,#
 .item-count { background:linear-gradient(45deg,#FF6B6B,#4ECDC4); color:white; padding:2px 10px; border-radius:15px; font-size:0.85rem; font-weight:bold; }
 .item-description { font-size:0.85rem; color:#34495E; margin-bottom:6px; }
 .item-price { font-size:1rem; font-weight:bold; color:#E67E22; text-align:center; background:rgba(255,255,255,0.4); padding:6px; border-radius:10px; }
+.item-price.discounted { color:#27AE60; }
 .item-production { font-size:0.8rem; color:#27AE60; font-weight:bold; text-align:center; margin-top:4px; }
 .error-message { color:#E74C3C; font-weight:bold; margin:8px 0; }
 .success-message { color:#27AE60; font-weight:bold; margin:8px 0; }
@@ -112,6 +116,8 @@ body { font-family:Arial, sans-serif; background:linear-gradient(45deg,#FF6B6B,#
 </style>
 </head>
 <body>
+<div class="event-banner" id="eventBanner"></div>
+
 <div class="login-screen" id="loginScreen">
     <div class="login-form">
         <h2>🍪 משחק האימפריית עוגיות 🍪</h2>
@@ -252,18 +258,49 @@ body { font-family:Arial, sans-serif; background:linear-gradient(45deg,#FF6B6B,#
         <div class="admin-section" id="moderationListsSection" style="display:none;">
             <h4>📋 ניהול קהילה</h4>
             <button onclick="loadModerationLists()">🔄 רענן רשימות</button>
-            <div style="text-align:right; margin-top:12px;">
-                <strong>🚫 באנים פעילים:</strong>
-                <div id="bansListDiv" style="margin-top:6px;"></div>
+            <div style="text-align:right; margin-top:12px;"><strong>🚫 באנים פעילים:</strong><div id="bansListDiv" style="margin-top:6px;"></div></div>
+            <div style="text-align:right; margin-top:12px;"><strong>🔇 חסימות צ'אט פעילות:</strong><div id="mutesListDiv" style="margin-top:6px;"></div></div>
+            <div style="text-align:right; margin-top:12px;"><strong>⚠️ שחקנים עם אזהרות:</strong><div id="warningsListDiv" style="margin-top:6px;"></div></div>
+        </div>
+        <div class="admin-section" id="eventsSection" style="display:none;">
+            <h4>🎉 ניהול אירועים</h4>
+            <div style="text-align:right; margin-bottom:10px;"><strong>מצב נוכחי:</strong> <span id="currentEventStatus">אין אירוע פעיל</span></div>
+
+            <div style="margin-bottom:15px; text-align:right;">
+                <strong>🌟 גשם עוגיות זהב</strong>
+                <input type="number" id="rainDurationInput" placeholder="משך בדקות" min="1" value="10">
+                <button onclick="startEvent('golden_rain', 'rainDurationInput', {}, '🌟 גשם עוגיות זהב פעיל!')">הפעל</button>
             </div>
-            <div style="text-align:right; margin-top:12px;">
-                <strong>🔇 חסימות צ'אט פעילות:</strong>
-                <div id="mutesListDiv" style="margin-top:6px;"></div>
+
+            <div style="margin-bottom:15px; text-align:right;">
+                <strong>⚡ שעת כפל ייצור</strong>
+                <input type="number" id="cpsDurationInput" placeholder="משך בדקות" min="1" value="10">
+                <select id="cpsMultiplierSelect"><option value="2">x2</option><option value="3">x3</option></select>
+                <button onclick="startCpsEvent()">הפעל</button>
             </div>
-            <div style="text-align:right; margin-top:12px;">
-                <strong>⚠️ שחקנים עם אזהרות:</strong>
-                <div id="warningsListDiv" style="margin-top:6px;"></div>
+
+            <div style="margin-bottom:15px; text-align:right;">
+                <strong>💰 הנחת חנות</strong>
+                <input type="number" id="discountDurationInput" placeholder="משך בדקות" min="1" value="10">
+                <input type="number" id="discountPercentInput" placeholder="אחוז הנחה" min="1" max="90" value="30">
+                <button onclick="startDiscountEvent()">הפעל</button>
             </div>
+
+            <div style="margin-bottom:15px; text-align:right;">
+                <strong>👆 כפל כוח לחיצה</strong>
+                <input type="number" id="clickDurationInput" placeholder="משך בדקות" min="1" value="10">
+                <button onclick="startEvent('double_click', 'clickDurationInput', {multiplier:2}, '👆 כפל כוח לחיצה פעיל!')">הפעל</button>
+            </div>
+
+            <button class="danger-button" onclick="endEventNow()">⏹️ סיים אירוע נוכחי מיידית</button>
+
+            <div class="settings-section" style="margin-top:20px;">
+                <h4>🎁 מתנה לכל השחקנים</h4>
+                <input type="number" id="giftAllAmountInput" placeholder="כמות עוגיות לכל שחקן" min="1">
+                <button onclick="giftAllPlayers()">שלח לכולם</button>
+            </div>
+
+            <div id="eventsMessage"></div>
         </div>
         <button class="close-button" onclick="closeModal('adminModal')">סגור</button>
         <div id="adminMessage"></div>
@@ -407,6 +444,7 @@ var selectedDonationTarget = null;
 var unlockedAchievements = [];
 var isAdminSession = false;
 var moderationTargetUid = null, moderationTargetName = null;
+var activeEvent = null;
 
 var buildings = {
     cursor: { name:"סמן אוטומטי", emoji:"👆", description:"לוחץ אוטומטית", baseCost:15, cps:0.1, count:0 },
@@ -463,25 +501,44 @@ function formatNum(num) {
     return (num/1000000000000).toFixed(1) + "T";
 }
 
+function isEventActive(type) {
+    return activeEvent && activeEvent.type === type && activeEvent.endTime > Date.now();
+}
+
 function calcClickPower() {
     clickPower = 1;
     for (var k in clickUpgrades) { clickPower += clickUpgrades[k].level * clickUpgrades[k].clickBonus; }
 }
 function calcCPS() {
     cookiesPerSecond = 0;
-    for (var k in buildings) { cookiesPerSecond += buildings[k].count * buildings[k].cps * prestigeMultiplier; }
+    var eventMult = isEventActive("double_cps") ? activeEvent.multiplier : 1;
+    for (var k in buildings) { cookiesPerSecond += buildings[k].count * buildings[k].cps * prestigeMultiplier * eventMult; }
 }
 function updateDisplay() {
     document.getElementById("cookieCount").textContent = formatNum(cookies);
     document.getElementById("cpsDisplay").textContent = formatNum(cookiesPerSecond) + " עוגיות לשנייה";
-    document.getElementById("cpcDisplay").textContent = "+" + formatNum(Math.floor(clickPower*prestigeMultiplier)) + " ללחיצה";
+    var clickMult = isEventActive("double_click") ? activeEvent.multiplier : 1;
+    document.getElementById("cpcDisplay").textContent = "+" + formatNum(Math.floor(clickPower*prestigeMultiplier*clickMult)) + " ללחיצה";
     document.getElementById("prestigeInfo").textContent = "רמת יוקרה: " + prestigeLevel + " | כפולה: x" + prestigeMultiplier.toFixed(1);
 }
 
-function getCost(b) { return Math.floor(b.baseCost * Math.pow(1.15, b.count)); }
-function getClickCost(u) { return Math.floor(u.baseCost * Math.pow(2, u.level)); }
+function getCost(b) {
+    var base = Math.floor(b.baseCost * Math.pow(1.15, b.count));
+    if (isEventActive("shop_discount")) {
+        return Math.floor(base * (1 - activeEvent.discount / 100));
+    }
+    return base;
+}
+function getClickCost(u) {
+    var base = Math.floor(u.baseCost * Math.pow(2, u.level));
+    if (isEventActive("shop_discount")) {
+        return Math.floor(base * (1 - activeEvent.discount / 100));
+    }
+    return base;
+}
 
 function makeShop() {
+    var discountActive = isEventActive("shop_discount");
     var bc = document.getElementById("buildingItems");
     bc.innerHTML = "";
     for (var key in buildings) {
@@ -489,7 +546,7 @@ function makeShop() {
             var b = buildings[key], cost = getCost(b), afford = cookies >= cost;
             var itm = document.createElement("div");
             itm.className = afford ? "shop-item" : "shop-item disabled";
-            itm.innerHTML = "<div class='item-header'><span class='item-name'>"+b.emoji+" "+b.name+"</span><span class='item-count'>"+b.count+"</span></div><div class='item-description'>"+b.description+"</div><div class='item-production'>מייצר: "+formatNum(b.cps*prestigeMultiplier)+"/שנייה</div><div class='item-price'>💰 "+formatNum(cost)+"</div>";
+            itm.innerHTML = "<div class='item-header'><span class='item-name'>"+b.emoji+" "+b.name+"</span><span class='item-count'>"+b.count+"</span></div><div class='item-description'>"+b.description+"</div><div class='item-production'>מייצר: "+formatNum(b.cps*prestigeMultiplier*(isEventActive('double_cps')?activeEvent.multiplier:1))+"/שנייה</div><div class='item-price"+(discountActive?" discounted":"")+"'>💰 "+formatNum(cost)+"</div>";
             if (afford) itm.addEventListener("click", function(){ buyBuilding(key); });
             bc.appendChild(itm);
         })(key);
@@ -501,7 +558,7 @@ function makeShop() {
             var u = clickUpgrades[key2], cost = getClickCost(u), afford = cookies >= cost;
             var itm = document.createElement("div");
             itm.className = afford ? "shop-item" : "shop-item disabled";
-            itm.innerHTML = "<div class='item-header'><span class='item-name'>"+u.emoji+" "+u.name+"</span><span class='item-count'>רמה "+u.level+"</span></div><div class='item-description'>"+u.description+"</div><div class='item-price'>💰 "+formatNum(cost)+"</div>";
+            itm.innerHTML = "<div class='item-header'><span class='item-name'>"+u.emoji+" "+u.name+"</span><span class='item-count'>רמה "+u.level+"</span></div><div class='item-description'>"+u.description+"</div><div class='item-price"+(discountActive?" discounted":"")+"'>💰 "+formatNum(cost)+"</div>";
             if (afford) itm.addEventListener("click", function(){ buyClickUpgrade(key2); });
             cc.appendChild(itm);
         })(key2);
@@ -559,7 +616,8 @@ function buyUpgrade(key) {
 function showClickEffect(x, y) {
     var eff = document.createElement("div");
     eff.className = "click-effect";
-    eff.textContent = "+" + formatNum(clickPower*prestigeMultiplier);
+    var clickMult = isEventActive("double_click") ? activeEvent.multiplier : 1;
+    eff.textContent = "+" + formatNum(clickPower*prestigeMultiplier*clickMult);
     eff.style.left = (x-25)+"px"; eff.style.top = (y-25)+"px";
     document.body.appendChild(eff);
     setTimeout(function(){ if(document.body.contains(eff)) document.body.removeChild(eff); }, 1200);
@@ -600,7 +658,8 @@ function makeFloatingCookies() {
     }
 }
 function spawnGoldenCookie() {
-    if (Date.now() - lastGoldenCookie < 30000) return;
+    var cooldown = isEventActive("golden_rain") ? 3000 : 30000;
+    if (Date.now() - lastGoldenCookie < cooldown) return;
     var gc = document.createElement("div");
     gc.className = "golden-cookie";
     gc.style.left = Math.random()*(window.innerWidth-60)+"px";
@@ -635,7 +694,117 @@ function prestige() {
     }
 }
 
-// ---------- MODERATION (חסימות / התראות) ----------
+// ---------- EVENTS ----------
+function setupEventListener() {
+    if (!firebaseInit) return;
+    database.ref("events/active").on("value", function(snap) {
+        var wasCpsActive = isEventActive("double_cps");
+        activeEvent = snap.exists() ? snap.val() : null;
+        updateEventBanner();
+        var isCpsActiveNow = isEventActive("double_cps");
+        if (wasCpsActive !== isCpsActiveNow) { calcCPS(); updateDisplay(); }
+        makeShop();
+    });
+    setInterval(function() {
+        updateEventBanner();
+        if (activeEvent && activeEvent.endTime <= Date.now()) {
+            activeEvent = null;
+            calcCPS(); updateDisplay(); makeShop();
+        }
+    }, 1000);
+}
+
+function updateEventBanner() {
+    var banner = document.getElementById("eventBanner");
+    var statusSpan = document.getElementById("currentEventStatus");
+    if (!activeEvent || activeEvent.endTime <= Date.now()) {
+        banner.classList.remove("show");
+        if (statusSpan) statusSpan.textContent = "אין אירוע פעיל";
+        return;
+    }
+    var remainingMs = activeEvent.endTime - Date.now();
+    var mins = Math.floor(remainingMs / 60000);
+    var secs = Math.floor((remainingMs % 60000) / 1000);
+    var timeStr = mins + ":" + (secs < 10 ? "0" : "") + secs;
+    banner.textContent = activeEvent.message + " ⏱️ " + timeStr;
+    banner.classList.add("show");
+    if (statusSpan) statusSpan.textContent = activeEvent.message + " (נותרו " + timeStr + ")";
+}
+
+function startEvent(type, durationInputId, extra, message) {
+    var durationMinutes = parseFloat(document.getElementById(durationInputId).value);
+    var msg = document.getElementById("eventsMessage");
+    if (!durationMinutes || durationMinutes <= 0) { msg.innerHTML = "<div class='error-message'>הזן משך זמן תקין</div>"; return; }
+
+    var eventData = { type: type, message: message, endTime: Date.now() + durationMinutes * 60000, startedBy: currentUsername };
+    for (var key in extra) { eventData[key] = extra[key]; }
+
+    withTimeout(database.ref("events/active").set(eventData), 10000).then(function() {
+        return withTimeout(database.ref("chat/" + Date.now() + "_event").set({
+            senderName: "מערכת", message: message + " (" + durationMinutes + " דקות)", timestamp: Date.now(), isSystemMessage: true
+        }), 10000);
+    }).then(function() {
+        msg.innerHTML = "<div class='success-message'>האירוע הופעל!</div>";
+    }).catch(function(e) {
+        msg.innerHTML = "<div class='error-message'>שגיאה: " + (e.message||e.code) + "</div>";
+    });
+}
+
+function startCpsEvent() {
+    var multiplier = parseInt(document.getElementById("cpsMultiplierSelect").value);
+    startEvent("double_cps", "cpsDurationInput", { multiplier: multiplier }, "⚡ שעת כפל ייצור (x" + multiplier + ") פעילה!");
+}
+
+function startDiscountEvent() {
+    var discount = parseInt(document.getElementById("discountPercentInput").value);
+    var msg = document.getElementById("eventsMessage");
+    if (!discount || discount <= 0 || discount >= 100) { msg.innerHTML = "<div class='error-message'>הזן אחוז הנחה תקין (1-99)</div>"; return; }
+    startEvent("shop_discount", "discountDurationInput", { discount: discount }, "💰 הנחת חנות של " + discount + "% פעילה!");
+}
+
+function endEventNow() {
+    var msg = document.getElementById("eventsMessage");
+    withTimeout(database.ref("events/active").remove(), 10000).then(function() {
+        msg.innerHTML = "<div class='success-message'>האירוע הופסק!</div>";
+    }).catch(function(e) {
+        msg.innerHTML = "<div class='error-message'>שגיאה: " + (e.message||e.code) + "</div>";
+    });
+}
+
+function giftAllPlayers() {
+    var amount = parseInt(document.getElementById("giftAllAmountInput").value);
+    var msg = document.getElementById("eventsMessage");
+    if (!amount || amount <= 0) { msg.innerHTML = "<div class='error-message'>הזן כמות תקינה</div>"; return; }
+
+    msg.innerHTML = "<div class='info-message'>שולח לכולם...</div>";
+    withTimeout(database.ref("users").once("value"), 15000).then(function(snap) {
+        if (!snap.exists()) { msg.innerHTML = "<div class='error-message'>לא נמצאו שחקנים</div>"; return; }
+        var updates = {};
+        var count = 0;
+        snap.forEach(function(child) {
+            var data = child.val();
+            var newCookies = (data.cookies || 0) + amount;
+            var newTotal = (data.totalCookiesBaked || 0) + amount;
+            updates[child.key + "/cookies"] = newCookies;
+            updates[child.key + "/totalCookiesBaked"] = newTotal;
+            count++;
+        });
+        return withTimeout(database.ref("users").update(updates), 15000).then(function() { return count; });
+    }).then(function(count) {
+        if (count === undefined) return;
+        return withTimeout(database.ref("chat/" + Date.now() + "_giftall").set({
+            senderName: "מערכת", message: "🎁 יוצר המשחק העביר לכל השחקנים (" + count + ") " + formatNum(amount) + " עוגיות!",
+            timestamp: Date.now(), isSystemMessage: true
+        }), 10000).then(function() {
+            msg.innerHTML = "<div class='success-message'>נשלח ל-" + count + " שחקנים!</div>";
+            document.getElementById("giftAllAmountInput").value = "";
+        });
+    }).catch(function(e) {
+        msg.innerHTML = "<div class='error-message'>שגיאה: " + (e.message||e.code) + "</div>";
+    });
+}
+
+// ---------- MODERATION ----------
 function checkPendingWarnings(uid) {
     return withTimeout(database.ref("moderation/pendingWarnings/" + uid).once("value"), 10000).then(function(snap) {
         if (!snap.exists()) return;
@@ -831,7 +1000,6 @@ function login() {
         console.log("Login error:", e);
         var code = e.code || e.message;
         if (code === "banned") {
-            // ההודעה כבר הוצגה בתוך checkBanThenProceed
         } else if (code === "auth/user-not-found" || code === "auth/wrong-password" || code === "auth/invalid-credential" || code === "auth/invalid-login-credentials") {
             msg.innerHTML = "<div class='error-message'>שם משתמש או סיסמה שגויים</div>";
         } else if (code === "timeout") {
@@ -1101,6 +1269,7 @@ function openAdminModal() {
     document.getElementById("adminActionsSection").style.display = "none";
     document.getElementById("adminDeleteSection").style.display = "none";
     document.getElementById("moderationListsSection").style.display = "none";
+    document.getElementById("eventsSection").style.display = "none";
     document.getElementById("adminMessage").innerHTML = "";
 }
 function verifyAdmin() {
@@ -1110,6 +1279,7 @@ function verifyAdmin() {
         document.getElementById("adminActionsSection").style.display = "block";
         document.getElementById("adminDeleteSection").style.display = "block";
         document.getElementById("moderationListsSection").style.display = "block";
+        document.getElementById("eventsSection").style.display = "block";
         msg.innerHTML = "<div class='success-message'>גישה אושרה!</div>";
         isAdminSession = true;
         if (currentUid) {
@@ -1471,7 +1641,8 @@ function confirmDonation() {
 // ---------- MAIN LOOP ----------
 var cookieEl = document.getElementById("cookie");
 cookieEl.addEventListener("click", function(e) {
-    var val = clickPower * prestigeMultiplier;
+    var clickMult = isEventActive("double_click") ? activeEvent.multiplier : 1;
+    var val = clickPower * prestigeMultiplier * clickMult;
     cookies += val; totalCookiesBaked += val; totalClicks++;
     updateDisplay();
     showClickEffect(e.clientX, e.clientY);
@@ -1485,6 +1656,7 @@ function startGameLoops() {
     loopsStarted = true;
     makeFloatingCookies();
     setupChatListener();
+    setupEventListener();
     renderChat();
     updateClubButtons();
 
