@@ -107,7 +107,9 @@ body { font-family:Arial, sans-serif; background:linear-gradient(45deg,#FF6B6B,#
 .firebase-disconnected { color:#E74C3C; border:2px solid #E74C3C; }
 .achievement-popup { position:fixed; top:20px; right:20px; background:linear-gradient(135deg,#4CAF50,#45a049); color:white; padding:18px 22px; border-radius:15px; box-shadow:0 10px 30px rgba(0,0,0,0.3); transform:translateX(450px); transition:transform 0.6s ease; z-index:3000; min-width:220px; }
 .achievement-popup.show { transform:translateX(0); }
-.golden-cookie { position:fixed; width:55px; height:55px; background:radial-gradient(circle,#FFD700,#FFA500); border-radius:50%; cursor:pointer; z-index:2500; animation:goldenFloat 3s ease-in-out infinite; box-shadow:0 0 20px rgba(255,215,0,0.8); border:3px solid #FF8C00; }
+.golden-cookie-wrap { position:fixed; z-index:9999; }
+.golden-cookie-ring { position:absolute; top:-8px; left:-8px; width:76px; height:76px; border-radius:50%; background:radial-gradient(circle, rgba(0,0,0,0.55) 0%, rgba(0,0,0,0) 70%); pointer-events:none; }
+.golden-cookie { position:relative; width:60px; height:60px; background:radial-gradient(circle,#FFD700,#FFA500); border-radius:50%; cursor:pointer; animation:goldenFloat 3s ease-in-out infinite; box-shadow:0 0 25px 8px rgba(255,215,0,0.95), 0 0 0 4px #FFFFFF, 0 0 0 7px #FF8C00; border:none; }
 @keyframes goldenFloat { 0%,100%{transform:scale(1);} 50%{transform:scale(1.1);} }
 .floating-cookies { position:fixed; top:0; left:0; width:100%; height:100%; pointer-events:none; z-index:-1; }
 .floating-cookie { position:absolute; width:30px; height:30px; background:radial-gradient(circle,#DEB887,#D2691E); border-radius:50%; opacity:0.12; animation:floatBg 25s infinite linear; }
@@ -269,7 +271,8 @@ body { font-family:Arial, sans-serif; background:linear-gradient(45deg,#FF6B6B,#
             <div style="margin-bottom:15px; text-align:right;">
                 <strong>🌟 גשם עוגיות זהב</strong>
                 <input type="number" id="rainDurationInput" placeholder="משך בדקות" min="1" value="10">
-                <button onclick="startEvent('golden_rain', 'rainDurationInput', {}, '🌟 גשם עוגיות זהב פעיל!')">הפעל</button>
+                <input type="number" id="rainBonusInput" placeholder="בונוס קבוע לכל עוגיית זהב" min="1" value="1000000">
+                <button onclick="startRainEvent()">הפעל</button>
             </div>
 
             <div style="margin-bottom:15px; text-align:right;">
@@ -613,11 +616,15 @@ function buyUpgrade(key) {
     }
 }
 
-function showClickEffect(x, y) {
+function showClickEffect(x, y, amountText) {
     var eff = document.createElement("div");
     eff.className = "click-effect";
-    var clickMult = isEventActive("double_click") ? activeEvent.multiplier : 1;
-    eff.textContent = "+" + formatNum(clickPower*prestigeMultiplier*clickMult);
+    if (amountText) {
+        eff.textContent = amountText;
+    } else {
+        var clickMult = isEventActive("double_click") ? activeEvent.multiplier : 1;
+        eff.textContent = "+" + formatNum(clickPower*prestigeMultiplier*clickMult);
+    }
     eff.style.left = (x-25)+"px"; eff.style.top = (y-25)+"px";
     document.body.appendChild(eff);
     setTimeout(function(){ if(document.body.contains(eff)) document.body.removeChild(eff); }, 1200);
@@ -658,25 +665,43 @@ function makeFloatingCookies() {
     }
 }
 function spawnGoldenCookie() {
-    var cooldown = isEventActive("golden_rain") ? 3000 : 30000;
+    var rainActive = isEventActive("golden_rain");
+    var cooldown = rainActive ? 3000 : 30000;
     if (Date.now() - lastGoldenCookie < cooldown) return;
+
+    var wrap = document.createElement("div");
+    wrap.className = "golden-cookie-wrap";
+    wrap.style.left = Math.random()*(window.innerWidth-76)+"px";
+    wrap.style.top = Math.random()*(window.innerHeight-76)+"px";
+
+    var ring = document.createElement("div");
+    ring.className = "golden-cookie-ring";
+    wrap.appendChild(ring);
+
     var gc = document.createElement("div");
     gc.className = "golden-cookie";
-    gc.style.left = Math.random()*(window.innerWidth-60)+"px";
-    gc.style.top = Math.random()*(window.innerHeight-60)+"px";
+    wrap.appendChild(gc);
+
     gc.onclick = function(e) {
         goldenCookieClicks++;
-        var bonus = Math.floor(cookies*0.15) + Math.floor(cookiesPerSecond*77);
+        var bonus;
+        if (rainActive && activeEvent.fixedBonus) {
+            bonus = activeEvent.fixedBonus;
+        } else {
+            bonus = Math.floor(cookies*0.15) + Math.floor(cookiesPerSecond*77);
+        }
         cookies += bonus; totalCookiesBaked += bonus;
-        showClickEffect(e.clientX, e.clientY);
+        showClickEffect(e.clientX, e.clientY, "+" + formatNum(bonus));
         makeParticles(e.clientX, e.clientY, "#FFD700");
         showAchievement({ name:"עוגיית זהב!", desc:"+"+formatNum(bonus), emoji:"🌟" });
-        document.body.removeChild(gc);
+        document.body.removeChild(wrap);
         lastGoldenCookie = Date.now();
         checkAchievements(); updateDisplay();
+        saveUserData();
     };
-    document.body.appendChild(gc);
-    setTimeout(function(){ if(document.body.contains(gc)) document.body.removeChild(gc); }, 13000);
+
+    document.body.appendChild(wrap);
+    setTimeout(function(){ if(document.body.contains(wrap)) document.body.removeChild(wrap); }, 13000);
 }
 function prestige() {
     if (totalCookiesBaked < 1000000) {
@@ -698,12 +723,9 @@ function prestige() {
 function setupEventListener() {
     if (!firebaseInit) return;
     database.ref("events/active").on("value", function(snap) {
-        var wasCpsActive = isEventActive("double_cps");
         activeEvent = snap.exists() ? snap.val() : null;
         updateEventBanner();
-        var isCpsActiveNow = isEventActive("double_cps");
-        if (wasCpsActive !== isCpsActiveNow) { calcCPS(); updateDisplay(); }
-        makeShop();
+        calcCPS(); updateDisplay(); makeShop();
     });
     setInterval(function() {
         updateEventBanner();
@@ -748,6 +770,13 @@ function startEvent(type, durationInputId, extra, message) {
     }).catch(function(e) {
         msg.innerHTML = "<div class='error-message'>שגיאה: " + (e.message||e.code) + "</div>";
     });
+}
+
+function startRainEvent() {
+    var bonus = parseInt(document.getElementById("rainBonusInput").value);
+    var msg = document.getElementById("eventsMessage");
+    if (!bonus || bonus <= 0) { msg.innerHTML = "<div class='error-message'>הזן בונוס תקין</div>"; return; }
+    startEvent("golden_rain", "rainDurationInput", { fixedBonus: bonus }, "🌟 גשם עוגיות זהב (+" + formatNum(bonus) + " לכל עוגייה)!");
 }
 
 function startCpsEvent() {
