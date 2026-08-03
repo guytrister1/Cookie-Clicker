@@ -547,20 +547,31 @@ function isEventActive(type) {
 function getEventData(type) {
     return isEventActive(type) ? activeEvents[type] : null;
 }
-    function setupModerationListenerForSelf() {
+   function setupModerationListenerForSelf() {
     if (!firebaseInit || !currentUid) return;
 
     database.ref("moderation/bans/" + currentUid).on("value", function(snap) {
         if (!snap.exists()) return;
         var ban = snap.val();
-        if (ban.until === null || ban.until > Date.now()) {
-            var untilText = ban.until === null ? "לצמיתות" : ("עד " + new Date(ban.until).toLocaleString("he-IL"));
+        if (ban.until === -1 || ban.until > Date.now()) {
+            var untilText = ban.until === -1 ? "לצמיתות" : ("עד " + new Date(ban.until).toLocaleString("he-IL"));
             alert("🚫 נחסמת מהמשחק " + untilText);
             saveUserData().finally(function() {
                 auth.signOut().then(function() { resetLocalState(); });
             });
         }
     });
+
+    database.ref("moderation/pendingWarnings/" + currentUid).on("value", function(snap) {
+        if (!snap.exists()) return;
+        var messages = [];
+        snap.forEach(function(child) { messages.push(child.val().message); });
+        if (messages.length === 0) return;
+        document.getElementById("warningPopupText").textContent = messages.join(" | ");
+        document.getElementById("warningPopupModal").style.display = "flex";
+        database.ref("moderation/pendingWarnings/" + currentUid).remove();
+    });
+}
 
     database.ref("moderation/pendingWarnings/" + currentUid).on("value", function(snap) {
         if (!snap.exists()) return;
@@ -1039,9 +1050,9 @@ function checkBanThenProceed(uid, data, msgEl) {
     return withTimeout(database.ref("moderation/bans/" + uid).once("value"), 10000).then(function(banSnap) {
         if (banSnap.exists()) {
             var ban = banSnap.val();
-            if (ban.until === null || ban.until > Date.now()) {
+            if (ban.until === -1 || ban.until > Date.now()) {
                 auth.signOut();
-                var untilText = ban.until === null ? "לצמיתות" : ("עד " + new Date(ban.until).toLocaleString("he-IL"));
+                var untilText = ban.until === -1 ? "לצמיתות" : ("עד " + new Date(ban.until).toLocaleString("he-IL"));
                 if (msgEl) msgEl.innerHTML = "<div class='error-message'>🚫 החשבון חסום " + untilText + "</div>";
                 throw new Error("banned");
             }
@@ -1076,7 +1087,7 @@ function applyBan(permanent) {
     var msg = document.getElementById("moderationMessage");
     var durationMs = permanent ? 0 : msFromDuration("ban");
     if (!permanent && durationMs <= 0) { msg.innerHTML = "<div class='error-message'>בחר משך זמן</div>"; return; }
-    var until = permanent ? null : (Date.now() + durationMs);
+    var until = permanent ? -1 : (Date.now() + durationMs);
     var data = { username: moderationTargetName, until: until, bannedAt: Date.now(), bannedBy: currentUsername };
     withTimeout(database.ref("moderation/bans/" + moderationTargetUid).set(data), 10000).then(function() {
         msg.innerHTML = "<div class='success-message'>השחקן נחסם" + (permanent ? " לצמיתות" : "") + "!</div>";
@@ -1096,7 +1107,7 @@ function applyMute(permanent) {
     var msg = document.getElementById("moderationMessage");
     var durationMs = permanent ? 0 : msFromDuration("mute");
     if (!permanent && durationMs <= 0) { msg.innerHTML = "<div class='error-message'>בחר משך זמן</div>"; return; }
-    var until = permanent ? null : (Date.now() + durationMs);
+    var until = permanent ? -1 : (Date.now() + durationMs);
     var data = { username: moderationTargetName, until: until, mutedAt: Date.now(), mutedBy: currentUsername };
     withTimeout(database.ref("moderation/mutes/" + moderationTargetUid).set(data), 10000).then(function() {
         msg.innerHTML = "<div class='success-message'>הצ'אט נחסם" + (permanent ? " לצמיתות" : "") + "!</div>";
@@ -1136,7 +1147,7 @@ function loadModerationLists() {
             var b = child.val();
             var row = document.createElement("div");
             row.className = "player-item";
-            row.innerHTML = "<div class='player-name'>" + b.username + " - " + (b.until===null?"לצמיתות":new Date(b.until).toLocaleString("he-IL")) + "</div>";
+            row.innerHTML = "<div class='player-name'>" + b.username + " - " + (b.until===-1?"לצמיתות":new Date(b.until).toLocaleString("he-IL")) + "</div>";
             var btn = document.createElement("button");
             btn.textContent = "הסר";
             btn.className = "danger-button";
@@ -1158,7 +1169,7 @@ function loadModerationLists() {
             var m = child.val();
             var row = document.createElement("div");
             row.className = "player-item";
-            row.innerHTML = "<div class='player-name'>" + m.username + " - " + (m.until===null?"לצמיתות":new Date(m.until).toLocaleString("he-IL")) + "</div>";
+            row.innerHTML = "<div class='player-name'>" + m.username + " - " + (m.until===-1?"לצמיתות":new Date(m.until).toLocaleString("he-IL")) + "</div>";
             var btn = document.createElement("button");
             btn.textContent = "הסר";
             btn.className = "danger-button";
@@ -1756,8 +1767,8 @@ function sendMessage() {
     withTimeout(database.ref("moderation/mutes/" + currentUid).once("value"), 8000).then(function(snap) {
         if (snap.exists()) {
             var mute = snap.val();
-            if (mute.until === null || mute.until > Date.now()) {
-                var untilText = mute.until === null ? "לצמיתות" : ("עד " + new Date(mute.until).toLocaleString("he-IL"));
+            if (mute.until === -1 || mute.until > Date.now()) {
+                var untilText = mute.until === -1 ? "לצמיתות" : ("עד " + new Date(mute.until).toLocaleString("he-IL"));
                 alert("🔇 הצ'אט שלך חסום " + untilText);
                 return;
             }
