@@ -481,8 +481,11 @@ function withTimeout(promise, ms) {
     ]);
 }
 
+function normalizeUsername(username) {
+    return username.toLowerCase().replace(/[^a-z0-9\u0590-\u05FF]/g, "");
+}
 function emailFor(username) {
-    return username.toLowerCase().replace(/[^a-z0-9\u0590-\u05FF]/g, "") + "@cookiegame.local";
+    return normalizeUsername(username) + "@cookiegame.local";
 }
 
 var ADMIN_PASSWORD_HASH = "072a26e98a5c607f017c335bf8401f0bc3e89cde958603da95420ff86bf5cdd6";
@@ -1292,7 +1295,19 @@ function login() {
     var persistence = remember ? firebase.auth.Auth.Persistence.LOCAL : firebase.auth.Auth.Persistence.SESSION;
 
     auth.setPersistence(persistence).then(function() {
-        return withTimeout(auth.signInWithEmailAndPassword(emailFor(username), pass), 10000);
+        return withTimeout(database.ref("usernames/" + normalizeUsername(username)).once("value"), 10000);
+    }).then(function(idxSnap) {
+        if (idxSnap.exists()) {
+            var uid = idxSnap.val();
+            return withTimeout(database.ref("users/" + uid + "/authEmail").once("value"), 10000).then(function(emailSnap) {
+                return emailSnap.exists() ? emailSnap.val() : emailFor(username);
+            });
+        }
+        // legacy account created before username-renaming existed / never renamed: falls back
+        // to deriving the auth email straight from the typed username, exactly as before.
+        return emailFor(username);
+    }).then(function(loginEmail) {
+        return withTimeout(auth.signInWithEmailAndPassword(loginEmail, pass), 10000);
     }).then(function(cred) {
         return withTimeout(database.ref("users/" + cred.user.uid).once("value"), 10000);
     }).then(function(snap) {
@@ -1332,19 +1347,23 @@ function register() {
 
     var persistence = remember ? firebase.auth.Auth.Persistence.LOCAL : firebase.auth.Auth.Persistence.SESSION;
     var createdUid = null;
+    var regEmail = emailFor(username);
 
     auth.setPersistence(persistence).then(function() {
-        return withTimeout(auth.createUserWithEmailAndPassword(emailFor(username), pass), 10000);
+        return withTimeout(auth.createUserWithEmailAndPassword(regEmail, pass), 10000);
     }).then(function(cred) {
         createdUid = cred.user.uid;
         var newUser = {
-            username: username, cookies:0, totalClicks:0, totalCookiesBaked:0,
+            username: username, authEmail: regEmail, cookies:0, totalClicks:0, totalCookiesBaked:0,
             buildings: JSON.parse(JSON.stringify(buildings)),
             clickUpgrades: JSON.parse(JSON.stringify(clickUpgrades)),
             upgrades: JSON.parse(JSON.stringify(upgrades)),
             prestigeLevel:0, prestigeMultiplier:1, club:null, gender:null, created:Date.now()
         };
-        return withTimeout(database.ref("users/" + createdUid).set(newUser), 10000).then(function() { return newUser; });
+        var updates = {};
+        updates["users/" + createdUid] = newUser;
+        updates["usernames/" + normalizeUsername(username)] = createdUid;
+        return withTimeout(database.ref().update(updates), 10000).then(function() { return newUser; });
     }).then(function(newUser) {
         msg.innerHTML = "<div class='success-message'>נרשמת בהצלחה!</div>";
         finishLogin(createdUid, newUser);
@@ -1437,7 +1456,8 @@ function saveUserData() {
 }
 
 function reauth(currentPassword) {
-    var cred = firebase.auth.EmailAuthProvider.credential(emailFor(currentUsername), currentPassword);
+    var authEmail = (usersCache[currentUid] && usersCache[currentUid].authEmail) || emailFor(currentUsername);
+    var cred = firebase.auth.EmailAuthProvider.credential(authEmail, currentPassword);
     return withTimeout(auth.currentUser.reauthenticateWithCredential(cred), 10000);
 }
 
@@ -1511,20 +1531,38 @@ function changeUsername() {
     if (!pass) { msg.innerHTML = "<div class='error-message'>הזן את הסיסמה שלך לאימות</div>"; return; }
     if (newName === currentUsername) { msg.innerHTML = "<div class='error-message'>זה כבר השם שלך</div>"; return; }
 
-    msg.innerHTML = "<div class='info-message'>מעדכן...</div>";
-    var newEmail = emailFor(newName);
+    var newNorm = normalizeUsername(newName);
+    var oldNorm = normalizeUsername(currentUsername);
+    if (!newNorm) { msg.innerHTML = "<div class='error-message'>שם לא תקין</div>"; return; }
 
+    msg.innerHTML = "<div class='info-message'>מעדכן...</div>";
+
+    // NOTE: this no longer calls auth.currentUser.updateEmail(). Firebase now requires the new
+    // email to be verified before it can be changed (auth/operation-not-allowed), which can
+    // never succeed for our fake "@cookiegame.local" addresses. Instead, the real Firebase Auth
+    // email is left untouched forever, and username changes/uniqueness/login are handled purely
+    // through the "usernames/{normalized}" -> uid index in the database.
     reauth(pass).then(function() {
-        return withTimeout(auth.currentUser.updateEmail(newEmail), 10000);
+        return withTimeout(database.ref("usernames/" + newNorm).once("value"), 10000);
+    }).then(function(snap) {
+        if (snap.exists() && snap.val() !== currentUid) {
+            throw { code: "username-taken" };
+        }
+        var authEmail = (usersCache[currentUid] && usersCache[currentUid].authEmail) || emailFor(currentUsername);
+        var updates = {};
+        updates["users/" + currentUid + "/username"] = newName;
+        updates["users/" + currentUid + "/authEmail"] = authEmail;
+        updates["usernames/" + newNorm] = currentUid;
+        updates["usernames/" + oldNorm] = null;
+        return withTimeout(database.ref().update(updates), 10000);
     }).then(function() {
         currentUsername = newName;
-        return withTimeout(database.ref("users/" + currentUid + "/username").set(newName), 10000).then(function() {
-            if (currentClub && clubsCache[currentClub]) {
-                var club = clubsCache[currentClub];
-                club.members = club.members.map(function(m) { if (m.uid === currentUid) m.username = newName; return m; });
-                return withTimeout(database.ref("clubs/" + currentClub).set(club), 10000);
-            }
-        });
+        if (usersCache[currentUid]) usersCache[currentUid].username = newName;
+        if (currentClub && clubsCache[currentClub]) {
+            var club = clubsCache[currentClub];
+            club.members = club.members.map(function(m) { if (m.uid === currentUid) m.username = newName; return m; });
+            return withTimeout(database.ref("clubs/" + currentClub).set(club), 10000);
+        }
     }).then(function() {
         document.getElementById("currentUsername").textContent = currentUsername;
         msg.innerHTML = "<div class='success-message'>שונה בהצלחה!</div>";
@@ -1532,7 +1570,7 @@ function changeUsername() {
         console.log(e);
         var code = e.code || e.message;
         if (code === "auth/wrong-password" || code === "auth/invalid-credential") msg.innerHTML = "<div class='error-message'>סיסמה שגויה</div>";
-        else if (code === "auth/email-already-in-use") msg.innerHTML = "<div class='error-message'>שם תפוס</div>";
+        else if (code === "username-taken") msg.innerHTML = "<div class='error-message'>שם תפוס</div>";
         else msg.innerHTML = "<div class='error-message'>שגיאה: " + code + "</div>";
     });
 }
