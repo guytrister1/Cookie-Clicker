@@ -147,16 +147,6 @@ body { font-family:Arial, sans-serif; background:linear-gradient(45deg,#FF6B6B,#
         <div id="loginMessage"></div>
     </div>
 </div>
-    <div class="modal" id="deleteMessageModal">
-    <div class="modal-content">
-        <h3>🗑️ מחיקת הודעה</h3>
-        <p style="margin:15px 0;">בטוח שברצונך למחוק את ההודעה הזו?</p>
-        <p id="deleteMessagePreview" style="font-size:0.9rem; color:#555; background:rgba(0,0,0,0.05); padding:10px; border-radius:10px; margin-bottom:15px;"></p>
-        <button class="danger-button" onclick="confirmDeleteMessage()">מחק לצמיתות</button>
-        <button class="close-button" onclick="closeModal('deleteMessageModal')">ביטול</button>
-        <div id="deleteMessageStatus"></div>
-    </div>
-</div>
 
 <div class="top-buttons">
     <div id="clubButtonsContainer">
@@ -176,6 +166,17 @@ body { font-family:Arial, sans-serif; background:linear-gradient(45deg,#FF6B6B,#
         <button class="danger-button" onclick="debugForceLeaveClub()">עזוב מועדון</button>
         <button class="close-button" onclick="closeModal('debugModal')">סגור</button>
         <div id="debugMessage"></div>
+    </div>
+</div>
+
+<div class="modal" id="deleteMessageModal">
+    <div class="modal-content">
+        <h3>🗑️ מחיקת הודעה</h3>
+        <p style="margin:15px 0;">בטוח שברצונך למחוק את ההודעה הזו?</p>
+        <p id="deleteMessagePreview" style="font-size:0.9rem; color:#555; background:rgba(0,0,0,0.05); padding:10px; border-radius:10px; margin-bottom:15px;"></p>
+        <button class="danger-button" onclick="confirmDeleteMessage()">מחק לצמיתות</button>
+        <button class="close-button" onclick="closeModal('deleteMessageModal')">ביטול</button>
+        <div id="deleteMessageStatus"></div>
     </div>
 </div>
 
@@ -480,6 +481,16 @@ function emailFor(username) {
     return username.toLowerCase().replace(/[^a-z0-9\u0590-\u05FF]/g, "") + "@cookiegame.local";
 }
 
+var ADMIN_PASSWORD_HASH = "PASTE_YOUR_HASH_HERE";
+
+async function sha256Hex(str) {
+    var enc = new TextEncoder();
+    var data = enc.encode(str);
+    var hashBuffer = await crypto.subtle.digest("SHA-256", data);
+    var hashArray = Array.from(new Uint8Array(hashBuffer));
+    return hashArray.map(function(b) { return b.toString(16).padStart(2, "0"); }).join("");
+}
+
 var cookies = 0, cookiesPerSecond = 0, clickPower = 1;
 var prestigeLevel = 0, prestigeMultiplier = 1, totalCookiesBaked = 0;
 var goldenCookieClicks = 0, lastGoldenCookie = 0, totalClicks = 0;
@@ -494,6 +505,7 @@ var isAdminSession = false;
 var moderationTargetUid = null, moderationTargetName = null;
 var activeEvents = {};
 var dismissedAnnouncementTimestamp = 0;
+var messageToDeleteId = null;
 
 var buildings = {
     cursor: { name:"סמן אוטומטי", emoji:"👆", description:"לוחץ אוטומטית", baseCost:15, cps:0.1, count:0, extraCps:0 },
@@ -517,26 +529,6 @@ var clickUpgrades = {
     clickPower4: { name:"כוח על-אנושי", emoji:"⚡", description:"+100 ללחיצה", baseCost:50000, clickBonus:100, level:0, extraClick:0 },
     clickPower5: { name:"אצבע אלוהית", emoji:"🌟", description:"+500 ללחיצה", baseCost:500000, clickBonus:500, level:0, extraClick:0 }
 };
-    var messageToDeleteId = null;
-
-function openDeleteMessageModal(msgId, msgText) {
-    messageToDeleteId = msgId;
-    document.getElementById("deleteMessagePreview").textContent = msgText;
-    document.getElementById("deleteMessageStatus").innerHTML = "";
-    document.getElementById("deleteMessageModal").style.display = "flex";
-}
-
-function confirmDeleteMessage() {
-    var statusDiv = document.getElementById("deleteMessageStatus");
-    if (!messageToDeleteId) { statusDiv.innerHTML = "<div class='error-message'>שגיאה - הודעה לא נמצאה</div>"; return; }
-
-    withTimeout(database.ref("chat/" + messageToDeleteId).remove(), 10000).then(function() {
-        statusDiv.innerHTML = "<div class='success-message'>ההודעה נמחקה!</div>";
-        setTimeout(function() { closeModal("deleteMessageModal"); }, 800);
-    }).catch(function(e) {
-        statusDiv.innerHTML = "<div class='error-message'>שגיאה: " + (e.message||e.code) + "</div>";
-    });
-}
 
 var upgrades = {
     reinforcedIndex: { name:"אצבע מחוזקת", emoji:"💪", description:"כפולה x2 לסמנים", cost:100, condition:function(){ return buildings.cursor.count>=1; }, effect:function(){ buildings.cursor.cps*=2; }, purchased:false },
@@ -838,6 +830,26 @@ function debugForceLeaveClub() {
         msg.innerHTML = "<div class='success-message'>עזבת את המועדון בהצלחה!</div>";
     }).catch(function(e) {
         msg.innerHTML = "<div class='error-message'>שגיאה: " + (e.message||e.code) + "</div>";
+    });
+}
+
+// ---------- DELETE MESSAGE ----------
+function openDeleteMessageModal(msgId, msgText) {
+    messageToDeleteId = msgId;
+    document.getElementById("deleteMessagePreview").textContent = msgText;
+    document.getElementById("deleteMessageStatus").innerHTML = "";
+    document.getElementById("deleteMessageModal").style.display = "flex";
+}
+
+function confirmDeleteMessage() {
+    var statusDiv = document.getElementById("deleteMessageStatus");
+    if (!messageToDeleteId) { statusDiv.innerHTML = "<div class='error-message'>שגיאה - הודעה לא נמצאה</div>"; return; }
+
+    withTimeout(database.ref("chat/" + messageToDeleteId).remove(), 10000).then(function() {
+        statusDiv.innerHTML = "<div class='success-message'>ההודעה נמחקה!</div>";
+        setTimeout(function() { closeModal("deleteMessageModal"); }, 800);
+    }).catch(function(e) {
+        statusDiv.innerHTML = "<div class='error-message'>שגיאה: " + (e.message||e.code) + "</div>";
     });
 }
 
@@ -1519,15 +1531,6 @@ function openAdminModal() {
         document.getElementById("adminPasswordInput").value = "";
     }
 }
-var ADMIN_PASSWORD_HASH = "c86a530b848177738a74d423995b2c7fc55acb9569936c214f6c160625a564fb";
-
-async function sha256Hex(str) {
-    var enc = new TextEncoder();
-    var data = enc.encode(str);
-    var hashBuffer = await crypto.subtle.digest("SHA-256", data);
-    var hashArray = Array.from(new Uint8Array(hashBuffer));
-    return hashArray.map(function(b) { return b.toString(16).padStart(2, "0"); }).join("");
-}
 
 function verifyAdmin() {
     var pass = document.getElementById("adminPasswordInput").value;
@@ -1827,10 +1830,7 @@ function openAdminMessageMenu(uid, uname, msgId, msgText, isOwn) {
         openModerationModal(uid, uname);
     }
 }
-        box.appendChild(row);
-    });
-    box.scrollTop = box.scrollHeight;
-}
+
 function setupChatListener() {
     if (!firebaseInit) return;
     try {
@@ -1846,6 +1846,14 @@ function setupChatListener() {
             }
         });
     } catch (e) { console.log(e); }
+}
+document.getElementById("chatInput").addEventListener("keypress", function(e) { if (e.key === "Enter") sendMessage(); });
+
+// ---------- DONATIONS ----------
+function openDonateModal() {
+    if (!currentUid) { alert("התחבר קודם"); return; }
+    loadPlayerList();
+    document.getElementById("donateModal").style.display = "flex";
 }
 function loadPlayerList() {
     var list = document.getElementById("playerList");
