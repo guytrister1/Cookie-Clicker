@@ -288,7 +288,7 @@ body { font-family:Arial, sans-serif; background:linear-gradient(45deg,#FF6B6B,#
         <div class="admin-section" id="adminActionsSection" style="display:none;">
             <h4>💰 העברת עוגיות</h4>
             <input type="text" id="targetPlayerInput" placeholder="שם השחקן">
-            <input type="number" id="cookieAmountInput" placeholder="כמות עוגיות" min="1">
+           <input type="text" inputmode="numeric" pattern="[0-9]*" id="cookieAmountInput" placeholder="כמות עוגיות">
             <button id="adminTransferBtn" onclick="adminTransferCookies()">העבר עוגיות</button>
         </div>
         <div class="admin-section danger-section" id="adminDeleteSection" style="display:none;">
@@ -1568,7 +1568,7 @@ function findUserByUsername(username) {
 
 function adminTransferCookies() {
     var target = document.getElementById("targetPlayerInput").value.trim();
-    var amount = parseInt(document.getElementById("cookieAmountInput").value);
+    var amount = Number(document.getElementById("cookieAmountInput").value.replace(/[^0-9]/g, ""));
     var msg = document.getElementById("adminMessage");
     if (!target) { msg.innerHTML = "<div class='error-message'>הזן שם שחקן</div>"; return; }
     if (!amount || amount <= 0) { msg.innerHTML = "<div class='error-message'>כמות לא תקינה</div>"; return; }
