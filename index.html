@@ -128,6 +128,7 @@ body { font-family:Arial, sans-serif; background:linear-gradient(45deg,#FF6B6B,#
 </style>
 </head>
 <body>
+<audio id="eventMusic" loop></audio>
 <div class="event-banner" id="eventBanner"></div>
 <div class="announcement-banner" id="announcementBanner">
     <span id="announcementText"></span>
@@ -311,12 +312,13 @@ body { font-family:Arial, sans-serif; background:linear-gradient(45deg,#FF6B6B,#
             <div id="currentEventsStatus" style="margin-bottom:15px;"></div>
 
             <div style="margin-bottom:15px; text-align:right;">
-                <strong>🌟 גשם עוגיות זהב</strong>
-                <input type="number" id="rainDurationInput" placeholder="משך בדקות" min="1" value="10">
-                <input type="number" id="rainBonusInput" placeholder="בונוס קבוע לכל עוגיית זהב" min="1" value="1000000000">
-                <button onclick="startRainEvent()">הפעל</button>
-                <button class="danger-button" onclick="endEvent('golden_rain')">עצור</button>
-            </div>
+    <strong>🌟 גשם עוגיות זהב</strong>
+    <input type="number" id="rainDurationInput" placeholder="משך בדקות" min="1" value="10">
+    <input type="number" id="rainBonusInput" placeholder="בונוס קבוע לכל עוגיית זהב" min="1" value="1000000000">
+    <select id="rainMusicSelect"></select>
+    <button onclick="startRainEvent()">הפעל</button>
+    <button class="danger-button" onclick="endEvent('golden_rain')">עצור</button>
+</div>
 
             <div style="margin-bottom:15px; text-align:right;">
                 <strong>⚡ כפל ייצור (בונוס קבוע לבניינים שנקנים בזמן האירוע)</strong>
@@ -334,13 +336,14 @@ body { font-family:Arial, sans-serif; background:linear-gradient(45deg,#FF6B6B,#
                 <button class="danger-button" onclick="endEvent('shop_discount')">עצור</button>
             </div>
 
-            <div style="margin-bottom:15px; text-align:right;">
-                <strong>👆 כפל כוח לחיצה (בונוס קבוע לשדרוגים שנקנים בזמן האירוע)</strong>
-                <input type="number" id="clickDurationInput" placeholder="משך בדקות" min="1" value="10">
-                <select id="clickMultiplierSelect"><option value="2">x2</option><option value="3">x3</option></select>
-                <button onclick="startClickEvent()">הפעל</button>
-                <button class="danger-button" onclick="endEvent('double_click')">עצור</button>
-            </div>
+           <div style="margin-bottom:15px; text-align:right;">
+    <strong>👆 כפל כוח לחיצה (בונוס קבוע לשדרוגים שנקנים בזמן האירוע)</strong>
+    <input type="number" id="clickDurationInput" placeholder="משך בדקות" min="1" value="10">
+    <select id="clickMultiplierSelect"><option value="2">x2</option><option value="3">x3</option></select>
+    <select id="clickMusicSelect"></select>
+    <button onclick="startClickEvent()">הפעל</button>
+    <button class="danger-button" onclick="endEvent('double_click')">עצור</button>
+</div>
 
             <button class="danger-button" onclick="endAllEvents()">⏹️ עצור את כל האירועים</button>
 
@@ -506,6 +509,13 @@ var isAdminSession = false;
 var moderationTargetUid = null, moderationTargetName = null;
 var activeEvents = {};
 var dismissedAnnouncementTimestamp = 0;
+var availableMusicTracks = [
+    { label: "ללא מוזיקה", file: "" },
+    { label: "Cookies on the Table", file: "Cookies on the Table.mp3" },
+    { label: "Strong Like Thunder", file: "Strong Like Thunder.mp3" }
+];
+var eventMusicPriority = ["golden_rain", "double_cps", "shop_discount", "double_click"];
+var currentPlayingEventType = null;
 var messageToDeleteId = null;
 
 var buildings = {
@@ -898,7 +908,45 @@ function clearBroadcast() {
         msg.innerHTML = "<div class='error-message'>שגיאה: " + (e.message||e.code) + "</div>";
     });
 }
+function populateMusicSelects() {
+    var selectIds = ["rainMusicSelect", "clickMusicSelect"];
+    selectIds.forEach(function(id) {
+        var sel = document.getElementById(id);
+        if (!sel) return;
+        sel.innerHTML = "";
+        availableMusicTracks.forEach(function(track) {
+            var opt = document.createElement("option");
+            opt.value = track.file;
+            opt.textContent = track.label;
+            sel.appendChild(opt);
+        });
+    });
+}
 
+function updateEventMusic() {
+    var audioEl = document.getElementById("eventMusic");
+    var typeToPlay = null;
+
+    for (var i = 0; i < eventMusicPriority.length; i++) {
+        var type = eventMusicPriority[i];
+        if (isEventActive(type) && activeEvents[type].musicFile) {
+            typeToPlay = type;
+            break;
+        }
+    }
+
+    if (typeToPlay === currentPlayingEventType) return;
+    currentPlayingEventType = typeToPlay;
+
+    if (typeToPlay) {
+        audioEl.src = encodeURI(activeEvents[typeToPlay].musicFile);
+        audioEl.volume = 0.4;
+        audioEl.play().catch(function(e) { console.log("Music play blocked:", e); });
+    } else {
+        audioEl.pause();
+        audioEl.currentTime = 0;
+    }
+}
 // ---------- EVENTS ----------
 function setupEventListener() {
     if (!firebaseInit) return;
@@ -906,6 +954,7 @@ function setupEventListener() {
         activeEvents = snap.exists() ? snap.val() : {};
         updateEventBanner();
         makeShop();
+        updateEventMusic();
     });
     setInterval(function() {
         updateEventBanner();
@@ -913,7 +962,7 @@ function setupEventListener() {
         for (var type in activeEvents) {
             if (activeEvents[type].endTime <= Date.now()) { delete activeEvents[type]; changed = true; }
         }
-        if (changed) makeShop();
+        if (changed) { makeShop(); updateEventMusic(); }
     }, 1000);
 }
 
@@ -970,9 +1019,9 @@ function startRainEvent() {
     var bonus = parseInt(document.getElementById("rainBonusInput").value);
     var msg = document.getElementById("eventsMessage");
     if (!bonus || bonus <= 0) { msg.innerHTML = "<div class='error-message'>הזן בונוס תקין</div>"; return; }
-    startEvent("golden_rain", "rainDurationInput", { fixedBonus: bonus }, "🌟 גשם עוגיות זהב (+" + formatNum(bonus) + " לכל עוגייה)!");
+    var musicFile = document.getElementById("rainMusicSelect").value;
+    startEvent("golden_rain", "rainDurationInput", { fixedBonus: bonus, musicFile: musicFile }, "🌟 גשם עוגיות זהב (+" + formatNum(bonus) + " לכל עוגייה)!");
 }
-
 function startCpsEvent() {
     var multiplier = parseInt(document.getElementById("cpsMultiplierSelect").value);
     startEvent("double_cps", "cpsDurationInput", { multiplier: multiplier }, "⚡ כפל ייצור (x" + multiplier + ") - בניינים שנקנים עכשיו יקבלו בונוס קבוע!");
@@ -980,9 +1029,9 @@ function startCpsEvent() {
 
 function startClickEvent() {
     var multiplier = parseInt(document.getElementById("clickMultiplierSelect").value);
-    startEvent("double_click", "clickDurationInput", { multiplier: multiplier }, "👆 כפל כוח לחיצה (x" + multiplier + ") - שדרוגים שנקנים עכשיו יקבלו בונוס קבוע!");
+    var musicFile = document.getElementById("clickMusicSelect").value;
+    startEvent("double_click", "clickDurationInput", { multiplier: multiplier, musicFile: musicFile }, "👆 כפל כוח לחיצה (x" + multiplier + ") - שדרוגים שנקנים עכשיו יקבלו בונוס קבוע!");
 }
-
 function startDiscountEvent() {
     var discount = parseInt(document.getElementById("discountPercentInput").value);
     var msg = document.getElementById("eventsMessage");
@@ -1515,6 +1564,7 @@ function showAdminSections() {
     document.getElementById("moderationListsSection").style.display = "block";
     document.getElementById("eventsSection").style.display = "block";
     loadModerationLists();
+    populateMusicSelects();
 }
 
 function openAdminModal() {
@@ -1985,6 +2035,7 @@ function setupModerationListenerForSelf() {
 
 updateDisplay();
 makeShop();
+populateMusicSelects();
 
 if (firebaseInit) {
     auth.onAuthStateChanged(function(user) {
