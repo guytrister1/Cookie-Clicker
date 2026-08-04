@@ -147,6 +147,16 @@ body { font-family:Arial, sans-serif; background:linear-gradient(45deg,#FF6B6B,#
         <div id="loginMessage"></div>
     </div>
 </div>
+    <div class="modal" id="deleteMessageModal">
+    <div class="modal-content">
+        <h3>🗑️ מחיקת הודעה</h3>
+        <p style="margin:15px 0;">בטוח שברצונך למחוק את ההודעה הזו?</p>
+        <p id="deleteMessagePreview" style="font-size:0.9rem; color:#555; background:rgba(0,0,0,0.05); padding:10px; border-radius:10px; margin-bottom:15px;"></p>
+        <button class="danger-button" onclick="confirmDeleteMessage()">מחק לצמיתות</button>
+        <button class="close-button" onclick="closeModal('deleteMessageModal')">ביטול</button>
+        <div id="deleteMessageStatus"></div>
+    </div>
+</div>
 
 <div class="top-buttons">
     <div id="clubButtonsContainer">
@@ -507,6 +517,26 @@ var clickUpgrades = {
     clickPower4: { name:"כוח על-אנושי", emoji:"⚡", description:"+100 ללחיצה", baseCost:50000, clickBonus:100, level:0, extraClick:0 },
     clickPower5: { name:"אצבע אלוהית", emoji:"🌟", description:"+500 ללחיצה", baseCost:500000, clickBonus:500, level:0, extraClick:0 }
 };
+    var messageToDeleteId = null;
+
+function openDeleteMessageModal(msgId, msgText) {
+    messageToDeleteId = msgId;
+    document.getElementById("deleteMessagePreview").textContent = msgText;
+    document.getElementById("deleteMessageStatus").innerHTML = "";
+    document.getElementById("deleteMessageModal").style.display = "flex";
+}
+
+function confirmDeleteMessage() {
+    var statusDiv = document.getElementById("deleteMessageStatus");
+    if (!messageToDeleteId) { statusDiv.innerHTML = "<div class='error-message'>שגיאה - הודעה לא נמצאה</div>"; return; }
+
+    withTimeout(database.ref("chat/" + messageToDeleteId).remove(), 10000).then(function() {
+        statusDiv.innerHTML = "<div class='success-message'>ההודעה נמחקה!</div>";
+        setTimeout(function() { closeModal("deleteMessageModal"); }, 800);
+    }).catch(function(e) {
+        statusDiv.innerHTML = "<div class='error-message'>שגיאה: " + (e.message||e.code) + "</div>";
+    });
+}
 
 var upgrades = {
     reinforcedIndex: { name:"אצבע מחוזקת", emoji:"💪", description:"כפולה x2 לסמנים", cost:100, condition:function(){ return buildings.cursor.count>=1; }, effect:function(){ buildings.cursor.cps*=2; }, purchased:false },
@@ -1775,16 +1805,28 @@ function renderChat() {
         bubble.className = "chat-message " + (m.senderUid === currentUid ? "own" : "other");
         bubble.innerHTML = "<div class='message-sender'>" + m.senderName + "</div><div>" + m.message + "</div>";
         row.appendChild(bubble);
-        if (isAdminSession && m.senderUid !== currentUid) {
+        if (isAdminSession) {
             var dotsBtn = document.createElement("button");
             dotsBtn.className = "msg-dots-btn";
             dotsBtn.textContent = "⋮";
             dotsBtn.title = "פעולות מנהל";
-            dotsBtn.addEventListener("click", (function(uid, uname) {
-                return function() { openModerationModal(uid, uname); };
-            })(m.senderUid, m.senderName));
+            dotsBtn.addEventListener("click", (function(uid, uname, msgId, msgText, isOwn) {
+                return function() { openAdminMessageMenu(uid, uname, msgId, msgText, isOwn); };
+            })(m.senderUid, m.senderName, m.msgKey, m.message, m.senderUid === currentUid));
             row.appendChild(dotsBtn);
         }
+        box.appendChild(row);
+    });
+    box.scrollTop = box.scrollHeight;
+}
+
+function openAdminMessageMenu(uid, uname, msgId, msgText, isOwn) {
+    if (isOwn) {
+        openDeleteMessageModal(msgId, msgText);
+    } else {
+        openModerationModal(uid, uname);
+    }
+}
         box.appendChild(row);
     });
     box.scrollTop = box.scrollHeight;
@@ -1793,17 +1835,17 @@ function setupChatListener() {
     if (!firebaseInit) return;
     try {
         database.ref("chat").limitToLast(50).on("value", function(snap) {
-            if (snap.exists()) { chatMessages = Object.values(snap.val()); renderChat(); }
+            if (snap.exists()) {
+                var raw = snap.val();
+                chatMessages = Object.keys(raw).map(function(key) {
+                    var m = raw[key];
+                    m.msgKey = key;
+                    return m;
+                });
+                renderChat();
+            }
         });
     } catch (e) { console.log(e); }
-}
-document.getElementById("chatInput").addEventListener("keypress", function(e) { if (e.key === "Enter") sendMessage(); });
-
-// ---------- DONATIONS ----------
-function openDonateModal() {
-    if (!currentUid) { alert("התחבר קודם"); return; }
-    loadPlayerList();
-    document.getElementById("donateModal").style.display = "flex";
 }
 function loadPlayerList() {
     var list = document.getElementById("playerList");
