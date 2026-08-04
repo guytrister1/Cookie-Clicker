@@ -160,7 +160,7 @@ body { font-family:Arial, sans-serif; background:linear-gradient(45deg,#FF6B6B,#
 
 <button class="settings-button" onclick="openSettingsModal()">⚙️ הגדרות</button>
 <button class="admin-button" onclick="openAdminModal()">👑 מסך יוצר</button>
-<button class="debug-button" onclick="openDebugModal()">🐛 מצב באגים</button>
+<button class="debug-button" id="debugButton" onclick="openDebugModal()" style="display:none;">🐛 מצב באגים</button>
 
 <div class="modal" id="debugModal">
     <div class="modal-content">
@@ -519,18 +519,18 @@ var currentPlayingEventType = null;
 var messageToDeleteId = null;
 
 var buildings = {
-    cursor: { name:"סמן אוטומטי", emoji:"👆", description:"לוחץ אוטומטית", baseCost:15, cps:0.1, count:0, extraCps:0 },
-    grandma: { name:"סבתא", emoji:"👵", description:"אופה עוגיות", baseCost:100, cps:1, count:0, extraCps:0 },
-    farm: { name:"חווה", emoji:"🚜", description:"מגדלת עוגיות", baseCost:1100, cps:8, count:0, extraCps:0 },
-    mine: { name:"מכרה", emoji:"⛏", description:"חופר עוגיות", baseCost:12000, cps:47, count:0, extraCps:0 },
-    factory: { name:"מפעל", emoji:"🏭", description:"מייצר עוגיות", baseCost:130000, cps:260, count:0, extraCps:0 },
-    bank: { name:"בנק", emoji:"🏦", description:"ריבית עוגיות", baseCost:1400000, cps:1400, count:0, extraCps:0 },
-    temple: { name:"מקדש", emoji:"🏛", description:"מקדש קדוש", baseCost:20000000, cps:7800, count:0, extraCps:0 },
-    wizardTower: { name:"מגדל קוסמים", emoji:"🧙", description:"מזמן עוגיות", baseCost:330000000, cps:44000, count:0, extraCps:0 },
-    shipment: { name:"חללית", emoji:"🚀", description:"מביאה מהחלל", baseCost:5100000000, cps:260000, count:0, extraCps:0 },
-    alchemyLab: { name:"מעבדה אלכימית", emoji:"⚗", description:"הופכת חומרים", baseCost:75000000000, cps:1600000, count:0, extraCps:0 },
-    portal: { name:"פורטל", emoji:"🌀", description:"ממדים אחרים", baseCost:1000000000000, cps:10000000, count:0, extraCps:0 },
-    timeMachine: { name:"מכונת זמן", emoji:"⏰", description:"מהעתיד", baseCost:14000000000000, cps:65000000, count:0, extraCps:0 }
+    cursor: { name:"סמן אוטומטי", emoji:"👆", description:"לוחץ אוטומטית", baseCost:15, baseCps:0.1, cps:0.1, count:0, extraCps:0 },
+    grandma: { name:"סבתא", emoji:"👵", description:"אופה עוגיות", baseCost:100, baseCps:1, cps:1, count:0, extraCps:0 },
+    farm: { name:"חווה", emoji:"🚜", description:"מגדלת עוגיות", baseCost:1100, baseCps:8, cps:8, count:0, extraCps:0 },
+    mine: { name:"מכרה", emoji:"⛏", description:"חופר עוגיות", baseCost:12000, baseCps:47, cps:47, count:0, extraCps:0 },
+    factory: { name:"מפעל", emoji:"🏭", description:"מייצר עוגיות", baseCost:130000, baseCps:260, cps:260, count:0, extraCps:0 },
+    bank: { name:"בנק", emoji:"🏦", description:"ריבית עוגיות", baseCost:1400000, baseCps:1400, cps:1400, count:0, extraCps:0 },
+    temple: { name:"מקדש", emoji:"🏛", description:"מקדש קדוש", baseCost:20000000, baseCps:7800, cps:7800, count:0, extraCps:0 },
+    wizardTower: { name:"מגדל קוסמים", emoji:"🧙", description:"מזמן עוגיות", baseCost:330000000, baseCps:44000, cps:44000, count:0, extraCps:0 },
+    shipment: { name:"חללית", emoji:"🚀", description:"מביאה מהחלל", baseCost:5100000000, baseCps:260000, cps:260000, count:0, extraCps:0 },
+    alchemyLab: { name:"מעבדה אלכימית", emoji:"⚗", description:"הופכת חומרים", baseCost:75000000000, baseCps:1600000, cps:1600000, count:0, extraCps:0 },
+    portal: { name:"פורטל", emoji:"🌀", description:"ממדים אחרים", baseCost:1000000000000, baseCps:10000000, cps:10000000, count:0, extraCps:0 },
+    timeMachine: { name:"מכונת זמן", emoji:"⏰", description:"מהעתיד", baseCost:14000000000000, baseCps:65000000, cps:65000000, count:0, extraCps:0 }
 };
 
 var clickUpgrades = {
@@ -593,6 +593,21 @@ function calcCPS() {
     for (var k in buildings) {
         var b = buildings[k];
         cookiesPerSecond += (b.count * b.cps + (b.extraCps || 0)) * prestigeMultiplier;
+    }
+}
+// BUGFIX: rebuilds buildings[k].cps from the true base value, then re-applies every
+// currently-purchased upgrade's effect() exactly once. This replaces the old approach
+// where effect() permanently mutated cps in place, which caused two real bugs:
+//  1) cps was never restored on login/refresh (only count/extraCps were), so every
+//     purchased "double production" upgrade silently stopped working after a reload,
+//     even though the shop correctly remembered it as already bought.
+//  2) prestige() reset the "purchased" flags but not cps itself, so re-buying the same
+//     upgrade after a prestige multiplied cps again on top of the old value, compounding
+//     forever instead of resetting to a clean baseline.
+function recalcBuildingCps() {
+    for (var k in buildings) { buildings[k].cps = buildings[k].baseCps; }
+    for (var uk in upgrades) {
+        if (upgrades[uk].purchased) { upgrades[uk].effect(); }
     }
 }
 function updateDisplay() {
@@ -802,6 +817,7 @@ function prestige() {
         cookies = 0; totalCookiesBaked = 0;
         for (var k in buildings) { buildings[k].count = 0; buildings[k].extraCps = 0; }
         for (var k2 in upgrades) upgrades[k2].purchased = false;
+        recalcBuildingCps();
         calcCPS(); updateDisplay(); makeShop(); checkAchievements();
         showAchievement({ name:"איפוס יוקרה!", desc:"רמה "+prestigeLevel, emoji:"⭐" });
         saveUserData();
@@ -1371,7 +1387,9 @@ function finishLogin(uid, data) {
     }
     for (var k3 in upgrades) upgrades[k3].purchased = (data.upgrades && data.upgrades[k3]) ? (data.upgrades[k3].purchased||false) : false;
 
+    recalcBuildingCps();
     calcClickPower(); calcCPS(); updateDisplay(); makeShop(); updateClubButtons();
+    updateDebugButtonVisibility();
     document.getElementById("loginScreen").style.display = "none";
     startGameLoops();
 }
@@ -1393,6 +1411,8 @@ function resetLocalState() {
     for (var k in buildings) { buildings[k].count = 0; buildings[k].extraCps = 0; }
     for (var k2 in clickUpgrades) { clickUpgrades[k2].level = 0; clickUpgrades[k2].extraClick = 0; }
     for (var k3 in upgrades) upgrades[k3].purchased = false;
+    recalcBuildingCps();
+    updateDebugButtonVisibility();
     document.querySelectorAll(".modal").forEach(function(m){ m.style.display="none"; });
     document.getElementById("loginScreen").style.display = "flex";
     document.getElementById("usernameInput").value = "";
@@ -1453,7 +1473,7 @@ function deleteMyAccount() {
     }).catch(function(e) {
         console.log(e);
         var code = e.code || e.message;
-        if (code === "auth/wrong-password") msg.innerHTML = "<div class='error-message'>סיסמה שגויה</div>";
+        if (code === "auth/wrong-password" || code === "auth/invalid-credential") msg.innerHTML = "<div class='error-message'>סיסמה שגויה</div>";
         else msg.innerHTML = "<div class='error-message'>שגיאה: " + code + "</div>";
     });
 }
@@ -1511,7 +1531,7 @@ function changeUsername() {
     }).catch(function(e) {
         console.log(e);
         var code = e.code || e.message;
-        if (code === "auth/wrong-password") msg.innerHTML = "<div class='error-message'>סיסמה שגויה</div>";
+        if (code === "auth/wrong-password" || code === "auth/invalid-credential") msg.innerHTML = "<div class='error-message'>סיסמה שגויה</div>";
         else if (code === "auth/email-already-in-use") msg.innerHTML = "<div class='error-message'>שם תפוס</div>";
         else msg.innerHTML = "<div class='error-message'>שגיאה: " + code + "</div>";
     });
@@ -1537,7 +1557,7 @@ function changePassword() {
     }).catch(function(e) {
         console.log(e);
         var code = e.code || e.message;
-        if (code === "auth/wrong-password") msg.innerHTML = "<div class='error-message'>סיסמה נוכחית שגויה</div>";
+        if (code === "auth/wrong-password" || code === "auth/invalid-credential") msg.innerHTML = "<div class='error-message'>סיסמה נוכחית שגויה</div>";
         else msg.innerHTML = "<div class='error-message'>שגיאה: " + code + "</div>";
     });
 }
@@ -1556,7 +1576,13 @@ function changeGender() {
 }
 
 // ---------- ADMIN ----------
+function updateDebugButtonVisibility() {
+    var btn = document.getElementById("debugButton");
+    if (btn) btn.style.display = isAdminSession ? "block" : "none";
+}
+
 function showAdminSections() {
+    updateDebugButtonVisibility();
     document.getElementById("adminAuthSection").style.display = "none";
     document.getElementById("adminBroadcastSection").style.display = "block";
     document.getElementById("adminActionsSection").style.display = "block";
@@ -1839,7 +1865,10 @@ function sendMessage() {
         }
         var m = { senderUid: currentUid, senderName: currentUsername, message: text, timestamp: Date.now() };
         input.value = "";
-        withTimeout(database.ref("chat/" + Date.now()).set(m), 10000).catch(function(e) { console.log(e); });
+        // BUGFIX: was "chat/" + Date.now() alone, which could collide (and silently overwrite
+        // one message with another) if two messages were sent in the same millisecond.
+        var msgKey = Date.now() + "_" + Math.random().toString(36).slice(2, 7);
+        withTimeout(database.ref("chat/" + msgKey).set(m), 10000).catch(function(e) { console.log(e); });
     }).catch(function(e) { console.log(e); });
 }
 function renderChat() {
