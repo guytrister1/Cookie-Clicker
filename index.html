@@ -1693,9 +1693,16 @@ function adminTransferCookies() {
     findUserByUsername(target).then(function(found) {
         if (!found) { msg.innerHTML = "<div class='error-message'>שחקן '" + target + "' לא נמצא</div>"; return; }
         var data = found.data;
-        data.cookies = (data.cookies||0) + amount;
-        data.totalCookiesBaked = (data.totalCookiesBaked||0) + amount;
-        return withTimeout(database.ref("users/" + found.uid).set(data), 10000).then(function() {
+        var newCookies = (data.cookies||0) + amount;
+        var newTotal = (data.totalCookiesBaked||0) + amount;
+        // Targeted field update instead of overwriting the whole user object with .set(data) —
+        // matches the Firebase Rules, which only grant a non-owner write access to the
+        // cookies/totalCookiesBaked fields specifically (admins) or an increase (donations),
+        // never a full-object rewrite of someone else's account.
+        var updates = {};
+        updates["users/" + found.uid + "/cookies"] = newCookies;
+        updates["users/" + found.uid + "/totalCookiesBaked"] = newTotal;
+        return withTimeout(database.ref().update(updates), 10000).then(function() {
             return withTimeout(database.ref("chat/" + Date.now() + "_admin").set({
                 senderName:"מערכת", message:"👑 יוצר המשחק העביר ל" + target + " " + formatNum(amount) + " עוגיות!",
                 timestamp:Date.now(), isSystemMessage:true
@@ -2015,9 +2022,15 @@ function confirmDonation() {
         if (!snap.exists()) throw new Error("no-target");
         var data = snap.val();
         cookies -= amount; totalCookiesBaked += amount;
-        data.cookies = (data.cookies||0) + amount;
-        data.totalCookiesBaked = (data.totalCookiesBaked||0) + amount;
-        return withTimeout(database.ref("users/" + selectedDonationTarget.uid).set(data), 10000);
+        var newCookies = (data.cookies||0) + amount;
+        var newTotal = (data.totalCookiesBaked||0) + amount;
+        // Targeted field update, not a full-object .set(data) — the donor isn't the owner of
+        // the target account, so the Rules only permit them to *increase* cookies/
+        // totalCookiesBaked specifically, never rewrite the recipient's whole profile.
+        var updates = {};
+        updates["users/" + selectedDonationTarget.uid + "/cookies"] = newCookies;
+        updates["users/" + selectedDonationTarget.uid + "/totalCookiesBaked"] = newTotal;
+        return withTimeout(database.ref().update(updates), 10000);
     }).then(function() {
         return saveUserData();
     }).then(function() {
