@@ -316,7 +316,8 @@ body { font-family:Arial, sans-serif; background:linear-gradient(45deg,#FF6B6B,#
             <h4>💰 העברת עוגיות</h4>
             <input type="text" id="targetPlayerInput" placeholder="שם השחקן">
            <input type="text" inputmode="numeric" pattern="[0-9]*" id="cookieAmountInput" placeholder="כמות עוגיות">
-            <button id="adminTransferBtn" onclick="adminTransferCookies()">העבר עוגיות</button>
+            <button id="adminTransferBtn" onclick="adminAdjustCookies(1)">➕ הוסף עוגיות</button>
+            <button class="danger-button" id="adminRemoveCookiesBtn" onclick="adminAdjustCookies(-1)">➖ הורד עוגיות</button>
         </div>
         <div class="admin-section danger-section" id="adminDeleteSection" style="display:none;">
             <h4>🗑️ מחיקת שחקן</h4>
@@ -379,9 +380,10 @@ body { font-family:Arial, sans-serif; background:linear-gradient(45deg,#FF6B6B,#
             <button class="danger-button" onclick="endAllEvents()">⏹️ עצור את כל האירועים</button>
 
             <div class="settings-section" style="margin-top:20px;">
-                <h4>🎁 מתנה לכל השחקנים</h4>
+                <h4>🎁 עוגיות לכל השחקנים</h4>
                 <input type="number" id="giftAllAmountInput" placeholder="כמות עוגיות לכל שחקן" min="1">
-                <button onclick="giftAllPlayers()">שלח לכולם</button>
+                <button onclick="adjustAllPlayersCookies(1)">➕ הוסף לכולם</button>
+                <button class="danger-button" onclick="adjustAllPlayersCookies(-1)">➖ הורד מכולם</button>
             </div>
 
             <div id="eventsMessage"></div>
@@ -1179,12 +1181,12 @@ function endAllEvents() {
     });
 }
 
-function giftAllPlayers() {
+function adjustAllPlayersCookies(direction) {
     var amount = parseInt(document.getElementById("giftAllAmountInput").value);
     var msg = document.getElementById("eventsMessage");
     if (!amount || !Number.isFinite(amount) || amount <= 0) { msg.innerHTML = "<div class='error-message'>הזן כמות תקינה</div>"; return; }
 
-    msg.innerHTML = "<div class='info-message'>שולח לכולם...</div>";
+    msg.innerHTML = "<div class='info-message'>" + (direction > 0 ? "שולח לכולם..." : "מוריד מכולם...") + "</div>";
     withTimeout(database.ref("users").once("value"), 15000).then(function(snap) {
         if (!snap.exists()) { msg.innerHTML = "<div class='error-message'>לא נמצאו שחקנים</div>"; return; }
         var updates = {};
@@ -1192,8 +1194,14 @@ function giftAllPlayers() {
         var skipped = 0;
         snap.forEach(function(child) {
             var data = child.val();
-            var newCookies = (data.cookies || 0) + amount;
-            var newTotal = (data.totalCookiesBaked || 0) + amount;
+            var newCookies, newTotal;
+            if (direction > 0) {
+                newCookies = (data.cookies || 0) + amount;
+                newTotal = (data.totalCookiesBaked || 0) + amount;
+            } else {
+                newCookies = Math.max(0, (data.cookies || 0) - amount);
+                newTotal = data.totalCookiesBaked || 0; // lifetime stat, untouched when subtracting
+            }
             if (!Number.isFinite(newCookies) || !Number.isFinite(newTotal)) { skipped++; return; } // corrupted existing data — don't touch it
             updates[child.key + "/cookies"] = newCookies;
             updates[child.key + "/totalCookiesBaked"] = newTotal;
@@ -1203,11 +1211,14 @@ function giftAllPlayers() {
     }).then(function(result) {
         if (result === undefined) return;
         var count = result.count;
+        var chatMsg = direction > 0
+            ? ("🎁 יוצר המשחק העביר לכל השחקנים (" + count + ") " + formatNum(amount) + " עוגיות!")
+            : ("👑 יוצר המשחק הוריד מכל השחקנים (" + count + ") " + formatNum(amount) + " עוגיות!");
         return withTimeout(database.ref("chat/" + Date.now() + "_giftall").set({
-            senderName: "מערכת", message: "🎁 יוצר המשחק העביר לכל השחקנים (" + count + ") " + formatNum(amount) + " עוגיות!",
+            senderName: "מערכת", message: chatMsg,
             timestamp: Date.now(), isSystemMessage: true
         }), 10000).then(function() {
-            msg.innerHTML = "<div class='success-message'>נשלח ל-" + count + " שחקנים!" + (result.skipped ? (" (דילגתי על " + result.skipped + " עם נתונים פגומים)") : "") + "</div>";
+            msg.innerHTML = "<div class='success-message'>" + (direction > 0 ? "נשלח ל-" : "הורד מ-") + count + " שחקנים!" + (result.skipped ? (" (דילגתי על " + result.skipped + " עם נתונים פגומים)") : "") + "</div>";
             document.getElementById("giftAllAmountInput").value = "";
         });
     }).catch(function(e) {
@@ -2472,7 +2483,7 @@ function findUserByUsername(username) {
     });
 }
 
-function adminTransferCookies() {
+function adminAdjustCookies(direction) {
     var target = document.getElementById("targetPlayerInput").value.trim();
     var rawAmount = document.getElementById("cookieAmountInput").value.replace(/[^0-9]/g, "");
     var amount = Number(rawAmount);
@@ -2488,32 +2499,47 @@ function adminTransferCookies() {
     findUserByUsername(target).then(function(found) {
         if (!found) { msg.innerHTML = "<div class='error-message'>שחקן '" + target + "' לא נמצא</div>"; return; }
         var data = found.data;
-        var newCookies = (data.cookies||0) + amount;
-        var newTotal = (data.totalCookiesBaked||0) + amount;
+        var updates = {};
+        var newCookies, newTotal;
+        if (direction > 0) {
+            newCookies = (data.cookies||0) + amount;
+            newTotal = (data.totalCookiesBaked||0) + amount;
+        } else {
+            // Subtracting is a correction, not "un-baking" — only the current balance drops
+            // (clamped at 0), while totalCookiesBaked (used for achievements/prestige) is a
+            // lifetime stat and stays untouched.
+            newCookies = Math.max(0, (data.cookies||0) - amount);
+            newTotal = data.totalCookiesBaked || 0;
+        }
         if (!Number.isFinite(newCookies) || !Number.isFinite(newTotal)) {
-            msg.innerHTML = "<div class='error-message'>הנתונים הקיימים של '" + target + "' כבר פגומים (Infinity/NaN) — אי אפשר להוסיף עוד. תבדוק/תתקן ידנית ב-Firebase Console תחת users/" + found.uid + "/cookies</div>";
+            msg.innerHTML = "<div class='error-message'>הנתונים הקיימים של '" + target + "' כבר פגומים (Infinity/NaN) — אי אפשר לשנות. תבדוק/תתקן ידנית ב-Firebase Console תחת users/" + found.uid + "/cookies</div>";
             return;
         }
         // Targeted field update instead of overwriting the whole user object with .set(data) —
         // matches the Firebase Rules, which only grant a non-owner write access to the
         // cookies/totalCookiesBaked fields specifically (admins) or an increase (donations),
         // never a full-object rewrite of someone else's account.
-        var updates = {};
         updates["users/" + found.uid + "/cookies"] = newCookies;
         updates["users/" + found.uid + "/totalCookiesBaked"] = newTotal;
+        var chatMsg = direction > 0
+            ? ("👑 יוצר המשחק העביר ל" + target + " " + formatNum(amount) + " עוגיות!")
+            : ("👑 יוצר המשחק הוריד מ" + target + " " + formatNum(amount) + " עוגיות!");
+        var notifMsg = direction > 0
+            ? ("יוצר המשחק העביר לך " + formatNum(amount) + " עוגיות! 🎁👑")
+            : ("יוצר המשחק הוריד לך " + formatNum(amount) + " עוגיות.");
         return withTimeout(database.ref().update(updates), 10000).then(function() {
             return withTimeout(database.ref("chat/" + Date.now() + "_admin").set({
-                senderName:"מערכת", message:"👑 יוצר המשחק העביר ל" + target + " " + formatNum(amount) + " עוגיות!",
+                senderName:"מערכת", message: chatMsg,
                 timestamp:Date.now(), isSystemMessage:true
             }), 10000);
         }).then(function() {
             return withTimeout(database.ref("notifications/" + found.uid + "/" + Date.now()).set({
-                senderName:"יוצר המשחק", amount:amount,
-                message:"יוצר המשחק העביר לך " + formatNum(amount) + " עוגיות! 🎁👑",
-                timestamp:Date.now(), type:"admin_transfer"
+                senderName:"יוצר המשחק", amount: direction * amount,
+                message: notifMsg,
+                timestamp:Date.now(), type: direction > 0 ? "admin_transfer" : "admin_deduction"
             }), 10000);
         }).then(function() {
-            msg.innerHTML = "<div class='success-message'>הועברו " + formatNum(amount) + " עוגיות ל" + target + "!</div>";
+            msg.innerHTML = "<div class='success-message'>" + (direction > 0 ? "הועברו " : "הורדו ") + formatNum(amount) + " עוגיות " + (direction > 0 ? "ל" : "מ") + target + "!</div>";
             document.getElementById("targetPlayerInput").value = "";
             document.getElementById("cookieAmountInput").value = "";
         });
