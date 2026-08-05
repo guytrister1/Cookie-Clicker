@@ -414,7 +414,12 @@ body { font-family:Arial, sans-serif; background:linear-gradient(45deg,#FF6B6B,#
                     <input type="text" id="competitionBadgeCustomText" placeholder="הקלד את התואר" maxlength="30" style="display:none; margin-top:6px;">
                 </div>
             </div>
-            <input type="number" id="competitionDurationInput" placeholder="משך בדקות" min="1" value="30">
+            <div style="text-align:right; margin-bottom:6px;"><strong>⏱️ משך התחרות</strong></div>
+            <div style="display:flex; gap:5px;">
+                <input type="number" id="competitionDaysInput" placeholder="ימים" min="0" style="width:33%;">
+                <input type="number" id="competitionHoursInput" placeholder="שעות" min="0" style="width:33%;">
+                <input type="number" id="competitionMinutesInput" placeholder="דקות" min="0" style="width:33%;">
+            </div>
             <button onclick="startCompetition()">🏁 הפעל תחרות</button>
             <button class="danger-button" onclick="endCompetition()">⏹️ עצור תחרות</button>
             <div style="text-align:right; margin-top:14px; padding-top:12px; border-top:1px solid rgba(0,0,0,0.15);">
@@ -1212,6 +1217,18 @@ function isCompetitionActive() {
     return activeCompetition && activeCompetition.endTime > Date.now();
 }
 
+function formatDurationHebrew(ms) {
+    var totalMinutes = Math.max(0, Math.floor(ms / 60000));
+    var days = Math.floor(totalMinutes / 1440);
+    var hours = Math.floor((totalMinutes % 1440) / 60);
+    var mins = totalMinutes % 60;
+    var parts = [];
+    if (days > 0) parts.push(days + " ימים");
+    if (hours > 0) parts.push(hours + " שעות");
+    if (mins > 0 || parts.length === 0) parts.push(mins + " דקות");
+    return parts.join(", ");
+}
+
 // Whether the current player's own clicks should be tracked toward the competition at all —
 // for a "clubs"-only competition, a player who isn't in any club has nothing to contribute.
 function playerInCompetitionScope() {
@@ -1274,9 +1291,13 @@ function refreshCompetitionCountdown() {
     var el = document.getElementById("competitionCountdown");
     if (!el || !isCompetitionActive()) return;
     var remainingMs = activeCompetition.endTime - Date.now();
-    var mins = Math.floor(remainingMs / 60000);
-    var secs = Math.floor((remainingMs % 60000) / 1000);
-    el.textContent = "⏱️ נותרו " + mins + ":" + (secs < 10 ? "0" : "") + secs;
+    if (remainingMs >= 3600000) {
+        el.textContent = "⏱️ נותרו " + formatDurationHebrew(remainingMs);
+    } else {
+        var mins = Math.floor(remainingMs / 60000);
+        var secs = Math.floor((remainingMs % 60000) / 1000);
+        el.textContent = "⏱️ נותרו " + mins + ":" + (secs < 10 ? "0" : "") + secs;
+    }
 }
 
 function refreshCompetitionsModalIfOpen() {
@@ -1411,9 +1432,9 @@ function toggleCompetitionBadgeCustomText() {
 function startCompetition() {
     var scope = document.getElementById("competitionScopeSelect").value;
     var type = document.getElementById("competitionTypeSelect").value;
-    var duration = parseFloat(document.getElementById("competitionDurationInput").value);
+    var durationMs = msFromDuration("competition");
     var msg = document.getElementById("competitionsAdminMessage");
-    if (!duration || duration <= 0) { msg.innerHTML = "<div class='error-message'>הזן משך זמן תקין</div>"; return; }
+    if (!durationMs || durationMs <= 0) { msg.innerHTML = "<div class='error-message'>הזן משך זמן תקין</div>"; return; }
 
     var prizeCookiesPlayer = parseInt(document.getElementById("competitionPrizeCookiesPlayer").value) || 0;
     var prizeCookiesClub = parseInt(document.getElementById("competitionPrizeCookiesClub").value) || 0;
@@ -1436,7 +1457,7 @@ function startCompetition() {
         type: type,
         scope: scope,
         startTime: Date.now(),
-        endTime: Date.now() + duration * 60000,
+        endTime: Date.now() + durationMs,
         startedBy: currentUsername,
         prizeCookiesPlayer: prizeCookiesPlayer,
         prizeCookiesClub: prizeCookiesClub,
@@ -1451,7 +1472,7 @@ function startCompetition() {
     withTimeout(database.ref().update(updates), 10000).then(function() {
         return withTimeout(database.ref("chat/" + Date.now() + "_comp").set({
             senderName: "מערכת",
-            message: "🏁 תחרות חדשה החלה: " + competitionTypeLabels[type] + " (" + competitionScopeLabels[scope] + ", " + duration + " דקות)!",
+            message: "🏁 תחרות חדשה החלה: " + competitionTypeLabels[type] + " (" + competitionScopeLabels[scope] + ", " + formatDurationHebrew(durationMs) + ")!",
             timestamp: Date.now(), isSystemMessage: true
         }), 10000);
     }).then(function() {
@@ -1641,7 +1662,6 @@ function renderCompetitionAdminStatus() {
     if (!el) return;
     if (!isCompetitionActive()) { el.innerHTML = "<div style='color:#888;'>אין תחרות פעילה כרגע</div>"; return; }
     var remainingMs = activeCompetition.endTime - Date.now();
-    var mins = Math.floor(remainingMs / 60000);
     var prizeParts = [];
     if (activeCompetition.prizeCookiesPlayer > 0) prizeParts.push("👤 " + formatNum(activeCompetition.prizeCookiesPlayer) + " עוגיות לשחקן");
     if (activeCompetition.prizeCookiesClub > 0) prizeParts.push("🏆 " + formatNum(activeCompetition.prizeCookiesClub) + " עוגיות לכל חבר מועדון");
@@ -1649,7 +1669,7 @@ function renderCompetitionAdminStatus() {
     var prizeLine = prizeParts.length ? ("<div style='font-size:0.85rem; color:#8E44AD; margin-top:4px;'>פרס: " + prizeParts.join(" · ") + "</div>") : "";
     el.innerHTML = "<div class='player-item'><span class='event-active-tag'>פעיל</span>" +
         competitionTypeLabels[activeCompetition.type] + " · " + competitionScopeLabels[activeCompetition.scope] +
-        " · נותרו כ-" + mins + " דק'" + prizeLine + "</div>";
+        " · נותרו " + formatDurationHebrew(remainingMs) + prizeLine + "</div>";
 }
 
 // ---------- MODERATION ----------
