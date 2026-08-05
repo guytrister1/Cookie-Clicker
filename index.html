@@ -618,7 +618,7 @@ function updateDisplay() {
     document.getElementById("cookieCount").textContent = formatNum(cookies);
     document.getElementById("cpsDisplay").textContent = formatNum(cookiesPerSecond) + " עוגיות לשנייה";
     document.getElementById("cpcDisplay").textContent = "+" + formatNum(Math.floor(clickPower*prestigeMultiplier)) + " ללחיצה";
-    document.getElementById("prestigeInfo").textContent = "רמת יוקרה: " + prestigeLevel + " | כפולה: x" + prestigeMultiplier.toFixed(1);
+    document.getElementById("prestigeInfo").textContent = "רמת יוקרה: " + prestigeLevel + " | כפולה: x" + prestigeMultiplier.toFixed(1) + " | לאיפוס הבא: " + formatNum(getPrestigeRequirement()) + " עוגיות";
 }
 
 function getCost(b) {
@@ -811,12 +811,19 @@ function spawnGoldenCookie() {
     document.body.appendChild(wrap);
     setTimeout(function(){ if (document.body.contains(wrap)) document.body.removeChild(wrap); }, 13000);
 }
+// Each prestige level doubles the requirement for the *next* one: 1M, 2M, 4M, 8M, 16M...
+// so resetting stays meaningful instead of being a flat 1M forever.
+function getPrestigeRequirement() {
+    return 1000000 * Math.pow(2, prestigeLevel);
+}
+
 function prestige() {
-    if (totalCookiesBaked < 1000000) {
-        showAchievement({ name:"לא מוכן", desc:"צריך מיליון עוגיות לפחות", emoji:"❌" });
+    var required = getPrestigeRequirement();
+    if (totalCookiesBaked < required) {
+        showAchievement({ name:"לא מוכן", desc:"צריך " + formatNum(required) + " עוגיות לפחות", emoji:"❌" });
         return;
     }
-    if (confirm("איפוס יוקרה יאפס הכל אבל ייתן בונוס קבוע. להמשיך?")) {
+    if (confirm("איפוס יוקרה יאפס הכל אבל ייתן בונוס קבוע. הדרישה הבאה תעלה ל-" + formatNum(getPrestigeRequirement() * 2) + " עוגיות. להמשיך?")) {
         prestigeLevel++; prestigeMultiplier = 1 + prestigeLevel*0.1;
         cookies = 0; totalCookiesBaked = 0;
         for (var k in buildings) { buildings[k].count = 0; buildings[k].extraCps = 0; }
