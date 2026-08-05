@@ -1151,29 +1151,33 @@ function endAllEvents() {
 function giftAllPlayers() {
     var amount = parseInt(document.getElementById("giftAllAmountInput").value);
     var msg = document.getElementById("eventsMessage");
-    if (!amount || amount <= 0) { msg.innerHTML = "<div class='error-message'>הזן כמות תקינה</div>"; return; }
+    if (!amount || !Number.isFinite(amount) || amount <= 0) { msg.innerHTML = "<div class='error-message'>הזן כמות תקינה</div>"; return; }
+    if (amount > 1e18) { msg.innerHTML = "<div class='error-message'>הכמות גדולה מדי (מקסימום 10^18)</div>"; return; }
 
     msg.innerHTML = "<div class='info-message'>שולח לכולם...</div>";
     withTimeout(database.ref("users").once("value"), 15000).then(function(snap) {
         if (!snap.exists()) { msg.innerHTML = "<div class='error-message'>לא נמצאו שחקנים</div>"; return; }
         var updates = {};
         var count = 0;
+        var skipped = 0;
         snap.forEach(function(child) {
             var data = child.val();
             var newCookies = (data.cookies || 0) + amount;
             var newTotal = (data.totalCookiesBaked || 0) + amount;
+            if (!Number.isFinite(newCookies) || !Number.isFinite(newTotal)) { skipped++; return; } // corrupted existing data — don't touch it
             updates[child.key + "/cookies"] = newCookies;
             updates[child.key + "/totalCookiesBaked"] = newTotal;
             count++;
         });
-        return withTimeout(database.ref("users").update(updates), 15000).then(function() { return count; });
-    }).then(function(count) {
-        if (count === undefined) return;
+        return withTimeout(database.ref("users").update(updates), 15000).then(function() { return { count: count, skipped: skipped }; });
+    }).then(function(result) {
+        if (result === undefined) return;
+        var count = result.count;
         return withTimeout(database.ref("chat/" + Date.now() + "_giftall").set({
             senderName: "מערכת", message: "🎁 יוצר המשחק העביר לכל השחקנים (" + count + ") " + formatNum(amount) + " עוגיות!",
             timestamp: Date.now(), isSystemMessage: true
         }), 10000).then(function() {
-            msg.innerHTML = "<div class='success-message'>נשלח ל-" + count + " שחקנים!</div>";
+            msg.innerHTML = "<div class='success-message'>נשלח ל-" + count + " שחקנים!" + (result.skipped ? (" (דילגתי על " + result.skipped + " עם נתונים פגומים)") : "") + "</div>";
             document.getElementById("giftAllAmountInput").value = "";
         });
     }).catch(function(e) {
@@ -1384,6 +1388,14 @@ function startCompetition() {
 
     var prizeCookiesPlayer = parseInt(document.getElementById("competitionPrizeCookiesPlayer").value) || 0;
     var prizeCookiesClub = parseInt(document.getElementById("competitionPrizeCookiesClub").value) || 0;
+    if (!Number.isFinite(prizeCookiesPlayer) || !Number.isFinite(prizeCookiesClub) || prizeCookiesPlayer < 0 || prizeCookiesClub < 0) {
+        msg.innerHTML = "<div class='error-message'>סכום פרס לא תקין</div>";
+        return;
+    }
+    if (prizeCookiesPlayer > 1e18 || prizeCookiesClub > 1e18) {
+        msg.innerHTML = "<div class='error-message'>סכום הפרס גדול מדי (מקסימום 10^18)</div>";
+        return;
+    }
     var badgeEnabled = document.getElementById("competitionBadgeEnabled").checked;
     var badgeType = document.getElementById("competitionBadgeType").value;
     var badgeCustomText = document.getElementById("competitionBadgeCustomText").value.trim();
@@ -1486,8 +1498,14 @@ function awardCompetitionPrizes(comp) {
                 var winnerData = usersData[bestUid];
                 var winnerName = winnerData.username || "שחקן";
                 if (comp.prizeCookiesPlayer > 0) {
-                    updates["users/" + bestUid + "/cookies"] = (winnerData.cookies || 0) + comp.prizeCookiesPlayer;
-                    updates["users/" + bestUid + "/totalCookiesBaked"] = (winnerData.totalCookiesBaked || 0) + comp.prizeCookiesPlayer;
+                    var newWinnerCookies = (winnerData.cookies || 0) + comp.prizeCookiesPlayer;
+                    var newWinnerTotal = (winnerData.totalCookiesBaked || 0) + comp.prizeCookiesPlayer;
+                    if (Number.isFinite(newWinnerCookies) && Number.isFinite(newWinnerTotal)) {
+                        updates["users/" + bestUid + "/cookies"] = newWinnerCookies;
+                        updates["users/" + bestUid + "/totalCookiesBaked"] = newWinnerTotal;
+                    } else {
+                        console.log("Skipped cookie prize for " + winnerName + ": existing balance is corrupted (Infinity/NaN)");
+                    }
                 }
                 if (comp.prizeBadgeEnabled && comp.prizeBadgeText) {
                     updates["users/" + bestUid + "/title"] = comp.prizeBadgeText;
@@ -1515,8 +1533,14 @@ function awardCompetitionPrizes(comp) {
                     var udata = usersData[m.uid];
                     if (!udata) return;
                     if (comp.prizeCookiesClub > 0) {
-                        updates["users/" + m.uid + "/cookies"] = (udata.cookies || 0) + comp.prizeCookiesClub;
-                        updates["users/" + m.uid + "/totalCookiesBaked"] = (udata.totalCookiesBaked || 0) + comp.prizeCookiesClub;
+                        var newMemberCookies = (udata.cookies || 0) + comp.prizeCookiesClub;
+                        var newMemberTotal = (udata.totalCookiesBaked || 0) + comp.prizeCookiesClub;
+                        if (Number.isFinite(newMemberCookies) && Number.isFinite(newMemberTotal)) {
+                            updates["users/" + m.uid + "/cookies"] = newMemberCookies;
+                            updates["users/" + m.uid + "/totalCookiesBaked"] = newMemberTotal;
+                        } else {
+                            console.log("Skipped cookie prize for club member " + m.uid + ": existing balance is corrupted (Infinity/NaN)");
+                        }
                     }
                     if (comp.prizeBadgeEnabled && comp.prizeBadgeText) {
                         updates["users/" + m.uid + "/title"] = comp.prizeBadgeText;
@@ -2156,10 +2180,15 @@ function findUserByUsername(username) {
 
 function adminTransferCookies() {
     var target = document.getElementById("targetPlayerInput").value.trim();
-    var amount = Number(document.getElementById("cookieAmountInput").value.replace(/[^0-9]/g, ""));
+    var rawAmount = document.getElementById("cookieAmountInput").value.replace(/[^0-9]/g, "");
+    var amount = Number(rawAmount);
     var msg = document.getElementById("adminMessage");
     if (!target) { msg.innerHTML = "<div class='error-message'>הזן שם שחקן</div>"; return; }
-    if (!amount || amount <= 0) { msg.innerHTML = "<div class='error-message'>כמות לא תקינה</div>"; return; }
+    // Number.isFinite catches both an empty/garbage amount AND a value so large (e.g. an
+    // accidentally-pasted string of dozens of digits) that it overflows to Infinity — Firebase
+    // rejects Infinity outright with an opaque console error, so we catch it here first.
+    if (!rawAmount || !Number.isFinite(amount) || amount <= 0) { msg.innerHTML = "<div class='error-message'>כמות לא תקינה</div>"; return; }
+    if (amount > 1e18) { msg.innerHTML = "<div class='error-message'>הכמות גדולה מדי (מקסימום 10^18)</div>"; return; }
 
     msg.innerHTML = "<div class='info-message'>מחפש שחקן...</div>";
 
@@ -2168,6 +2197,10 @@ function adminTransferCookies() {
         var data = found.data;
         var newCookies = (data.cookies||0) + amount;
         var newTotal = (data.totalCookiesBaked||0) + amount;
+        if (!Number.isFinite(newCookies) || !Number.isFinite(newTotal)) {
+            msg.innerHTML = "<div class='error-message'>הנתונים הקיימים של '" + target + "' כבר פגומים (Infinity/NaN) — אי אפשר להוסיף עוד. תבדוק/תתקן ידנית ב-Firebase Console תחת users/" + found.uid + "/cookies</div>";
+            return;
+        }
         // Targeted field update instead of overwriting the whole user object with .set(data) —
         // matches the Firebase Rules, which only grant a non-owner write access to the
         // cookies/totalCookiesBaked fields specifically (admins) or an increase (donations),
@@ -2488,7 +2521,7 @@ function confirmDonation() {
     var amount = parseInt(document.getElementById("donationAmountInput").value);
     var msg = document.getElementById("donationMessage");
     var btn = document.getElementById("confirmDonationBtn");
-    if (!amount || amount <= 0) { msg.innerHTML = "<div class='error-message'>כמות לא תקינה</div>"; return; }
+    if (!amount || !Number.isFinite(amount) || amount <= 0) { msg.innerHTML = "<div class='error-message'>כמות לא תקינה</div>"; return; }
     if (amount > cookies) { msg.innerHTML = "<div class='error-message'>אין לך מספיק עוגיות</div>"; return; }
 
     btn.disabled = true;
@@ -2497,9 +2530,12 @@ function confirmDonation() {
     withTimeout(database.ref("users/" + selectedDonationTarget.uid).once("value"), 10000).then(function(snap) {
         if (!snap.exists()) throw new Error("no-target");
         var data = snap.val();
-        cookies -= amount; totalCookiesBaked += amount;
         var newCookies = (data.cookies||0) + amount;
         var newTotal = (data.totalCookiesBaked||0) + amount;
+        if (!Number.isFinite(newCookies) || !Number.isFinite(newTotal)) {
+            throw { code: "corrupted-target" };
+        }
+        cookies -= amount; totalCookiesBaked += amount;
         // Targeted field update, not a full-object .set(data) — the donor isn't the owner of
         // the target account, so the Rules only permit them to *increase* cookies/
         // totalCookiesBaked specifically, never rewrite the recipient's whole profile.
@@ -2520,7 +2556,12 @@ function confirmDonation() {
         setTimeout(function() { closeModal("donationAmountModal"); }, 1200);
     }).catch(function(e) {
         console.log(e);
-        msg.innerHTML = "<div class='error-message'>שגיאה: " + (e.message||e.code) + "</div>";
+        var code = e.code || e.message;
+        if (code === "corrupted-target") {
+            msg.innerHTML = "<div class='error-message'>נתוני השחקן המקבל פגומים (Infinity/NaN) — אי אפשר לתרום לו כרגע</div>";
+        } else {
+            msg.innerHTML = "<div class='error-message'>שגיאה: " + code + "</div>";
+        }
     }).finally(function() { btn.disabled = false; });
 }
 
