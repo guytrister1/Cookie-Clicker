@@ -1152,7 +1152,6 @@ function giftAllPlayers() {
     var amount = parseInt(document.getElementById("giftAllAmountInput").value);
     var msg = document.getElementById("eventsMessage");
     if (!amount || !Number.isFinite(amount) || amount <= 0) { msg.innerHTML = "<div class='error-message'>הזן כמות תקינה</div>"; return; }
-    if (amount > 1e18) { msg.innerHTML = "<div class='error-message'>הכמות גדולה מדי (מקסימום 10^18)</div>"; return; }
 
     msg.innerHTML = "<div class='info-message'>שולח לכולם...</div>";
     withTimeout(database.ref("users").once("value"), 15000).then(function(snap) {
@@ -1390,10 +1389,6 @@ function startCompetition() {
     var prizeCookiesClub = parseInt(document.getElementById("competitionPrizeCookiesClub").value) || 0;
     if (!Number.isFinite(prizeCookiesPlayer) || !Number.isFinite(prizeCookiesClub) || prizeCookiesPlayer < 0 || prizeCookiesClub < 0) {
         msg.innerHTML = "<div class='error-message'>סכום פרס לא תקין</div>";
-        return;
-    }
-    if (prizeCookiesPlayer > 1e18 || prizeCookiesClub > 1e18) {
-        msg.innerHTML = "<div class='error-message'>סכום הפרס גדול מדי (מקסימום 10^18)</div>";
         return;
     }
     var badgeEnabled = document.getElementById("competitionBadgeEnabled").checked;
@@ -2188,7 +2183,6 @@ function adminTransferCookies() {
     // accidentally-pasted string of dozens of digits) that it overflows to Infinity — Firebase
     // rejects Infinity outright with an opaque console error, so we catch it here first.
     if (!rawAmount || !Number.isFinite(amount) || amount <= 0) { msg.innerHTML = "<div class='error-message'>כמות לא תקינה</div>"; return; }
-    if (amount > 1e18) { msg.innerHTML = "<div class='error-message'>הכמות גדולה מדי (מקסימום 10^18)</div>"; return; }
 
     msg.innerHTML = "<div class='info-message'>מחפש שחקן...</div>";
 
