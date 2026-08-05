@@ -28,6 +28,18 @@ body { font-family:Arial, sans-serif; background:linear-gradient(45deg,#FF6B6B,#
 .competition-button:hover, .club-button:hover, .donate-button:hover { transform:translateY(-2px); }
 .leaderboard-title { margin-top:14px; margin-bottom:8px; color:#2C3E50; font-size:1.1rem; }
 .leaderboard-empty { color:#888; font-size:0.9rem; padding:6px 0; }
+.competitions-fullscreen { position:fixed; top:0; left:0; width:100%; height:100%; background:linear-gradient(135deg,#0F2027,#203A43,#2C5364,#4facfe); background-size:400% 400%; animation:gradientShift 15s ease infinite; z-index:6000; display:none; flex-direction:column; align-items:center; overflow-y:auto; padding:70px 20px 40px 20px; }
+.competitions-close-btn { position:fixed; top:20px; left:20px; background:rgba(255,255,255,0.15); color:white; border:2px solid rgba(255,255,255,0.5); padding:10px 22px; border-radius:15px; font-weight:bold; font-size:1rem; cursor:pointer; z-index:6001; }
+.competitions-close-btn:hover { background:rgba(255,255,255,0.3); }
+.competitions-fullscreen-header { color:white; text-align:center; margin-bottom:25px; }
+.competitions-fullscreen-header h2 { font-size:2.3rem; text-shadow:0 2px 12px rgba(0,0,0,0.4); margin-bottom:6px; }
+.leaderboard-full-table { background:rgba(255,255,255,0.96); border-radius:20px; padding:22px; max-width:650px; width:100%; margin:0 auto 25px auto; box-shadow:0 15px 40px rgba(0,0,0,0.35); }
+.leaderboard-full-row { display:flex; justify-content:space-between; align-items:center; padding:10px 14px; border-radius:10px; margin-bottom:6px; background:rgba(0,0,0,0.04); }
+.leaderboard-full-row.rank-1 { background:linear-gradient(45deg,#FFD700,#FFA500); font-weight:bold; }
+.leaderboard-full-row.rank-2 { background:linear-gradient(45deg,#D9D9D9,#B0B0B0); font-weight:bold; }
+.leaderboard-full-row.rank-3 { background:linear-gradient(45deg,#CD7F32,#B8732E); font-weight:bold; color:white; }
+.leaderboard-rank-num { font-weight:bold; min-width:26px; display:inline-block; }
+.badge-tag { font-size:0.78rem; background:rgba(142,68,173,0.15); color:#8E44AD; padding:2px 7px; border-radius:8px; margin-right:4px; }
 .settings-button { position:fixed; top:20px; right:20px; background:linear-gradient(45deg,#34495E,#2C3E50); color:white; padding:10px 20px; border:none; border-radius:15px; font-size:1rem; font-weight:bold; cursor:pointer; z-index:1000; }
 .admin-button { position:fixed; top:80px; right:20px; background:linear-gradient(45deg,#9B59B6,#8E44AD); color:white; padding:10px 20px; border:none; border-radius:15px; font-size:1rem; font-weight:bold; cursor:pointer; z-index:1000; border:2px solid rgba(255,255,255,0.3); }
 .debug-button { position:fixed; top:140px; right:20px; background:linear-gradient(45deg,#7F8C8D,#2C3E50); color:white; padding:10px 20px; border:none; border-radius:15px; font-size:1rem; font-weight:bold; cursor:pointer; z-index:1000; border:2px dashed rgba(255,255,255,0.4); }
@@ -238,12 +250,12 @@ body { font-family:Arial, sans-serif; background:linear-gradient(45deg,#FF6B6B,#
     </div>
 </div>
 
-<div class="modal" id="competitionsModal">
-    <div class="modal-content">
-        <h3>🏁 תחרויות</h3>
-        <div id="competitionsContent"></div>
-        <button class="close-button" onclick="closeModal('competitionsModal')">סגור</button>
+<div class="competitions-fullscreen" id="competitionsModal">
+    <button class="competitions-close-btn" onclick="closeModal('competitionsModal')">✕ סגור</button>
+    <div class="competitions-fullscreen-header">
+        <h2>🏁 תחרויות</h2>
     </div>
+    <div id="competitionsContent" style="width:100%; max-width:650px;"></div>
 </div>
 
 <div class="modal" id="settingsModal">
@@ -252,6 +264,7 @@ body { font-family:Arial, sans-serif; background:linear-gradient(45deg,#FF6B6B,#
         <div class="settings-section">
             <h4>👤 שם משתמש</h4>
             <div class="current-info">נוכחי: <span id="currentUsername"></span></div>
+            <div class="current-info" id="currentTitleInfo" style="display:none;">תואר: <span id="currentTitleText"></span></div>
             <input type="text" id="newUsernameInput" placeholder="שם משתמש חדש" maxlength="20">
             <input type="password" id="usernameChangePasswordInput" placeholder="הסיסמה שלך (לאימות)">
             <button id="changeUsernameBtn" onclick="changeUsername()">שנה שם משתמש</button>
@@ -385,6 +398,21 @@ body { font-family:Arial, sans-serif; background:linear-gradient(45deg,#FF6B6B,#
                     <option value="cookies">🍪 הכי הרבה עוגיות</option>
                     <option value="prestige">⭐ הכי הרבה איפוסי יוקרה</option>
                 </select>
+            </div>
+            <div style="text-align:right; margin-bottom:10px;">
+                <strong>🎁 פרס בעוגיות (0 = ללא פרס)</strong>
+                <div style="margin-top:6px;">לשחקן יחיד מנצח: <input type="number" id="competitionPrizeCookiesPlayer" min="0" value="0" style="width:140px; display:inline-block;"></div>
+                <div style="margin-top:6px;">לכל חבר במועדון מנצח: <input type="number" id="competitionPrizeCookiesClub" min="0" value="0" style="width:140px; display:inline-block;"></div>
+            </div>
+            <div style="text-align:right; margin-bottom:10px;">
+                <label><input type="checkbox" id="competitionBadgeEnabled" onchange="toggleCompetitionBadgeInputs()"> תן גם תואר/סמל לזוכה</label>
+                <div id="competitionBadgeOptions" style="display:none; margin-top:8px;">
+                    <select id="competitionBadgeType" onchange="toggleCompetitionBadgeCustomText()">
+                        <option value="champion">🏆 אלוף העולם</option>
+                        <option value="custom">✏️ תואר מותאם אישית</option>
+                    </select>
+                    <input type="text" id="competitionBadgeCustomText" placeholder="הקלד את התואר" maxlength="30" style="display:none; margin-top:6px;">
+                </div>
             </div>
             <input type="number" id="competitionDurationInput" placeholder="משך בדקות" min="1" value="30">
             <button onclick="startCompetition()">🏁 הפעל תחרות</button>
@@ -1204,6 +1232,8 @@ function setupCompetitionsListener() {
 
     setInterval(function() {
         if (activeCompetition && activeCompetition.endTime <= Date.now()) {
+            var expiredComp = activeCompetition;
+            finalizeCompetition(expiredComp);
             activeCompetition = null;
             trackedCompetitionId = null;
             refreshCompetitionsModalIfOpen();
@@ -1243,15 +1273,15 @@ function openCompetitionsModal() {
 function renderCompetitionsScreen() {
     var content = document.getElementById("competitionsContent");
     if (!isCompetitionActive()) {
-        content.innerHTML = "<p class='leaderboard-empty' style='font-size:1.1rem; padding:20px 0; text-align:center;'>אין תחרויות כרגע</p>";
+        content.innerHTML = "<p style='font-size:1.3rem; padding:40px 0; text-align:center; color:white; text-shadow:0 2px 8px rgba(0,0,0,0.4); font-weight:bold;'>אין תחרויות כרגע</p>";
         return;
     }
     var comp = activeCompetition;
     content.innerHTML =
-        "<div style='margin-bottom:10px; text-align:center;'>" +
-        "<strong>" + competitionTypeLabels[comp.type] + "</strong><br>" +
-        "<span style='font-size:0.85rem; color:#666;'>" + competitionScopeLabels[comp.scope] + "</span><br>" +
-        "<span id='competitionCountdown' style='font-weight:bold; color:#E67E22;'></span></div>" +
+        "<div style='margin-bottom:16px; text-align:center; color:white; text-shadow:0 2px 8px rgba(0,0,0,0.4);'>" +
+        "<strong style='font-size:1.2rem;'>" + competitionTypeLabels[comp.type] + "</strong><br>" +
+        "<span style='font-size:0.9rem; opacity:0.9;'>" + competitionScopeLabels[comp.scope] + "</span><br>" +
+        "<span id='competitionCountdown' style='font-weight:bold; color:#FFD700;'></span></div>" +
         "<div id='competitionTables'><div class='info-message'>טוען...</div></div>";
     refreshCompetitionCountdown();
     loadCompetitionStandings(comp);
@@ -1287,7 +1317,7 @@ function loadCompetitionStandings(comp) {
             for (var uid in usersData) {
                 var score = getCompetitionScoreForUser(uid, usersData[uid], clickCountsMap);
                 if (comp.type === "clicks" && score <= 0) continue; // only count players who actually clicked
-                playerRows.push({ name: usersData[uid].username || "שחקן", score: score });
+                playerRows.push({ name: usersData[uid].username || "שחקן", score: score, title: usersData[uid].title || null });
             }
             playerRows.sort(function(a,b){ return b.score - a.score; });
             tablesHtml += buildLeaderboardTable("👤 שחקנים יחידים", playerRows);
@@ -1322,14 +1352,27 @@ function loadCompetitionStandings(comp) {
 
 function buildLeaderboardTable(title, rows) {
     var medals = ["🥇", "🥈", "🥉"];
-    var html = "<h4 class='leaderboard-title'>" + title + " (" + rows.length + " משתתפים)</h4>";
+    var html = "<div class='leaderboard-full-table'><h3 class='leaderboard-title' style='margin-top:0;'>" + title + " (" + rows.length + " משתתפים)</h3>";
     if (rows.length === 0) {
-        return html + "<div class='leaderboard-empty'>אין עדיין משתתפים</div>";
+        return html + "<div class='leaderboard-empty'>אין עדיין משתתפים</div></div>";
     }
-    rows.slice(0, 3).forEach(function(r, i) {
-        html += "<div class='player-item'>" + (medals[i]||"") + " <span class='player-name'>" + r.name + "</span> — " + formatNum(r.score) + "</div>";
+    rows.forEach(function(r, i) {
+        var rankClass = i < 3 ? " rank-" + (i+1) : "";
+        var rankLabel = i < 3 ? medals[i] : (i+1) + ".";
+        var badge = r.title ? ("<span class='badge-tag'>🏅 " + r.title + "</span>") : "";
+        html += "<div class='leaderboard-full-row" + rankClass + "'><span><span class='leaderboard-rank-num'>" + rankLabel + "</span> " + r.name + " " + badge + "</span><span>" + formatNum(r.score) + "</span></div>";
     });
+    html += "</div>";
     return html;
+}
+
+function toggleCompetitionBadgeInputs() {
+    var enabled = document.getElementById("competitionBadgeEnabled").checked;
+    document.getElementById("competitionBadgeOptions").style.display = enabled ? "block" : "none";
+}
+function toggleCompetitionBadgeCustomText() {
+    var type = document.getElementById("competitionBadgeType").value;
+    document.getElementById("competitionBadgeCustomText").style.display = type === "custom" ? "block" : "none";
 }
 
 function startCompetition() {
@@ -1339,13 +1382,29 @@ function startCompetition() {
     var msg = document.getElementById("competitionsAdminMessage");
     if (!duration || duration <= 0) { msg.innerHTML = "<div class='error-message'>הזן משך זמן תקין</div>"; return; }
 
+    var prizeCookiesPlayer = parseInt(document.getElementById("competitionPrizeCookiesPlayer").value) || 0;
+    var prizeCookiesClub = parseInt(document.getElementById("competitionPrizeCookiesClub").value) || 0;
+    var badgeEnabled = document.getElementById("competitionBadgeEnabled").checked;
+    var badgeType = document.getElementById("competitionBadgeType").value;
+    var badgeCustomText = document.getElementById("competitionBadgeCustomText").value.trim();
+    var badgeText = badgeType === "champion" ? "🏆 אלוף העולם" : badgeCustomText;
+
+    if (badgeEnabled && badgeType === "custom" && !badgeCustomText) {
+        msg.innerHTML = "<div class='error-message'>הזן טקסט לתואר</div>";
+        return;
+    }
+
     var compData = {
         id: Date.now(),
         type: type,
         scope: scope,
         startTime: Date.now(),
         endTime: Date.now() + duration * 60000,
-        startedBy: currentUsername
+        startedBy: currentUsername,
+        prizeCookiesPlayer: prizeCookiesPlayer,
+        prizeCookiesClub: prizeCookiesClub,
+        prizeBadgeEnabled: badgeEnabled,
+        prizeBadgeText: badgeEnabled ? badgeText : null
     };
 
     var updates = {};
@@ -1367,11 +1426,116 @@ function startCompetition() {
 
 function endCompetition() {
     var msg = document.getElementById("competitionsAdminMessage");
+    if (activeCompetition) finalizeCompetition(activeCompetition);
     withTimeout(database.ref("competitions/active").remove(), 10000).then(function() {
         msg.innerHTML = "<div class='success-message'>התחרות הופסקה!</div>";
     }).catch(function(e) {
         msg.innerHTML = "<div class='error-message'>שגיאה: " + (e.message||e.code) + "</div>";
     });
+}
+
+// Guards against awarding prizes more than once (e.g. two admins online, or a manual stop
+// racing the natural-expiry check) using a Firebase transaction as a single-winner lock.
+function finalizeCompetition(comp) {
+    if (!comp || !isAdminUid) return;
+    withTimeout(database.ref("competitions/active/finalizing").transaction(function(current) {
+        if (current === true) return; // abort — someone already claimed it
+        return true;
+    }), 15000).then(function(result) {
+        if (result && result.committed) {
+            awardCompetitionPrizes(comp);
+        }
+    }).catch(function(e) { console.log("Finalize transaction error:", e); });
+}
+
+function awardCompetitionPrizes(comp) {
+    if (!comp) return;
+    var needsClickCounts = comp.type === "clicks";
+    var needsClubs = comp.scope !== "players";
+    var reads = [
+        withTimeout(database.ref("users").once("value"), 15000),
+        needsClickCounts ? withTimeout(database.ref("competitions/clickCounts").once("value"), 15000) : Promise.resolve(null),
+        needsClubs ? withTimeout(database.ref("clubs").once("value"), 15000) : Promise.resolve(null)
+    ];
+
+    function scoreOf(uid, udata, clickCountsMap) {
+        if (comp.type === "clicks") return (clickCountsMap[uid]) || 0;
+        if (comp.type === "cookies") return udata.cookies || 0;
+        if (comp.type === "prestige") return udata.prestigeLevel || 0;
+        return 0;
+    }
+
+    Promise.all(reads).then(function(results) {
+        var usersSnap = results[0], clickSnap = results[1], clubsSnap = results[2];
+        var usersData = {};
+        if (usersSnap.exists()) usersSnap.forEach(function(c) { usersData[c.key] = c.val(); });
+        var clickCountsMap = {};
+        if (clickSnap && clickSnap.exists()) clickSnap.forEach(function(c) { clickCountsMap[c.key] = c.val(); });
+
+        var updates = {};
+        var announcements = [];
+
+        if (comp.scope === "players" || comp.scope === "both") {
+            var bestUid = null, bestScore = -1;
+            for (var uid in usersData) {
+                var s = scoreOf(uid, usersData[uid], clickCountsMap);
+                if (comp.type === "clicks" && s <= 0) continue;
+                if (s > bestScore) { bestScore = s; bestUid = uid; }
+            }
+            if (bestUid) {
+                var winnerData = usersData[bestUid];
+                var winnerName = winnerData.username || "שחקן";
+                if (comp.prizeCookiesPlayer > 0) {
+                    updates["users/" + bestUid + "/cookies"] = (winnerData.cookies || 0) + comp.prizeCookiesPlayer;
+                    updates["users/" + bestUid + "/totalCookiesBaked"] = (winnerData.totalCookiesBaked || 0) + comp.prizeCookiesPlayer;
+                }
+                if (comp.prizeBadgeEnabled && comp.prizeBadgeText) {
+                    updates["users/" + bestUid + "/title"] = comp.prizeBadgeText;
+                }
+                announcements.push("👤 " + winnerName + " ניצח/ה בתחרות " + competitionTypeLabels[comp.type] + "!");
+            }
+        }
+
+        if (comp.scope === "clubs" || comp.scope === "both") {
+            var clubsData = {};
+            if (clubsSnap && clubsSnap.exists()) clubsSnap.forEach(function(c) { clubsData[c.key] = c.val(); });
+            var bestCode = null, bestClubScore = -1, bestClub = null;
+            for (var code in clubsData) {
+                var club = clubsData[code];
+                var total = 0;
+                (club.members || []).forEach(function(m) {
+                    var udata = usersData[m.uid];
+                    if (udata) total += scoreOf(m.uid, udata, clickCountsMap);
+                });
+                if (comp.type === "clicks" && total <= 0) continue;
+                if (total > bestClubScore) { bestClubScore = total; bestCode = code; bestClub = club; }
+            }
+            if (bestClub) {
+                (bestClub.members || []).forEach(function(m) {
+                    var udata = usersData[m.uid];
+                    if (!udata) return;
+                    if (comp.prizeCookiesClub > 0) {
+                        updates["users/" + m.uid + "/cookies"] = (udata.cookies || 0) + comp.prizeCookiesClub;
+                        updates["users/" + m.uid + "/totalCookiesBaked"] = (udata.totalCookiesBaked || 0) + comp.prizeCookiesClub;
+                    }
+                    if (comp.prizeBadgeEnabled && comp.prizeBadgeText) {
+                        updates["users/" + m.uid + "/title"] = comp.prizeBadgeText;
+                    }
+                });
+                announcements.push("🏆 מועדון " + (bestClub.name || bestCode) + " ניצח בתחרות " + competitionTypeLabels[comp.type] + "!");
+            }
+        }
+
+        var writePromise = Object.keys(updates).length ? withTimeout(database.ref().update(updates), 15000) : Promise.resolve();
+        return writePromise.then(function() {
+            if (announcements.length) {
+                return withTimeout(database.ref("chat/" + Date.now() + "_compend").set({
+                    senderName: "מערכת", message: announcements.join(" | "),
+                    timestamp: Date.now(), isSystemMessage: true
+                }), 10000);
+            }
+        });
+    }).catch(function(e) { console.log("Prize award error:", e); });
 }
 
 function renderCompetitionAdminStatus() {
@@ -1380,9 +1544,14 @@ function renderCompetitionAdminStatus() {
     if (!isCompetitionActive()) { el.innerHTML = "<div style='color:#888;'>אין תחרות פעילה כרגע</div>"; return; }
     var remainingMs = activeCompetition.endTime - Date.now();
     var mins = Math.floor(remainingMs / 60000);
+    var prizeParts = [];
+    if (activeCompetition.prizeCookiesPlayer > 0) prizeParts.push("👤 " + formatNum(activeCompetition.prizeCookiesPlayer) + " עוגיות לשחקן");
+    if (activeCompetition.prizeCookiesClub > 0) prizeParts.push("🏆 " + formatNum(activeCompetition.prizeCookiesClub) + " עוגיות לכל חבר מועדון");
+    if (activeCompetition.prizeBadgeEnabled && activeCompetition.prizeBadgeText) prizeParts.push("🏅 " + activeCompetition.prizeBadgeText);
+    var prizeLine = prizeParts.length ? ("<div style='font-size:0.85rem; color:#8E44AD; margin-top:4px;'>פרס: " + prizeParts.join(" · ") + "</div>") : "";
     el.innerHTML = "<div class='player-item'><span class='event-active-tag'>פעיל</span>" +
         competitionTypeLabels[activeCompetition.type] + " · " + competitionScopeLabels[activeCompetition.scope] +
-        " · נותרו כ-" + mins + " דק'</div>";
+        " · נותרו כ-" + mins + " דק'" + prizeLine + "</div>";
 }
 
 // ---------- MODERATION ----------
@@ -1781,6 +1950,12 @@ function openSettingsModal() {
     if (!currentUid) { alert("התחבר קודם"); return; }
     document.getElementById("currentUsername").textContent = currentUsername;
     var data = usersCache[currentUid] || {};
+    if (data.title) {
+        document.getElementById("currentTitleInfo").style.display = "block";
+        document.getElementById("currentTitleText").textContent = "🏅 " + data.title;
+    } else {
+        document.getElementById("currentTitleInfo").style.display = "none";
+    }
     document.getElementById("currentGender").textContent = data.gender === "male" ? "בן" : data.gender === "female" ? "בת" : "לא נבחר";
     document.getElementById("maleOption").classList.toggle("selected", data.gender === "male");
     document.getElementById("femaleOption").classList.toggle("selected", data.gender === "female");
@@ -2207,6 +2382,8 @@ function sendMessage() {
             }
         }
         var m = { senderUid: currentUid, senderName: currentUsername, message: text, timestamp: Date.now() };
+        var myTitle = usersCache[currentUid] && usersCache[currentUid].title;
+        if (myTitle) m.senderTitle = myTitle;
         input.value = "";
         // BUGFIX: was "chat/" + Date.now() alone, which could collide (and silently overwrite
         // one message with another) if two messages were sent in the same millisecond.
@@ -2229,7 +2406,8 @@ function renderChat() {
         row.className = "msg-row";
         var bubble = document.createElement("div");
         bubble.className = "chat-message " + (m.senderUid === currentUid ? "own" : "other");
-        bubble.innerHTML = "<div class='message-sender'>" + m.senderName + "</div><div>" + m.message + "</div>";
+        var senderBadge = m.senderTitle ? ("<span class='badge-tag'>🏅 " + m.senderTitle + "</span>") : "";
+        bubble.innerHTML = "<div class='message-sender'>" + m.senderName + " " + senderBadge + "</div><div>" + m.message + "</div>";
         row.appendChild(bubble);
         if (isAdminSession) {
             var dotsBtn = document.createElement("button");
