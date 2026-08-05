@@ -491,6 +491,11 @@ body { font-family:Arial, sans-serif; background:linear-gradient(45deg,#FF6B6B,#
             <button class="danger-button" onclick="sendWarning()">שלח אזהרה</button>
         </div>
 
+        <div class="admin-section danger-section" id="moderationDeleteMsgSection" style="display:none;">
+            <h4>🗑️ מחיקת ההודעה שנבחרה</h4>
+            <button class="danger-button" onclick="deleteMessageFromModeration()">מחק את ההודעה הזו</button>
+        </div>
+
         <button class="close-button" onclick="closeModal('moderationModal')">סגור</button>
         <div id="moderationMessage"></div>
     </div>
@@ -608,6 +613,7 @@ var unlockedAchievements = [];
 var isAdminSession = false;
 var isAdminUid = false;
 var moderationTargetUid = null, moderationTargetName = null;
+var moderationTargetMsgId = null, moderationTargetMsgText = "";
 var activeEvents = {};
 var dismissedAnnouncementTimestamp = 0;
 var availableMusicTracks = [
@@ -1846,8 +1852,10 @@ function checkBanThenProceed(uid, data, msgEl) {
     });
 }
 
-function openModerationModal(uid, username) {
+function openModerationModal(uid, username, msgId, msgText) {
     moderationTargetUid = uid; moderationTargetName = username;
+    moderationTargetMsgId = msgId || null;
+    moderationTargetMsgText = msgText || "";
     document.getElementById("modTargetName").textContent = username;
     document.getElementById("banDaysInput").value = "";
     document.getElementById("banHoursInput").value = "";
@@ -1857,7 +1865,14 @@ function openModerationModal(uid, username) {
     document.getElementById("muteMinutesInput").value = "";
     document.getElementById("warnTextInput").value = "";
     document.getElementById("moderationMessage").innerHTML = "";
+    document.getElementById("moderationDeleteMsgSection").style.display = moderationTargetMsgId ? "block" : "none";
     document.getElementById("moderationModal").style.display = "flex";
+}
+
+function deleteMessageFromModeration() {
+    if (!moderationTargetMsgId) return;
+    closeModal("moderationModal");
+    openDeleteMessageModal(moderationTargetMsgId, moderationTargetMsgText);
 }
 
 function msFromDuration(prefix) {
@@ -2813,11 +2828,7 @@ function renderChat() {
 }
 
 function openAdminMessageMenu(uid, uname, msgId, msgText, isOwn) {
-    if (isOwn) {
-        openDeleteMessageModal(msgId, msgText);
-    } else {
-        openModerationModal(uid, uname);
-    }
+    openModerationModal(uid, uname, msgId, msgText);
 }
 
 function setupChatListener() {
