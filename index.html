@@ -418,6 +418,16 @@ body { font-family:Arial, sans-serif; background:linear-gradient(45deg,#FF6B6B,#
             <button onclick="startCompetition()">🏁 הפעל תחרות</button>
             <button class="danger-button" onclick="endCompetition()">⏹️ עצור תחרות</button>
             <div style="text-align:right; margin-top:14px; padding-top:12px; border-top:1px solid rgba(0,0,0,0.15);">
+                <strong>🏅 מתן תואר לשחקן (ללא קשר לתחרות)</strong>
+                <input type="text" id="giveTitleTargetInput" placeholder="שם השחקן">
+                <select id="giveTitleTypeSelect" onchange="toggleGiveTitleCustomText()">
+                    <option value="champion">🏆 אלוף העולם</option>
+                    <option value="custom">✏️ תואר מותאם אישית</option>
+                </select>
+                <input type="text" id="giveTitleCustomText" placeholder="הקלד את התואר" maxlength="30" style="display:none;">
+                <button onclick="adminGiveTitle()">תן תואר</button>
+            </div>
+            <div style="text-align:right; margin-top:14px; padding-top:12px; border-top:1px solid rgba(0,0,0,0.15);">
                 <strong>🗑️ הסרת תואר משחקן</strong>
                 <input type="text" id="removeTitleTargetInput" placeholder="שם השחקן">
                 <button class="danger-button" onclick="adminRemoveTitle()">מחק תואר</button>
@@ -1456,6 +1466,33 @@ function endCompetition() {
     if (activeCompetition) finalizeCompetition(activeCompetition);
     withTimeout(database.ref("competitions/active").remove(), 10000).then(function() {
         msg.innerHTML = "<div class='success-message'>התחרות הופסקה!</div>";
+    }).catch(function(e) {
+        msg.innerHTML = "<div class='error-message'>שגיאה: " + (e.message||e.code) + "</div>";
+    });
+}
+
+function toggleGiveTitleCustomText() {
+    var type = document.getElementById("giveTitleTypeSelect").value;
+    document.getElementById("giveTitleCustomText").style.display = type === "custom" ? "block" : "none";
+}
+
+function adminGiveTitle() {
+    var target = document.getElementById("giveTitleTargetInput").value.trim();
+    var type = document.getElementById("giveTitleTypeSelect").value;
+    var customText = document.getElementById("giveTitleCustomText").value.trim();
+    var titleText = type === "champion" ? "🏆 אלוף העולם" : customText;
+    var msg = document.getElementById("competitionsAdminMessage");
+    if (!target) { msg.innerHTML = "<div class='error-message'>הזן שם שחקן</div>"; return; }
+    if (type === "custom" && !customText) { msg.innerHTML = "<div class='error-message'>הזן טקסט לתואר</div>"; return; }
+
+    msg.innerHTML = "<div class='info-message'>מחפש שחקן...</div>";
+    findUserByUsername(target).then(function(found) {
+        if (!found) { msg.innerHTML = "<div class='error-message'>שחקן '" + target + "' לא נמצא</div>"; return; }
+        return withTimeout(database.ref("users/" + found.uid + "/title").set(titleText), 10000).then(function() {
+            msg.innerHTML = "<div class='success-message'>התואר '" + titleText + "' ניתן ל" + target + "!</div>";
+            document.getElementById("giveTitleTargetInput").value = "";
+            document.getElementById("giveTitleCustomText").value = "";
+        });
     }).catch(function(e) {
         msg.innerHTML = "<div class='error-message'>שגיאה: " + (e.message||e.code) + "</div>";
     });
