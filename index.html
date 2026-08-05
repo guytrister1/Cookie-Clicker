@@ -416,9 +416,10 @@ body { font-family:Arial, sans-serif; background:linear-gradient(45deg,#FF6B6B,#
             </div>
             <div style="text-align:right; margin-bottom:6px;"><strong>⏱️ משך התחרות</strong></div>
             <div style="display:flex; gap:5px;">
-                <input type="number" id="competitionDaysInput" placeholder="ימים" min="0" style="width:33%;">
-                <input type="number" id="competitionHoursInput" placeholder="שעות" min="0" style="width:33%;">
-                <input type="number" id="competitionMinutesInput" placeholder="דקות" min="0" style="width:33%;">
+                <input type="number" id="competitionDaysInput" placeholder="ימים" min="0" style="width:25%;">
+                <input type="number" id="competitionHoursInput" placeholder="שעות" min="0" style="width:25%;">
+                <input type="number" id="competitionMinutesInput" placeholder="דקות" min="0" style="width:25%;">
+                <input type="number" id="competitionSecondsInput" placeholder="שניות" min="0" style="width:25%;">
             </div>
             <button onclick="startCompetition()">🏁 הפעל תחרות</button>
             <button class="danger-button" onclick="endCompetition()">⏹️ עצור תחרות</button>
@@ -1217,15 +1218,25 @@ function isCompetitionActive() {
     return activeCompetition && activeCompetition.endTime > Date.now();
 }
 
+function competitionDurationMs() {
+    var d = parseInt(document.getElementById("competitionDaysInput").value)||0;
+    var h = parseInt(document.getElementById("competitionHoursInput").value)||0;
+    var m = parseInt(document.getElementById("competitionMinutesInput").value)||0;
+    var s = parseInt(document.getElementById("competitionSecondsInput").value)||0;
+    return (d*86400 + h*3600 + m*60 + s) * 1000;
+}
+
 function formatDurationHebrew(ms) {
-    var totalMinutes = Math.max(0, Math.floor(ms / 60000));
-    var days = Math.floor(totalMinutes / 1440);
-    var hours = Math.floor((totalMinutes % 1440) / 60);
-    var mins = totalMinutes % 60;
+    var totalSeconds = Math.max(0, Math.floor(ms / 1000));
+    var days = Math.floor(totalSeconds / 86400);
+    var hours = Math.floor((totalSeconds % 86400) / 3600);
+    var mins = Math.floor((totalSeconds % 3600) / 60);
+    var secs = totalSeconds % 60;
     var parts = [];
     if (days > 0) parts.push(days + " ימים");
     if (hours > 0) parts.push(hours + " שעות");
-    if (mins > 0 || parts.length === 0) parts.push(mins + " דקות");
+    if (mins > 0) parts.push(mins + " דקות");
+    if (secs > 0 || parts.length === 0) parts.push(secs + " שניות");
     return parts.join(", ");
 }
 
@@ -1432,7 +1443,7 @@ function toggleCompetitionBadgeCustomText() {
 function startCompetition() {
     var scope = document.getElementById("competitionScopeSelect").value;
     var type = document.getElementById("competitionTypeSelect").value;
-    var durationMs = msFromDuration("competition");
+    var durationMs = competitionDurationMs();
     var msg = document.getElementById("competitionsAdminMessage");
     if (!durationMs || durationMs <= 0) { msg.innerHTML = "<div class='error-message'>הזן משך זמן תקין</div>"; return; }
 
