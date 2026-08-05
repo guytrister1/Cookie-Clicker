@@ -1304,21 +1304,25 @@ function loadCompetitionStandings(comp) {
     var reads = [
         withTimeout(database.ref("users").once("value"), 15000),
         needsClickCounts ? withTimeout(database.ref("competitions/clickCounts").once("value"), 15000) : Promise.resolve(null),
-        needsClubs ? withTimeout(database.ref("clubs").once("value"), 15000) : Promise.resolve(null)
+        needsClubs ? withTimeout(database.ref("clubs").once("value"), 15000) : Promise.resolve(null),
+        withTimeout(database.ref("admins").once("value"), 15000)
     ];
 
     Promise.all(reads).then(function(results) {
-        var usersSnap = results[0], clickSnap = results[1], clubsSnap = results[2];
+        var usersSnap = results[0], clickSnap = results[1], clubsSnap = results[2], adminsSnap = results[3];
         var usersData = {};
         if (usersSnap.exists()) usersSnap.forEach(function(c) { usersData[c.key] = c.val(); });
         var clickCountsMap = {};
         if (clickSnap && clickSnap.exists()) clickSnap.forEach(function(c) { clickCountsMap[c.key] = c.val(); });
+        var adminUids = {};
+        if (adminsSnap && adminsSnap.exists()) adminsSnap.forEach(function(c) { adminUids[c.key] = true; });
 
         var tablesHtml = "";
 
         if (comp.scope === "players" || comp.scope === "both") {
             var playerRows = [];
             for (var uid in usersData) {
+                if (adminUids[uid]) continue; // admins don't compete individually — only as club members
                 var score = getCompetitionScoreForUser(uid, usersData[uid], clickCountsMap);
                 if (comp.type === "clicks" && score <= 0) continue; // only count players who actually clicked
                 playerRows.push({ name: usersData[uid].username || "שחקן", score: score, title: usersData[uid].title || null });
@@ -1463,7 +1467,8 @@ function awardCompetitionPrizes(comp) {
     var reads = [
         withTimeout(database.ref("users").once("value"), 15000),
         needsClickCounts ? withTimeout(database.ref("competitions/clickCounts").once("value"), 15000) : Promise.resolve(null),
-        needsClubs ? withTimeout(database.ref("clubs").once("value"), 15000) : Promise.resolve(null)
+        needsClubs ? withTimeout(database.ref("clubs").once("value"), 15000) : Promise.resolve(null),
+        withTimeout(database.ref("admins").once("value"), 15000)
     ];
 
     function scoreOf(uid, udata, clickCountsMap) {
@@ -1474,11 +1479,13 @@ function awardCompetitionPrizes(comp) {
     }
 
     Promise.all(reads).then(function(results) {
-        var usersSnap = results[0], clickSnap = results[1], clubsSnap = results[2];
+        var usersSnap = results[0], clickSnap = results[1], clubsSnap = results[2], adminsSnap = results[3];
         var usersData = {};
         if (usersSnap.exists()) usersSnap.forEach(function(c) { usersData[c.key] = c.val(); });
         var clickCountsMap = {};
         if (clickSnap && clickSnap.exists()) clickSnap.forEach(function(c) { clickCountsMap[c.key] = c.val(); });
+        var adminUids = {};
+        if (adminsSnap && adminsSnap.exists()) adminsSnap.forEach(function(c) { adminUids[c.key] = true; });
 
         var updates = {};
         var announcements = [];
@@ -1486,6 +1493,7 @@ function awardCompetitionPrizes(comp) {
         if (comp.scope === "players" || comp.scope === "both") {
             var bestUid = null, bestScore = -1;
             for (var uid in usersData) {
+                if (adminUids[uid]) continue; // admins are excluded from individual standings/prizes
                 var s = scoreOf(uid, usersData[uid], clickCountsMap);
                 if (comp.type === "clicks" && s <= 0) continue;
                 if (s > bestScore) { bestScore = s; bestUid = uid; }
