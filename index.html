@@ -2527,14 +2527,29 @@ function joinClub() {
         if (!club.members) club.members = [];
         club.members.push({ uid: currentUid, username: currentUsername, role:"חבר רגיל", joinDate:Date.now() });
         clubsCache[code] = club;
+
+        // BUGFIX: set currentClub/usersCache *before* the writes below, not after they resolve.
+        // Otherwise, if the periodic autosave (saveUserData, every ~3s) happens to fire while
+        // these writes are still in flight, it uses the stale currentClub (still null) and can
+        // overwrite the just-written club field back to null on the server — invisible until
+        // the next refresh, since the local session had already moved on.
+        var previousClub = currentClub;
+        currentClub = code;
+        usersCache[currentUid].club = code;
+        updateClubButtons();
+
         return withTimeout(database.ref("clubs/" + code).set(club), 10000).then(function() {
             return withTimeout(database.ref("users/" + currentUid + "/club").set(code), 10000);
         }).then(function() {
-            currentClub = code;
-            usersCache[currentUid].club = code;
             msg.innerHTML = "<div class='success-message'>הצטרפת בהצלחה!</div>";
-            updateClubButtons();
+            hasUnsavedChanges = true; // force one more fully-current authoritative save right after
             setTimeout(function() { closeModal("joinClubModal"); showClubInfo(); }, 800);
+        }).catch(function(e) {
+            currentClub = previousClub;
+            if (usersCache[currentUid]) usersCache[currentUid].club = previousClub;
+            delete clubsCache[code];
+            updateClubButtons();
+            throw e;
         });
     }).catch(function(e) {
         console.log(e);
@@ -2553,14 +2568,26 @@ function createClub() {
         var club = { name:name, code:code, founderUid:currentUid, founderName:currentUsername, created:Date.now(),
             members:[{ uid:currentUid, username:currentUsername, role:"מייסד מועדון", joinDate:Date.now() }] };
         clubsCache[code] = club;
+
+        // Same fix as joinClub() above — this window is even longer here because
+        // generateClubCode() can take multiple round trips, making the race far more likely.
+        var previousClub = currentClub;
+        currentClub = code;
+        usersCache[currentUid].club = code;
+        updateClubButtons();
+
         return withTimeout(database.ref("clubs/" + code).set(club), 10000).then(function() {
             return withTimeout(database.ref("users/" + currentUid + "/club").set(code), 10000);
         }).then(function() {
-            currentClub = code;
-            usersCache[currentUid].club = code;
             msg.innerHTML = "<div class='success-message'>נוצר! קוד: " + code + "</div>";
-            updateClubButtons();
+            hasUnsavedChanges = true; // force one more fully-current authoritative save right after
             setTimeout(function() { closeModal("createClubModal"); showClubInfo(); }, 1200);
+        }).catch(function(e) {
+            currentClub = previousClub;
+            if (usersCache[currentUid]) usersCache[currentUid].club = previousClub;
+            delete clubsCache[code];
+            updateClubButtons();
+            throw e;
         });
     }).catch(function(e) {
         console.log(e);
@@ -2572,22 +2599,31 @@ function leaveClub() {
     if (!currentClub) return;
     var club = clubsCache[currentClub];
     var isFounder = club.founderUid === currentUid;
+    var codeBeingLeft = currentClub;
     var p;
     if (isFounder) {
         if (!confirm("אתה המייסד. עזיבה תמחק את המועדון. להמשיך?")) return;
-        p = withTimeout(database.ref("clubs/" + currentClub).remove(), 10000).then(function() { delete clubsCache[currentClub]; });
+        p = withTimeout(database.ref("clubs/" + currentClub).remove(), 10000).then(function() { delete clubsCache[codeBeingLeft]; });
     } else {
         club.members = (club.members || []).filter(function(m) { return m.uid !== currentUid; });
         p = withTimeout(database.ref("clubs/" + currentClub + "/members").set(club.members), 10000);
     }
+    // Same fix as join/create — flip the local state before the removal write settles.
+    currentClub = null;
+    if (usersCache[currentUid]) usersCache[currentUid].club = null;
+    updateClubButtons();
+
     p.then(function() {
         return withTimeout(database.ref("users/" + currentUid + "/club").remove(), 10000);
     }).then(function() {
-        currentClub = null;
-        usersCache[currentUid].club = null;
-        updateClubButtons();
+        hasUnsavedChanges = true;
         closeModal("clubInfoModal");
-    }).catch(function(e) { console.log(e); });
+    }).catch(function(e) {
+        console.log(e);
+        currentClub = codeBeingLeft; // roll back if the leave actually failed
+        if (usersCache[currentUid]) usersCache[currentUid].club = codeBeingLeft;
+        updateClubButtons();
+    });
 }
 
 function showClubInfo() {
