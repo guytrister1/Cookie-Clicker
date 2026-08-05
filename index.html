@@ -563,6 +563,7 @@ async function sha256Hex(str) {
 }
 
 var cookies = 0, cookiesPerSecond = 0, clickPower = 1;
+var hasUnsavedChanges = false;
 var prestigeLevel = 0, prestigeMultiplier = 1, totalCookiesBaked = 0;
 var goldenCookieClicks = 0, lastGoldenCookie = 0, totalClicks = 0;
 
@@ -1822,7 +1823,7 @@ function register() {
             buildings: JSON.parse(JSON.stringify(buildings)),
             clickUpgrades: JSON.parse(JSON.stringify(clickUpgrades)),
             upgrades: JSON.parse(JSON.stringify(upgrades)),
-            prestigeLevel:0, prestigeMultiplier:1, club:null, gender:null, created:Date.now()
+            prestigeLevel:0, prestigeMultiplier:1, unlockedAchievements:[], club:null, gender:null, created:Date.now()
         };
         var updates = {};
         updates["users/" + createdUid] = newUser;
@@ -1859,6 +1860,10 @@ function finishLogin(uid, data) {
     prestigeMultiplier = data.prestigeMultiplier || 1;
     currentClub = data.club || null;
     isAdminSession = data.adminVerified === true;
+    // BUGFIX: this was never restored, so every fresh login started with an empty achievements
+    // list — since achievement conditions (e.g. "prestigeLevel >= 1") stay permanently true once
+    // met, every already-earned achievement popped up again as if it were brand new each login.
+    unlockedAchievements = Array.isArray(data.unlockedAchievements) ? data.unlockedAchievements : [];
 
     for (var k in buildings) {
         buildings[k].count = (data.buildings && data.buildings[k]) ? (data.buildings[k].count||0) : 0;
@@ -1916,6 +1921,7 @@ function saveUserData() {
     u.clickUpgrades = JSON.parse(JSON.stringify(clickUpgrades));
     u.upgrades = JSON.parse(JSON.stringify(upgrades));
     u.prestigeLevel = prestigeLevel; u.prestigeMultiplier = prestigeMultiplier;
+    u.unlockedAchievements = unlockedAchievements;
     u.club = currentClub; u.lastSave = Date.now();
     usersCache[currentUid] = u;
     if (!firebaseInit) return Promise.resolve();
@@ -2564,6 +2570,7 @@ var cookieEl = document.getElementById("cookie");
 cookieEl.addEventListener("click", function(e) {
     var val = clickPower * prestigeMultiplier;
     cookies += val; totalCookiesBaked += val; totalClicks++;
+    hasUnsavedChanges = true;
     if (isCompetitionActive() && activeCompetition.type === "clicks" && playerInCompetitionScope()) {
         localCompetitionClickCount++;
     }
@@ -2589,6 +2596,7 @@ function startGameLoops() {
     setInterval(function() {
         var gain = cookiesPerSecond / 10;
         cookies += gain; totalCookiesBaked += gain;
+        if (gain > 0) hasUnsavedChanges = true;
         updateDisplay(); checkAchievements();
     }, 100);
     setInterval(function() { makeShop(); }, 1000);
@@ -2599,7 +2607,17 @@ function startGameLoops() {
             spawnGoldenCookie();
         }
     }, 5000);
-    setInterval(function() { saveUserData(); }, 30000);
+    // BUGFIX: plain clicking (and passive CPS income) never triggered a save on their own —
+    // only buying something, or this interval, did. The old version only checked every 30s,
+    // so a quick "click a bunch, then refresh" within that window silently lost all progress,
+    // because Firebase still had whatever was saved from before. Checking every 3s (and only
+    // writing when something actually changed) fixes that without hammering Firebase while idle.
+    setInterval(function() {
+        if (hasUnsavedChanges) {
+            hasUnsavedChanges = false;
+            saveUserData();
+        }
+    }, 3000);
 }
 
 function setupModerationListenerForSelf() {
@@ -2643,6 +2661,15 @@ if (firebaseInit) {
         }
     });
 }
+
+// Best-effort: try to flush any last few seconds of progress right as the tab is closing or
+// refreshing. Not 100% guaranteed to complete (browsers don't wait for it), but it closes most
+// of the remaining gap on top of the 3-second periodic save above.
+window.addEventListener("beforeunload", function() {
+    if (currentUid && hasUnsavedChanges) {
+        saveUserData();
+    }
+});
 </script>
 </body>
 </html>
