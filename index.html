@@ -324,6 +324,12 @@ body { font-family:Arial, sans-serif; background:linear-gradient(45deg,#FF6B6B,#
             <input type="text" id="deleteTargetPlayerInput" placeholder="שם השחקן למחיקה">
             <button class="danger-button" id="adminDeleteBtn" onclick="adminDeleteUser()">מחק שחקן</button>
         </div>
+        <div class="admin-section" id="playersListSection" style="display:none;">
+            <h4>📋 רשימת שחקנים</h4>
+            <input type="text" id="adminPlayerSearchInput" placeholder="חפש שחקן לפי שם..." oninput="filterAdminPlayersList()">
+            <button onclick="loadAdminPlayersList()">🔄 רענן רשימה</button>
+            <div id="adminPlayersListDiv" style="max-height:320px; overflow-y:auto; margin-top:10px;"></div>
+        </div>
         <div class="admin-section" id="moderationListsSection" style="display:none;">
             <h4>📋 ניהול קהילה</h4>
             <button onclick="loadModerationLists()">🔄 רענן רשימות</button>
@@ -1905,6 +1911,63 @@ function sendWarning() {
     }).catch(function(e) { msg.innerHTML = "<div class='error-message'>שגיאה: " + (e.message||e.code) + "</div>"; });
 }
 
+var adminPlayersListCache = [];
+
+function loadAdminPlayersList() {
+    var listDiv = document.getElementById("adminPlayersListDiv");
+    listDiv.innerHTML = "<div class='info-message'>טוען...</div>";
+    withTimeout(database.ref("users").once("value"), 15000).then(function(snap) {
+        adminPlayersListCache = [];
+        if (snap.exists()) {
+            snap.forEach(function(child) {
+                var d = child.val();
+                adminPlayersListCache.push({
+                    uid: child.key,
+                    username: d.username || "(ללא שם)",
+                    cookies: d.cookies || 0,
+                    prestigeLevel: d.prestigeLevel || 0,
+                    club: d.club || null,
+                    title: d.title || null,
+                    created: d.created || null
+                });
+            });
+        }
+        adminPlayersListCache.sort(function(a,b) { return a.username.localeCompare(b.username, "he"); });
+        renderAdminPlayersList(document.getElementById("adminPlayerSearchInput").value.trim());
+    }).catch(function(e) {
+        listDiv.innerHTML = "<div class='error-message'>שגיאה: " + (e.message||e.code) + "</div>";
+    });
+}
+
+function filterAdminPlayersList() {
+    renderAdminPlayersList(document.getElementById("adminPlayerSearchInput").value.trim());
+}
+
+function renderAdminPlayersList(filterText) {
+    var listDiv = document.getElementById("adminPlayersListDiv");
+    var norm = filterText.toLowerCase();
+    var filtered = norm ? adminPlayersListCache.filter(function(p) { return p.username.toLowerCase().indexOf(norm) !== -1; }) : adminPlayersListCache;
+
+    if (filtered.length === 0) {
+        listDiv.innerHTML = "<div style='color:#888;'>" + (adminPlayersListCache.length === 0 ? "לא נמצאו שחקנים" : "אין תוצאות") + "</div>";
+        return;
+    }
+
+    var html = "";
+    filtered.forEach(function(p) {
+        var badge = p.title ? ("<span class='badge-tag'>🏅 " + p.title + "</span>") : "";
+        var createdText = p.created ? new Date(p.created).toLocaleDateString("he-IL") : "לא ידוע";
+        html += "<div class='player-item' style='cursor:default;'>" +
+            "<div class='player-name'>👤 " + p.username + " " + badge + "</div>" +
+            "<div style='font-size:0.85rem; color:#555; margin-top:3px;'>" +
+            "🍪 " + formatNum(p.cookies) + " · ⭐ יוקרה " + p.prestigeLevel +
+            (p.club ? " · 🏆 מועדון " + p.club : "") +
+            " · נרשם: " + createdText +
+            "</div></div>";
+    });
+    listDiv.innerHTML = html + "<div style='text-align:center; font-size:0.8rem; color:#888; margin-top:8px;'>" + filtered.length + " מתוך " + adminPlayersListCache.length + " שחקנים</div>";
+}
+
 function loadModerationLists() {
     withTimeout(database.ref("moderation/bans").once("value"), 10000).then(function(snap) {
         var div = document.getElementById("bansListDiv");
@@ -2350,9 +2413,11 @@ function showAdminSections() {
     document.getElementById("moderationListsSection").style.display = "block";
     document.getElementById("eventsSection").style.display = "block";
     document.getElementById("competitionsAdminSection").style.display = "block";
+    document.getElementById("playersListSection").style.display = "block";
     loadModerationLists();
     populateMusicSelects();
     renderCompetitionAdminStatus();
+    loadAdminPlayersList();
 }
 
 function openAdminModal() {
@@ -2368,6 +2433,7 @@ function openAdminModal() {
         document.getElementById("moderationListsSection").style.display = "none";
         document.getElementById("eventsSection").style.display = "none";
         document.getElementById("competitionsAdminSection").style.display = "none";
+        document.getElementById("playersListSection").style.display = "none";
         document.getElementById("adminPasswordInput").value = "";
     }
 }
