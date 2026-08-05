@@ -1285,10 +1285,20 @@ function renderCompetitionsScreen() {
         "<div style='margin-bottom:16px; text-align:center; color:white; text-shadow:0 2px 8px rgba(0,0,0,0.4);'>" +
         "<strong style='font-size:1.2rem;'>" + competitionTypeLabels[comp.type] + "</strong><br>" +
         "<span style='font-size:0.9rem; opacity:0.9;'>" + competitionScopeLabels[comp.scope] + "</span><br>" +
-        "<span id='competitionCountdown' style='font-weight:bold; color:#FFD700;'></span></div>" +
+        "<span id='competitionCountdown' style='font-weight:bold; color:#FFD700;'></span><br>" +
+        "<button onclick='refreshCompetitionLeaderboardManually()' style='margin-top:12px; background:rgba(255,255,255,0.2); color:white; border:2px solid rgba(255,255,255,0.5); padding:8px 18px; border-radius:15px; font-weight:bold; font-size:0.9rem; cursor:pointer;'>🔄 עדכן טבלאות מובילים</button></div>" +
         "<div id='competitionTables'><div class='info-message'>טוען...</div></div>";
     refreshCompetitionCountdown();
     loadCompetitionStandings(comp);
+}
+
+// Standings are a one-time snapshot read (not a live listener) — this button re-fetches so
+// players can see if someone just overtook them, without having to close and reopen the screen.
+function refreshCompetitionLeaderboardManually() {
+    if (!isCompetitionActive()) return;
+    var tablesEl = document.getElementById("competitionTables");
+    if (tablesEl) tablesEl.innerHTML = "<div class='info-message'>מעדכן...</div>";
+    loadCompetitionStandings(activeCompetition);
 }
 
 function getCompetitionScoreForUser(uid, userData, clickCountsMap) {
