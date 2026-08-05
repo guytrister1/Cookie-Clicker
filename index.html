@@ -356,6 +356,7 @@ body { font-family:Arial, sans-serif; background:linear-gradient(45deg,#FF6B6B,#
                 <strong>⚡ כפל ייצור (בונוס קבוע לבניינים שנקנים בזמן האירוע)</strong>
                 <input type="number" id="cpsDurationInput" placeholder="משך בדקות" min="1" value="10">
                 <select id="cpsMultiplierSelect"><option value="2">x2</option><option value="3">x3</option></select>
+                <select id="cpsMusicSelect"></select>
                 <button onclick="startCpsEvent()">הפעל</button>
                 <button class="danger-button" onclick="endEvent('double_cps')">עצור</button>
             </div>
@@ -364,6 +365,7 @@ body { font-family:Arial, sans-serif; background:linear-gradient(45deg,#FF6B6B,#
                 <strong>💰 הנחת חנות</strong>
                 <input type="number" id="discountDurationInput" placeholder="משך בדקות" min="1" value="10">
                 <input type="number" id="discountPercentInput" placeholder="אחוז הנחה" min="1" max="90" value="30">
+                <select id="discountMusicSelect"></select>
                 <button onclick="startDiscountEvent()">הפעל</button>
                 <button class="danger-button" onclick="endEvent('shop_discount')">עצור</button>
             </div>
@@ -876,7 +878,7 @@ function makeFloatingCookies() {
 }
 function spawnGoldenCookie() {
     var rainEv = getEventData("golden_rain");
-    var cooldown = rainEv ? 3000 : 30000;
+    var cooldown = rainEv ? 1000 : 30000;
     if (Date.now() - lastGoldenCookie < cooldown) return;
 
     var wrap = document.createElement("div");
@@ -1039,7 +1041,7 @@ function clearBroadcast() {
     });
 }
 function populateMusicSelects() {
-    var selectIds = ["rainMusicSelect", "clickMusicSelect"];
+    var selectIds = ["rainMusicSelect", "clickMusicSelect", "cpsMusicSelect", "discountMusicSelect"];
     selectIds.forEach(function(id) {
         var sel = document.getElementById(id);
         if (!sel) return;
@@ -1154,7 +1156,8 @@ function startRainEvent() {
 }
 function startCpsEvent() {
     var multiplier = parseInt(document.getElementById("cpsMultiplierSelect").value);
-    startEvent("double_cps", "cpsDurationInput", { multiplier: multiplier }, "⚡ כפל ייצור (x" + multiplier + ") - בניינים שנקנים עכשיו יקבלו בונוס קבוע!");
+    var musicFile = document.getElementById("cpsMusicSelect").value;
+    startEvent("double_cps", "cpsDurationInput", { multiplier: multiplier, musicFile: musicFile }, "⚡ כפל ייצור (x" + multiplier + ") - בניינים שנקנים עכשיו יקבלו בונוס קבוע!");
 }
 
 function startClickEvent() {
@@ -1164,9 +1167,10 @@ function startClickEvent() {
 }
 function startDiscountEvent() {
     var discount = parseInt(document.getElementById("discountPercentInput").value);
+    var musicFile = document.getElementById("discountMusicSelect").value;
     var msg = document.getElementById("eventsMessage");
     if (!discount || discount <= 0 || discount >= 100) { msg.innerHTML = "<div class='error-message'>הזן אחוז הנחה תקין (1-99)</div>"; return; }
-    startEvent("shop_discount", "discountDurationInput", { discount: discount }, "💰 הנחת חנות של " + discount + "% פעילה!");
+    startEvent("shop_discount", "discountDurationInput", { discount: discount, musicFile: musicFile }, "💰 הנחת חנות של " + discount + "% פעילה!");
 }
 
 function endEvent(type) {
@@ -3008,11 +3012,11 @@ function startGameLoops() {
     setInterval(function() { makeShop(); }, 1000);
     setInterval(function() {
         if (isEventActive("golden_rain")) {
-            if (Math.random() < 0.85) spawnGoldenCookie();
-        } else if (Math.random() < 0.06 && cookiesPerSecond > 0) {
+            if (Math.random() < 0.7) spawnGoldenCookie();
+        } else if (Math.random() < 0.02 && cookiesPerSecond > 0) {
             spawnGoldenCookie();
         }
-    }, 5000);
+    }, 1500);
     // BUGFIX: plain clicking (and passive CPS income) never triggered a save on their own —
     // only buying something, or this interval, did. The old version only checked every 30s,
     // so a quick "click a bunch, then refresh" within that window silently lost all progress,
