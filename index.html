@@ -2442,7 +2442,18 @@ function checkAdminEligibility() {
     if (!currentUid || !firebaseInit) return;
     withTimeout(database.ref("admins/" + currentUid).once("value"), 10000).then(function(snap) {
         isAdminUid = snap.exists();
+        if (!isAdminUid) {
+            // Revoke any stale/legacy admin session restored from an old adminVerified flag —
+            // the admins list is the only real source of truth for who's actually an admin.
+            // Without this, someone who verified the password before the admins list existed
+            // (or knows/guessed the password) would still see admin-only UI (like the chat
+            // moderation menu) even though every real write is correctly blocked by the Rules,
+            // producing a stream of confusing permission_denied errors instead of a clean UI.
+            isAdminSession = false;
+        }
         updateAdminButtonVisibility();
+        updateDebugButtonVisibility();
+        renderChat();
     }).catch(function(e) { console.log("Admin eligibility check failed:", e); });
 }
 
@@ -2465,7 +2476,7 @@ function showAdminSections() {
 function openAdminModal() {
     document.getElementById("adminModal").style.display = "flex";
     document.getElementById("adminMessage").innerHTML = "";
-    if (isAdminSession) {
+    if (isAdminSession && isAdminUid) {
         showAdminSections();
     } else {
         document.getElementById("adminAuthSection").style.display = "block";
@@ -2486,18 +2497,22 @@ function verifyAdmin() {
     msg.innerHTML = "<div class='info-message'>בודק...</div>";
 
     sha256Hex(pass).then(function(hash) {
-        if (hash === ADMIN_PASSWORD_HASH) {
-            msg.innerHTML = "<div class='success-message'>גישה אושרה!</div>";
-            isAdminSession = true;
-            if (currentUid) {
-                usersCache[currentUid].adminVerified = true;
-                withTimeout(database.ref("users/" + currentUid + "/adminVerified").set(true), 10000).catch(function(e){ console.log(e); });
-            }
-            showAdminSections();
-            renderChat();
-        } else {
+        if (hash !== ADMIN_PASSWORD_HASH) {
             msg.innerHTML = "<div class='error-message'>סיסמה שגויה</div>";
+            return;
         }
+        if (!isAdminUid) {
+            msg.innerHTML = "<div class='error-message'>הסיסמה נכונה, אבל המשתמש הזה לא רשום כיוצר משחק (ה-UID לא נמצא ברשימת admins ב-Firebase)</div>";
+            return;
+        }
+        msg.innerHTML = "<div class='success-message'>גישה אושרה!</div>";
+        isAdminSession = true;
+        if (currentUid) {
+            usersCache[currentUid].adminVerified = true;
+            withTimeout(database.ref("users/" + currentUid + "/adminVerified").set(true), 10000).catch(function(e){ console.log(e); });
+        }
+        showAdminSections();
+        renderChat();
     });
 }
 
@@ -2832,7 +2847,7 @@ function renderChat() {
         var senderBadge = m.senderTitle ? ("<span class='badge-tag'>🏅 " + m.senderTitle + "</span>") : "";
         bubble.innerHTML = "<div class='message-sender'>" + m.senderName + " " + senderBadge + "</div><div>" + m.message + "</div>";
         row.appendChild(bubble);
-        if (isAdminSession) {
+        if (isAdminSession && isAdminUid) {
             var dotsBtn = document.createElement("button");
             dotsBtn.className = "msg-dots-btn";
             dotsBtn.textContent = "⋮";
