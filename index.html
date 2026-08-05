@@ -417,6 +417,11 @@ body { font-family:Arial, sans-serif; background:linear-gradient(45deg,#FF6B6B,#
             <input type="number" id="competitionDurationInput" placeholder="משך בדקות" min="1" value="30">
             <button onclick="startCompetition()">🏁 הפעל תחרות</button>
             <button class="danger-button" onclick="endCompetition()">⏹️ עצור תחרות</button>
+            <div style="text-align:right; margin-top:14px; padding-top:12px; border-top:1px solid rgba(0,0,0,0.15);">
+                <strong>🗑️ הסרת תואר משחקן</strong>
+                <input type="text" id="removeTitleTargetInput" placeholder="שם השחקן">
+                <button class="danger-button" onclick="adminRemoveTitle()">מחק תואר</button>
+            </div>
             <div id="competitionsAdminMessage"></div>
         </div>
         <button class="close-button" onclick="closeModal('adminModal')">סגור</button>
@@ -1451,6 +1456,24 @@ function endCompetition() {
     if (activeCompetition) finalizeCompetition(activeCompetition);
     withTimeout(database.ref("competitions/active").remove(), 10000).then(function() {
         msg.innerHTML = "<div class='success-message'>התחרות הופסקה!</div>";
+    }).catch(function(e) {
+        msg.innerHTML = "<div class='error-message'>שגיאה: " + (e.message||e.code) + "</div>";
+    });
+}
+
+function adminRemoveTitle() {
+    var target = document.getElementById("removeTitleTargetInput").value.trim();
+    var msg = document.getElementById("competitionsAdminMessage");
+    if (!target) { msg.innerHTML = "<div class='error-message'>הזן שם שחקן</div>"; return; }
+
+    msg.innerHTML = "<div class='info-message'>מחפש שחקן...</div>";
+    findUserByUsername(target).then(function(found) {
+        if (!found) { msg.innerHTML = "<div class='error-message'>שחקן '" + target + "' לא נמצא</div>"; return; }
+        if (!found.data.title) { msg.innerHTML = "<div class='error-message'>לשחקן '" + target + "' אין תואר כרגע</div>"; return; }
+        return withTimeout(database.ref("users/" + found.uid + "/title").remove(), 10000).then(function() {
+            msg.innerHTML = "<div class='success-message'>התואר של " + target + " הוסר!</div>";
+            document.getElementById("removeTitleTargetInput").value = "";
+        });
     }).catch(function(e) {
         msg.innerHTML = "<div class='error-message'>שגיאה: " + (e.message||e.code) + "</div>";
     });
