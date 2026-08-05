@@ -2193,6 +2193,22 @@ function finishLogin(uid, data) {
 
     recalcBuildingCps();
     calcClickPower(); calcCPS(); updateDisplay(); makeShop(); updateClubButtons();
+    if (currentClub) {
+        // BUGFIX: currentClub was correctly restored from data.club, but clubsCache (a separate,
+        // in-memory-only cache) was never populated on login — it only ever got filled by
+        // explicitly opening the club info screen. updateClubButtons() requires BOTH to show the
+        // club name button, so it silently fell back to "join/create club" even though the
+        // player really was still in their club (proven by createClub() correctly refusing with
+        // "you're already in a club", since that check only looks at currentClub).
+        withTimeout(database.ref("clubs/" + currentClub).once("value"), 10000).then(function(snap) {
+            if (snap.exists()) {
+                var club = snap.val();
+                if (!club.members) club.members = [];
+                clubsCache[currentClub] = club;
+                updateClubButtons();
+            }
+        }).catch(function(e) { console.log("Failed to load club info on login:", e); });
+    }
     updateDebugButtonVisibility();
     checkAdminEligibility();
     document.getElementById("loginScreen").style.display = "none";
@@ -2759,6 +2775,10 @@ function updateClubButtons() {
     var c = document.getElementById("clubButtonsContainer");
     if (currentClub && clubsCache[currentClub]) {
         c.innerHTML = "<button class='club-button' onclick='showClubInfo()'>🏆 " + clubsCache[currentClub].name + "</button>";
+    } else if (currentClub) {
+        // We know the player is in a club (currentClub is set) but haven't fetched its name yet
+        // — show a safe placeholder instead of falsely implying they have no club at all.
+        c.innerHTML = "<button class='club-button' onclick='showClubInfo()'>🏆 המועדון שלי</button>";
     } else {
         c.innerHTML = "<button class='club-button' onclick='openJoinClubModal()'>🏆 הצטרף למועדון</button><button class='club-button' onclick='openCreateClubModal()'>⭐ צור מועדון</button>";
     }
