@@ -2575,11 +2575,13 @@ function loadPlayerList() {
         if (!snap.exists()) return;
         snap.forEach(function(child) {
             if (child.key === currentUid) return;
-            var uname = child.val().username;
+            var userData = child.val();
+            var uname = userData.username;
             var uid = child.key;
+            var badge = userData.title ? ("<span class='badge-tag'>🏅 " + userData.title + "</span>") : "";
             var d = document.createElement("div");
             d.className = "player-item";
-            d.innerHTML = "<div class='player-name'>👤 " + uname + "</div>";
+            d.innerHTML = "<div class='player-name'>👤 " + uname + " " + badge + "</div>";
             d.addEventListener("click", function() { selectPlayer(uid, uname); });
             list.appendChild(d);
         });
