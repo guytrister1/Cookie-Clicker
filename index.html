@@ -159,7 +159,7 @@ body { font-family:Arial, sans-serif; background:linear-gradient(45deg,#FF6B6B,#
 </div>
 
 <button class="settings-button" onclick="openSettingsModal()">⚙️ הגדרות</button>
-<button class="admin-button" onclick="openAdminModal()">👑 מסך יוצר</button>
+<button class="admin-button" id="adminButton" onclick="openAdminModal()" style="display:none;">👑 מסך יוצר</button>
 <button class="debug-button" id="debugButton" onclick="openDebugModal()" style="display:none;">🐛 מצב באגים</button>
 
 <div class="modal" id="debugModal">
@@ -509,6 +509,7 @@ var chatMessages = [];
 var selectedDonationTarget = null;
 var unlockedAchievements = [];
 var isAdminSession = false;
+var isAdminUid = false;
 var moderationTargetUid = null, moderationTargetName = null;
 var activeEvents = {};
 var dismissedAnnouncementTimestamp = 0;
@@ -1409,6 +1410,7 @@ function finishLogin(uid, data) {
     recalcBuildingCps();
     calcClickPower(); calcCPS(); updateDisplay(); makeShop(); updateClubButtons();
     updateDebugButtonVisibility();
+    checkAdminEligibility();
     document.getElementById("loginScreen").style.display = "none";
     startGameLoops();
 }
@@ -1427,11 +1429,13 @@ function resetLocalState() {
     cookies=0; cookiesPerSecond=0; clickPower=1; prestigeLevel=0; prestigeMultiplier=1;
     totalCookiesBaked=0; goldenCookieClicks=0; totalClicks=0; unlockedAchievements=[];
     isAdminSession = false;
+    isAdminUid = false;
     for (var k in buildings) { buildings[k].count = 0; buildings[k].extraCps = 0; }
     for (var k2 in clickUpgrades) { clickUpgrades[k2].level = 0; clickUpgrades[k2].extraClick = 0; }
     for (var k3 in upgrades) upgrades[k3].purchased = false;
     recalcBuildingCps();
     updateDebugButtonVisibility();
+    updateAdminButtonVisibility();
     document.querySelectorAll(".modal").forEach(function(m){ m.style.display="none"; });
     document.getElementById("loginScreen").style.display = "flex";
     document.getElementById("usernameInput").value = "";
@@ -1617,6 +1621,22 @@ function changeGender() {
 function updateDebugButtonVisibility() {
     var btn = document.getElementById("debugButton");
     if (btn) btn.style.display = isAdminSession ? "block" : "none";
+}
+
+function updateAdminButtonVisibility() {
+    var btn = document.getElementById("adminButton");
+    if (btn) btn.style.display = isAdminUid ? "block" : "none";
+}
+
+// Checks the real "admins/{uid}" list in the database — the same list the Firebase Rules
+// enforce — rather than any client-side flag, so the button only appears for genuine admins
+// even before they've typed the password this session.
+function checkAdminEligibility() {
+    if (!currentUid || !firebaseInit) return;
+    withTimeout(database.ref("admins/" + currentUid).once("value"), 10000).then(function(snap) {
+        isAdminUid = snap.exists();
+        updateAdminButtonVisibility();
+    }).catch(function(e) { console.log("Admin eligibility check failed:", e); });
 }
 
 function showAdminSections() {
