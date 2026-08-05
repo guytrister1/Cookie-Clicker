@@ -384,6 +384,10 @@ body { font-family:Arial, sans-serif; background:linear-gradient(45deg,#FF6B6B,#
             <h4>🏁 ניהול תחרויות</h4>
             <div id="currentCompetitionStatus" style="margin-bottom:12px; text-align:right;"></div>
             <div style="text-align:right; margin-bottom:10px;">
+                <strong>📛 שם התחרות</strong>
+                <input type="text" id="competitionNameInput" placeholder="למשל: תחרות אביב 2026" maxlength="40">
+            </div>
+            <div style="text-align:right; margin-bottom:10px;">
                 <strong>משתתפים:</strong>
                 <select id="competitionScopeSelect">
                     <option value="players">שחקנים יחידים</option>
@@ -421,8 +425,7 @@ body { font-family:Arial, sans-serif; background:linear-gradient(45deg,#FF6B6B,#
                 <input type="number" id="competitionMinutesInput" placeholder="דקות" min="0" style="width:25%;">
                 <input type="number" id="competitionSecondsInput" placeholder="שניות" min="0" style="width:25%;">
             </div>
-            <button onclick="startCompetition()">🏁 הפעל תחרות</button>
-            <button class="danger-button" onclick="endCompetition()">⏹️ עצור תחרות</button>
+            <button onclick="startCompetition()">🏁 הפעל תחרות חדשה</button>
             <div style="text-align:right; margin-top:14px; padding-top:12px; border-top:1px solid rgba(0,0,0,0.15);">
                 <strong>🏅 מתן תואר לשחקן (ללא קשר לתחרות)</strong>
                 <input type="text" id="giveTitleTargetInput" placeholder="שם השחקן">
@@ -1207,15 +1210,26 @@ function giftAllPlayers() {
 }
 
 // ---------- COMPETITIONS ----------
-var activeCompetition = null;
-var trackedCompetitionId = null;
-var localCompetitionClickCount = 0;
+var activeCompetitions = {}; // keyed by competition id -> competition object
+var trackedCompetitionIds = {}; // competition id -> true, once we've fetched our click baseline for it
+var localCompetitionClickCounts = {}; // competition id -> number
+var selectedCompetitionId = null; // which tab is shown in the full-screen competitions view
+var legacyCompetitionMigrationAttempted = false;
 
 var competitionTypeLabels = { clicks: "🖱 הכי הרבה לחיצות", cookies: "🍪 הכי הרבה עוגיות", prestige: "⭐ הכי הרבה איפוסי יוקרה" };
 var competitionScopeLabels = { players: "שחקנים יחידים", clubs: "מועדונים", both: "שחקנים ומועדונים" };
 
-function isCompetitionActive() {
-    return activeCompetition && activeCompetition.endTime > Date.now();
+function isCompetitionActive(comp) {
+    return comp && comp.endTime > Date.now();
+}
+
+function getActiveCompetitionsList() {
+    var list = [];
+    for (var id in activeCompetitions) {
+        if (isCompetitionActive(activeCompetitions[id])) list.push(activeCompetitions[id]);
+    }
+    list.sort(function(a,b){ return a.startTime - b.startTime; });
+    return list;
 }
 
 function competitionDurationMs() {
@@ -1240,49 +1254,63 @@ function formatDurationHebrew(ms) {
     return parts.join(", ");
 }
 
-// Whether the current player's own clicks should be tracked toward the competition at all —
+// Whether the current player's own clicks should be tracked toward a given competition at all —
 // for a "clubs"-only competition, a player who isn't in any club has nothing to contribute.
-function playerInCompetitionScope() {
-    if (!activeCompetition) return false;
-    if (activeCompetition.scope === "clubs") return !!currentClub;
+function playerInCompetitionScope(comp) {
+    if (!comp) return false;
+    if (comp.scope === "clubs") return !!currentClub;
     return true; // "players" or "both"
 }
 
 function setupCompetitionsListener() {
     if (!firebaseInit) return;
-    database.ref("competitions/active").on("value", function(snap) {
-        if (!snap.exists()) {
-            activeCompetition = null;
-            trackedCompetitionId = null;
-            localCompetitionClickCount = 0;
-            refreshCompetitionsModalIfOpen();
-            renderCompetitionAdminStatus();
-            return;
+
+    // One-time migration: fold any leftover competition from the old single-competition format
+    // into the new list, instead of silently losing it when this update goes live.
+    if (isAdminUid) migrateLegacyCompetitionIfNeeded();
+
+    database.ref("competitions/list").on("value", function(snap) {
+        var newActive = {};
+        if (snap.exists()) {
+            snap.forEach(function(child) { newActive[child.key] = child.val(); });
         }
-        var data = snap.val();
-        activeCompetition = data;
-        if (data.id !== trackedCompetitionId) {
-            // A different competition than the one we were tracking (either a brand-new one,
-            // or we just reloaded mid-competition) — (re)fetch our own click baseline from the
-            // server rather than assuming 0, so a page refresh never loses progress.
-            trackedCompetitionId = data.id;
-            localCompetitionClickCount = 0;
-            if (currentUid && data.type === "clicks") {
-                withTimeout(database.ref("competitions/clickCounts/" + currentUid).once("value"), 10000).then(function(cSnap) {
-                    localCompetitionClickCount = cSnap.exists() ? (cSnap.val() || 0) : 0;
-                }).catch(function(e) { console.log(e); });
+        activeCompetitions = newActive;
+
+        for (var id in activeCompetitions) {
+            if (!trackedCompetitionIds[id]) {
+                // A competition we haven't seen before (brand-new, or we just reloaded mid-competition)
+                // — (re)fetch our own click baseline from the server rather than assuming 0, so a page
+                // refresh never loses progress.
+                trackedCompetitionIds[id] = true;
+                localCompetitionClickCounts[id] = 0;
+                if (currentUid && activeCompetitions[id].type === "clicks") {
+                    (function(cid) {
+                        withTimeout(database.ref("competitions/clickCounts/" + cid + "/" + currentUid).once("value"), 10000).then(function(cSnap) {
+                            localCompetitionClickCounts[cid] = cSnap.exists() ? (cSnap.val() || 0) : 0;
+                        }).catch(function(e) { console.log(e); });
+                    })(id);
+                }
             }
         }
+
+        if (selectedCompetitionId && !isCompetitionActive(activeCompetitions[selectedCompetitionId])) {
+            selectedCompetitionId = null; // the tab we were viewing ended — fall back to another one
+        }
+
         refreshCompetitionsModalIfOpen();
         renderCompetitionAdminStatus();
     });
 
     setInterval(function() {
-        if (activeCompetition && activeCompetition.endTime <= Date.now()) {
-            var expiredComp = activeCompetition;
-            finalizeCompetition(expiredComp);
-            activeCompetition = null;
-            trackedCompetitionId = null;
+        var anyExpired = false;
+        for (var id in activeCompetitions) {
+            var comp = activeCompetitions[id];
+            if (comp.endTime <= Date.now()) {
+                anyExpired = true;
+                finalizeCompetition(comp); // safe to call repeatedly — a transaction guards against double-award
+            }
+        }
+        if (anyExpired) {
             refreshCompetitionsModalIfOpen();
             renderCompetitionAdminStatus();
         }
@@ -1290,18 +1318,77 @@ function setupCompetitionsListener() {
     }, 1000);
 
     // Periodically flush the local click tally instead of writing on every single click —
-    // keeps clicking snappy and avoids hammering the database.
+    // keeps clicking snappy and avoids hammering the database. A click can count toward
+    // several simultaneous "clicks"-type competitions at once.
     setInterval(function() {
-        if (currentUid && isCompetitionActive() && activeCompetition.type === "clicks" && playerInCompetitionScope()) {
-            withTimeout(database.ref("competitions/clickCounts/" + currentUid).set(localCompetitionClickCount), 10000).catch(function(e) { console.log(e); });
+        if (!currentUid) return;
+        for (var id in activeCompetitions) {
+            var comp = activeCompetitions[id];
+            if (isCompetitionActive(comp) && comp.type === "clicks" && playerInCompetitionScope(comp)) {
+                withTimeout(database.ref("competitions/clickCounts/" + id + "/" + currentUid).set(localCompetitionClickCounts[id] || 0), 10000).catch(function(e) { console.log(e); });
+            }
         }
     }, 3000);
 }
 
+// Migrates a leftover competition from the old single-competition schema (competitions/active +
+// a flat competitions/clickCounts map) into the new competitions/list/{id} schema, giving it a
+// default name since the old format never had one. Runs once per admin session; harmless if it
+// ever runs twice (just re-writes the same values). Already-expired legacy competitions are just
+// cleaned up rather than resurrected as a new list entry.
+function migrateLegacyCompetitionIfNeeded() {
+    if (legacyCompetitionMigrationAttempted) return;
+    legacyCompetitionMigrationAttempted = true;
+    withTimeout(database.ref("competitions/active").once("value"), 10000).then(function(snap) {
+        if (!snap.exists()) return;
+        var legacy = snap.val();
+        var newId = legacy.id || Date.now();
+        var isExpired = !legacy.endTime || legacy.endTime <= Date.now();
+
+        return withTimeout(database.ref("competitions/clickCounts").once("value"), 10000).then(function(clickSnap) {
+            var step1 = {};
+            var oldFlatKeys = [];
+            if (clickSnap.exists()) {
+                clickSnap.forEach(function(c) {
+                    oldFlatKeys.push(c.key); // old schema: keys here were player UIDs directly
+                    if (!isExpired && legacy.type === "clicks") {
+                        step1["competitions/clickCounts/" + newId + "/" + c.key] = c.val();
+                    }
+                });
+            }
+            if (!isExpired) {
+                step1["competitions/list/" + newId] = {
+                    id: newId,
+                    name: "תחרות קודמת (ללא שם)",
+                    type: legacy.type,
+                    scope: legacy.scope,
+                    startTime: legacy.startTime || Date.now(),
+                    endTime: legacy.endTime,
+                    startedBy: legacy.startedBy || currentUsername,
+                    prizeCookiesPlayer: legacy.prizeCookiesPlayer || 0,
+                    prizeCookiesClub: legacy.prizeCookiesClub || 0,
+                    prizeBadgeEnabled: legacy.prizeBadgeEnabled || false,
+                    prizeBadgeText: legacy.prizeBadgeText || null
+                };
+            }
+
+            var step1Promise = Object.keys(step1).length ? withTimeout(database.ref().update(step1), 15000) : Promise.resolve();
+            return step1Promise.then(function() {
+                var step2 = { "competitions/active": null };
+                oldFlatKeys.forEach(function(uid) { step2["competitions/clickCounts/" + uid] = null; });
+                return withTimeout(database.ref().update(step2), 15000);
+            });
+        });
+    }).then(function() {
+        console.log("Legacy competition migration check complete.");
+    }).catch(function(e) { console.log("Legacy competition migration failed:", e); });
+}
+
 function refreshCompetitionCountdown() {
     var el = document.getElementById("competitionCountdown");
-    if (!el || !isCompetitionActive()) return;
-    var remainingMs = activeCompetition.endTime - Date.now();
+    var comp = selectedCompetitionId ? activeCompetitions[selectedCompetitionId] : null;
+    if (!el || !isCompetitionActive(comp)) return;
+    var remainingMs = comp.endTime - Date.now();
     if (remainingMs >= 3600000) {
         el.textContent = "⏱️ נותרו " + formatDurationHebrew(remainingMs);
     } else {
@@ -1323,12 +1410,25 @@ function openCompetitionsModal() {
 
 function renderCompetitionsScreen() {
     var content = document.getElementById("competitionsContent");
-    if (!isCompetitionActive()) {
+    var list = getActiveCompetitionsList();
+    if (list.length === 0) {
         content.innerHTML = "<p style='font-size:1.3rem; padding:40px 0; text-align:center; color:white; text-shadow:0 2px 8px rgba(0,0,0,0.4); font-weight:bold;'>אין תחרויות כרגע</p>";
         return;
     }
-    var comp = activeCompetition;
-    content.innerHTML =
+    if (!selectedCompetitionId || !isCompetitionActive(activeCompetitions[selectedCompetitionId])) {
+        selectedCompetitionId = list[0].id;
+    }
+    var comp = activeCompetitions[selectedCompetitionId];
+
+    var tabsHtml = "<div style='display:flex; flex-wrap:wrap; justify-content:center; gap:8px; margin-bottom:18px;'>";
+    list.forEach(function(c) {
+        var isSelected = String(c.id) === String(selectedCompetitionId);
+        tabsHtml += "<button onclick='selectCompetitionTab(" + c.id + ")' style='padding:8px 16px; border-radius:15px; border:2px solid rgba(255,255,255,0.6); cursor:pointer; font-weight:bold; font-size:0.9rem; " +
+            (isSelected ? "background:rgba(255,255,255,0.95); color:#203A43;" : "background:rgba(255,255,255,0.15); color:white;") + "'>" + (c.name || "תחרות ללא שם") + "</button>";
+    });
+    tabsHtml += "</div>";
+
+    content.innerHTML = tabsHtml +
         "<div style='margin-bottom:16px; text-align:center; color:white; text-shadow:0 2px 8px rgba(0,0,0,0.4);'>" +
         "<strong style='font-size:1.2rem;'>" + competitionTypeLabels[comp.type] + "</strong><br>" +
         "<span style='font-size:0.9rem; opacity:0.9;'>" + competitionScopeLabels[comp.scope] + "</span><br>" +
@@ -1339,19 +1439,25 @@ function renderCompetitionsScreen() {
     loadCompetitionStandings(comp);
 }
 
+function selectCompetitionTab(compId) {
+    selectedCompetitionId = compId;
+    renderCompetitionsScreen();
+}
+
 // Standings are a one-time snapshot read (not a live listener) — this button re-fetches so
 // players can see if someone just overtook them, without having to close and reopen the screen.
 function refreshCompetitionLeaderboardManually() {
-    if (!isCompetitionActive()) return;
+    var comp = selectedCompetitionId ? activeCompetitions[selectedCompetitionId] : null;
+    if (!isCompetitionActive(comp)) return;
     var tablesEl = document.getElementById("competitionTables");
     if (tablesEl) tablesEl.innerHTML = "<div class='info-message'>מעדכן...</div>";
-    loadCompetitionStandings(activeCompetition);
+    loadCompetitionStandings(comp);
 }
 
-function getCompetitionScoreForUser(uid, userData, clickCountsMap) {
-    if (activeCompetition.type === "clicks") return (clickCountsMap && clickCountsMap[uid]) || 0;
-    if (activeCompetition.type === "cookies") return userData.cookies || 0;
-    if (activeCompetition.type === "prestige") return userData.prestigeLevel || 0;
+function getCompetitionScoreForUser(comp, uid, userData, clickCountsMap) {
+    if (comp.type === "clicks") return (clickCountsMap && clickCountsMap[uid]) || 0;
+    if (comp.type === "cookies") return userData.cookies || 0;
+    if (comp.type === "prestige") return userData.prestigeLevel || 0;
     return 0;
 }
 
@@ -1360,7 +1466,7 @@ function loadCompetitionStandings(comp) {
     var needsClubs = comp.scope !== "players";
     var reads = [
         withTimeout(database.ref("users").once("value"), 15000),
-        needsClickCounts ? withTimeout(database.ref("competitions/clickCounts").once("value"), 15000) : Promise.resolve(null),
+        needsClickCounts ? withTimeout(database.ref("competitions/clickCounts/" + comp.id).once("value"), 15000) : Promise.resolve(null),
         needsClubs ? withTimeout(database.ref("clubs").once("value"), 15000) : Promise.resolve(null),
         withTimeout(database.ref("admins").once("value"), 15000)
     ];
@@ -1380,7 +1486,7 @@ function loadCompetitionStandings(comp) {
             var playerRows = [];
             for (var uid in usersData) {
                 if (adminUids[uid]) continue; // admins don't compete individually — only as club members
-                var score = getCompetitionScoreForUser(uid, usersData[uid], clickCountsMap);
+                var score = getCompetitionScoreForUser(comp, uid, usersData[uid], clickCountsMap);
                 if (comp.type === "clicks" && score <= 0) continue; // only count players who actually clicked
                 playerRows.push({ name: usersData[uid].username || "שחקן", score: score, title: usersData[uid].title || null });
             }
@@ -1397,7 +1503,7 @@ function loadCompetitionStandings(comp) {
                 var total = 0;
                 (club.members || []).forEach(function(m) {
                     var udata = usersData[m.uid];
-                    if (udata) total += getCompetitionScoreForUser(m.uid, udata, clickCountsMap);
+                    if (udata) total += getCompetitionScoreForUser(comp, m.uid, udata, clickCountsMap);
                 });
                 if (comp.type === "clicks" && total <= 0) continue;
                 clubRows.push({ name: club.name || ("מועדון " + code), score: total });
@@ -1441,10 +1547,12 @@ function toggleCompetitionBadgeCustomText() {
 }
 
 function startCompetition() {
+    var name = document.getElementById("competitionNameInput").value.trim();
     var scope = document.getElementById("competitionScopeSelect").value;
     var type = document.getElementById("competitionTypeSelect").value;
     var durationMs = competitionDurationMs();
     var msg = document.getElementById("competitionsAdminMessage");
+    if (!name) { msg.innerHTML = "<div class='error-message'>הזן שם לתחרות</div>"; return; }
     if (!durationMs || durationMs <= 0) { msg.innerHTML = "<div class='error-message'>הזן משך זמן תקין</div>"; return; }
 
     var prizeCookiesPlayer = parseInt(document.getElementById("competitionPrizeCookiesPlayer").value) || 0;
@@ -1463,8 +1571,10 @@ function startCompetition() {
         return;
     }
 
+    var compId = Date.now();
     var compData = {
-        id: Date.now(),
+        id: compId,
+        name: name,
         type: type,
         scope: scope,
         startTime: Date.now(),
@@ -1477,30 +1587,30 @@ function startCompetition() {
     };
 
     var updates = {};
-    updates["competitions/active"] = compData;
-    if (type === "clicks") updates["competitions/clickCounts"] = null; // fresh scoreboard for the new competition
+    updates["competitions/list/" + compId] = compData;
+    // no need to clear any old scoreboard — this competition has its own fresh clickCounts
+    // sub-node under its own id, independent of every other running competition
 
     withTimeout(database.ref().update(updates), 10000).then(function() {
         return withTimeout(database.ref("chat/" + Date.now() + "_comp").set({
             senderName: "מערכת",
-            message: "🏁 תחרות חדשה החלה: " + competitionTypeLabels[type] + " (" + competitionScopeLabels[scope] + ", " + formatDurationHebrew(durationMs) + ")!",
+            message: "🏁 תחרות חדשה החלה: \"" + name + "\" – " + competitionTypeLabels[type] + " (" + competitionScopeLabels[scope] + ", " + formatDurationHebrew(durationMs) + ")!",
             timestamp: Date.now(), isSystemMessage: true
         }), 10000);
     }).then(function() {
         msg.innerHTML = "<div class='success-message'>התחרות הופעלה!</div>";
+        document.getElementById("competitionNameInput").value = "";
     }).catch(function(e) {
         msg.innerHTML = "<div class='error-message'>שגיאה: " + (e.message||e.code) + "</div>";
     });
 }
 
-function endCompetition() {
+function endCompetition(compId) {
     var msg = document.getElementById("competitionsAdminMessage");
-    if (activeCompetition) finalizeCompetition(activeCompetition);
-    withTimeout(database.ref("competitions/active").remove(), 10000).then(function() {
-        msg.innerHTML = "<div class='success-message'>התחרות הופסקה!</div>";
-    }).catch(function(e) {
-        msg.innerHTML = "<div class='error-message'>שגיאה: " + (e.message||e.code) + "</div>";
-    });
+    var comp = activeCompetitions[compId];
+    if (!comp) { msg.innerHTML = "<div class='error-message'>התחרות לא נמצאה (כבר הסתיימה?)</div>"; return; }
+    finalizeCompetition(comp); // awards prizes and removes it from the list once done
+    msg.innerHTML = "<div class='success-message'>התחרות מסתיימת ומחלקת פרסים...</div>";
 }
 
 function toggleGiveTitleCustomText() {
@@ -1552,23 +1662,25 @@ function adminRemoveTitle() {
 // racing the natural-expiry check) using a Firebase transaction as a single-winner lock.
 function finalizeCompetition(comp) {
     if (!comp || !isAdminUid) return;
-    withTimeout(database.ref("competitions/active/finalizing").transaction(function(current) {
+    withTimeout(database.ref("competitions/list/" + comp.id + "/finalizing").transaction(function(current) {
         if (current === true) return; // abort — someone already claimed it
         return true;
     }), 15000).then(function(result) {
         if (result && result.committed) {
-            awardCompetitionPrizes(comp);
+            return awardCompetitionPrizes(comp).then(function() {
+                return withTimeout(database.ref("competitions/list/" + comp.id).remove(), 10000);
+            });
         }
     }).catch(function(e) { console.log("Finalize transaction error:", e); });
 }
 
 function awardCompetitionPrizes(comp) {
-    if (!comp) return;
+    if (!comp) return Promise.resolve();
     var needsClickCounts = comp.type === "clicks";
     var needsClubs = comp.scope !== "players";
     var reads = [
         withTimeout(database.ref("users").once("value"), 15000),
-        needsClickCounts ? withTimeout(database.ref("competitions/clickCounts").once("value"), 15000) : Promise.resolve(null),
+        needsClickCounts ? withTimeout(database.ref("competitions/clickCounts/" + comp.id).once("value"), 15000) : Promise.resolve(null),
         needsClubs ? withTimeout(database.ref("clubs").once("value"), 15000) : Promise.resolve(null),
         withTimeout(database.ref("admins").once("value"), 15000)
     ];
@@ -1580,7 +1692,7 @@ function awardCompetitionPrizes(comp) {
         return 0;
     }
 
-    Promise.all(reads).then(function(results) {
+    return Promise.all(reads).then(function(results) {
         var usersSnap = results[0], clickSnap = results[1], clubsSnap = results[2], adminsSnap = results[3];
         var usersData = {};
         if (usersSnap.exists()) usersSnap.forEach(function(c) { usersData[c.key] = c.val(); });
@@ -1671,16 +1783,22 @@ function awardCompetitionPrizes(comp) {
 function renderCompetitionAdminStatus() {
     var el = document.getElementById("currentCompetitionStatus");
     if (!el) return;
-    if (!isCompetitionActive()) { el.innerHTML = "<div style='color:#888;'>אין תחרות פעילה כרגע</div>"; return; }
-    var remainingMs = activeCompetition.endTime - Date.now();
-    var prizeParts = [];
-    if (activeCompetition.prizeCookiesPlayer > 0) prizeParts.push("👤 " + formatNum(activeCompetition.prizeCookiesPlayer) + " עוגיות לשחקן");
-    if (activeCompetition.prizeCookiesClub > 0) prizeParts.push("🏆 " + formatNum(activeCompetition.prizeCookiesClub) + " עוגיות לכל חבר מועדון");
-    if (activeCompetition.prizeBadgeEnabled && activeCompetition.prizeBadgeText) prizeParts.push("🏅 " + activeCompetition.prizeBadgeText);
-    var prizeLine = prizeParts.length ? ("<div style='font-size:0.85rem; color:#8E44AD; margin-top:4px;'>פרס: " + prizeParts.join(" · ") + "</div>") : "";
-    el.innerHTML = "<div class='player-item'><span class='event-active-tag'>פעיל</span>" +
-        competitionTypeLabels[activeCompetition.type] + " · " + competitionScopeLabels[activeCompetition.scope] +
-        " · נותרו " + formatDurationHebrew(remainingMs) + prizeLine + "</div>";
+    var list = getActiveCompetitionsList();
+    if (list.length === 0) { el.innerHTML = "<div style='color:#888;'>אין תחרויות פעילות כרגע</div>"; return; }
+    var html = "";
+    list.forEach(function(comp) {
+        var remainingMs = comp.endTime - Date.now();
+        var prizeParts = [];
+        if (comp.prizeCookiesPlayer > 0) prizeParts.push("👤 " + formatNum(comp.prizeCookiesPlayer) + " עוגיות לשחקן");
+        if (comp.prizeCookiesClub > 0) prizeParts.push("🏆 " + formatNum(comp.prizeCookiesClub) + " עוגיות לכל חבר מועדון");
+        if (comp.prizeBadgeEnabled && comp.prizeBadgeText) prizeParts.push("🏅 " + comp.prizeBadgeText);
+        var prizeLine = prizeParts.length ? ("<div style='font-size:0.85rem; color:#8E44AD; margin-top:4px;'>פרס: " + prizeParts.join(" · ") + "</div>") : "";
+        html += "<div class='player-item'><span class='event-active-tag'>פעיל</span><strong>" + (comp.name || "תחרות ללא שם") + "</strong><br>" +
+            competitionTypeLabels[comp.type] + " · " + competitionScopeLabels[comp.scope] +
+            " · נותרו " + formatDurationHebrew(remainingMs) + prizeLine +
+            "<button class='danger-button' style='margin-top:6px;' onclick='endCompetition(" + comp.id + ")'>⏹️ עצור תחרות זו</button></div>";
+    });
+    el.innerHTML = html;
 }
 
 // ---------- MODERATION ----------
@@ -2682,8 +2800,11 @@ cookieEl.addEventListener("click", function(e) {
     var val = clickPower * prestigeMultiplier;
     cookies += val; totalCookiesBaked += val; totalClicks++;
     hasUnsavedChanges = true;
-    if (isCompetitionActive() && activeCompetition.type === "clicks" && playerInCompetitionScope()) {
-        localCompetitionClickCount++;
+    for (var compId in activeCompetitions) {
+        var comp = activeCompetitions[compId];
+        if (isCompetitionActive(comp) && comp.type === "clicks" && playerInCompetitionScope(comp)) {
+            localCompetitionClickCounts[compId] = (localCompetitionClickCounts[compId] || 0) + 1;
+        }
     }
     updateDisplay();
     showClickEffect(e.clientX, e.clientY);
