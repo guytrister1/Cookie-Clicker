@@ -2838,10 +2838,24 @@ function renderChat() {
     box.innerHTML = "";
     chatMessages.slice(-20).forEach(function(m) {
         if (m.isSystemMessage) {
-            var d = document.createElement("div");
-            d.className = "chat-message sys";
-            d.textContent = m.message;
-            box.appendChild(d);
+            var sysRow = document.createElement("div");
+            sysRow.className = "msg-row";
+            sysRow.style.justifyContent = "center";
+            var sysBubble = document.createElement("div");
+            sysBubble.className = "chat-message sys";
+            sysBubble.textContent = m.message;
+            sysRow.appendChild(sysBubble);
+            if (isAdminSession && isAdminUid) {
+                var sysDotsBtn = document.createElement("button");
+                sysDotsBtn.className = "msg-dots-btn";
+                sysDotsBtn.textContent = "⋮";
+                sysDotsBtn.title = "מחק הודעת מערכת";
+                sysDotsBtn.addEventListener("click", (function(msgId, msgText) {
+                    return function() { openDeleteMessageModal(msgId, msgText); };
+                })(m.msgKey, m.message));
+                sysRow.appendChild(sysDotsBtn);
+            }
+            box.appendChild(sysRow);
             return;
         }
         var row = document.createElement("div");
