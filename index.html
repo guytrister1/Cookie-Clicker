@@ -2398,7 +2398,7 @@ function updateDuelScoreboard(duel) {
 
 function startDuelCountdown(duel) {
     if (duelCountdownInterval) clearInterval(duelCountdownInterval);
-    duelCountdownInterval = setInterval(function() {
+    function tick() {
         var el = document.getElementById("duelCountdown");
         if (!el) { clearInterval(duelCountdownInterval); duelCountdownInterval = null; return; }
         var remaining = duel.endTime - Date.now();
@@ -2408,7 +2408,9 @@ function startDuelCountdown(duel) {
             return;
         }
         el.textContent = "⏱️ " + Math.ceil(remaining / 1000) + " שניות נותרו";
-    }, 250);
+    }
+    tick(); // fill in the text immediately, don't wait for the first interval delay
+    duelCountdownInterval = setInterval(tick, 250);
 }
 
 // Flushes the local click tally every 400ms instead of on every click — snappy for the
