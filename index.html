@@ -375,6 +375,12 @@ body { font-family:Arial, sans-serif; background:linear-gradient(45deg,#FF6B6B,#
            <input type="text" inputmode="numeric" pattern="[0-9]*" id="cookieAmountInput" placeholder="כמות עוגיות">
             <button id="adminTransferBtn" onclick="adminAdjustCookies(1)">➕ הוסף עוגיות</button>
             <button class="danger-button" id="adminRemoveCookiesBtn" onclick="adminAdjustCookies(-1)">➖ הורד עוגיות</button>
+            <h4 style="margin-top:16px;">⭐ מתן/הורדת יוקרה</h4>
+            <input type="text" id="prestigeTargetPlayerInput" placeholder="שם השחקן">
+            <input type="text" inputmode="numeric" pattern="[0-9]*" id="prestigeAmountInput" placeholder="כמות רמות יוקרה">
+            <button onclick="adminAdjustPrestige(1)">➕ הוסף יוקרה</button>
+            <button class="danger-button" onclick="adminAdjustPrestige(-1)">➖ הורד יוקרה</button>
+            <div id="adminPrestigeMessage"></div>
         </div>
         <div class="admin-section danger-section" id="adminDeleteSection" style="display:none;">
             <h4>🗑️ מחיקת שחקן</h4>
@@ -1022,7 +1028,7 @@ function spawnGoldenCookie() {
 // Each prestige level doubles the requirement for the *next* one: 1M, 2M, 4M, 8M, 16M...
 // so resetting stays meaningful instead of being a flat 1M forever.
 function getPrestigeRequirement() {
-    return 1000000 * Math.pow(2, prestigeLevel);
+    return 1000000 * Math.pow(1.25, prestigeLevel);
 }
 
 function prestige() {
@@ -1031,7 +1037,8 @@ function prestige() {
         showAchievement({ name:"לא מוכן", desc:"צריך " + formatNum(required) + " עוגיות לפחות", emoji:"❌" });
         return;
     }
-    if (confirm("איפוס יוקרה יאפס הכל אבל ייתן בונוס קבוע. הדרישה הבאה תעלה ל-" + formatNum(getPrestigeRequirement() * 2) + " עוגיות. להמשיך?")) {
+    var nextRequired = 1000000 * Math.pow(1.25, prestigeLevel + 1);
+    if (confirm("איפוס יוקרה יאפס הכל אבל ייתן בונוס קבוע. הדרישה הבאה תעלה ל-" + formatNum(nextRequired) + " עוגיות. להמשיך?")) {
         prestigeLevel++; prestigeMultiplier = 1 + prestigeLevel*0.1;
         cookies = 0; totalCookiesBaked = 0;
         for (var k in buildings) { buildings[k].count = 0; buildings[k].extraCps = 0; }
@@ -3382,6 +3389,54 @@ function adminAdjustCookies(direction) {
             msg.innerHTML = "<div class='success-message'>" + (direction > 0 ? "הועברו " : "הורדו ") + formatNum(amount) + " עוגיות " + (direction > 0 ? "ל" : "מ") + target + "!</div>";
             document.getElementById("targetPlayerInput").value = "";
             document.getElementById("cookieAmountInput").value = "";
+        });
+    }).catch(function(e) {
+        console.log(e);
+        msg.innerHTML = "<div class='error-message'>שגיאה: " + (e.message||e.code) + "</div>";
+    });
+}
+
+function adminAdjustPrestige(direction) {
+    var target = document.getElementById("prestigeTargetPlayerInput").value.trim();
+    var rawAmount = document.getElementById("prestigeAmountInput").value.replace(/[^0-9]/g, "");
+    var amount = Number(rawAmount);
+    var msg = document.getElementById("adminPrestigeMessage");
+    if (!target) { msg.innerHTML = "<div class='error-message'>הזן שם שחקן</div>"; return; }
+    if (!rawAmount || !Number.isFinite(amount) || amount <= 0) { msg.innerHTML = "<div class='error-message'>כמות לא תקינה</div>"; return; }
+
+    msg.innerHTML = "<div class='info-message'>מחפש שחקן...</div>";
+
+    findUserByUsername(target).then(function(found) {
+        if (!found) { msg.innerHTML = "<div class='error-message'>שחקן '" + target + "' לא נמצא</div>"; return; }
+        var data = found.data;
+        var currentLevel = data.prestigeLevel || 0;
+        var newLevel = direction > 0 ? (currentLevel + amount) : Math.max(0, currentLevel - amount);
+        var newMultiplier = 1 + newLevel * 0.1;
+
+        var updates = {};
+        updates["users/" + found.uid + "/prestigeLevel"] = newLevel;
+        updates["users/" + found.uid + "/prestigeMultiplier"] = newMultiplier;
+
+        // Same self-targeting fix as adminAdjustCookies() — update the live globals too, or the
+        // next autosave silently reverts this back to the stale local value.
+        if (found.uid === currentUid) {
+            prestigeLevel = newLevel;
+            prestigeMultiplier = newMultiplier;
+            calcCPS(); updateDisplay();
+        }
+
+        var chatMsg = direction > 0
+            ? ("👑 יוצר המשחק העניק ל" + target + " " + amount + " רמות יוקרה!")
+            : ("👑 יוצר המשחק הוריד מ" + target + " " + amount + " רמות יוקרה.");
+
+        return withTimeout(database.ref().update(updates), 10000).then(function() {
+            return withTimeout(database.ref("chat/" + Date.now() + "_prestige").set({
+                senderName: "מערכת", message: chatMsg, timestamp: Date.now(), isSystemMessage: true
+            }), 10000);
+        }).then(function() {
+            msg.innerHTML = "<div class='success-message'>" + target + " עכשיו ברמת יוקרה " + newLevel + "!</div>";
+            document.getElementById("prestigeTargetPlayerInput").value = "";
+            document.getElementById("prestigeAmountInput").value = "";
         });
     }).catch(function(e) {
         console.log(e);
