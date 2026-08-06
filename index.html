@@ -1222,11 +1222,19 @@ function adjustAllPlayersCookies(direction) {
             if (!Number.isFinite(newCookies) || !Number.isFinite(newTotal)) { skipped++; return; } // corrupted existing data — don't touch it
             updates[child.key + "/cookies"] = newCookies;
             updates[child.key + "/totalCookiesBaked"] = newTotal;
+            // BUGFIX: same class of bug as adminAdjustCookies() — the admin is a player too, so
+            // if they're logged in while running this, their own live "cookies" var needs
+            // updating here too, or the next autosave silently reverts their own share.
+            if (child.key === currentUid) {
+                cookies = newCookies;
+                totalCookiesBaked = newTotal;
+            }
             count++;
         });
         return withTimeout(database.ref("users").update(updates), 15000).then(function() { return { count: count, skipped: skipped }; });
     }).then(function(result) {
         if (result === undefined) return;
+        updateDisplay();
         var count = result.count;
         var chatMsg = direction > 0
             ? ("🎁 יוצר המשחק העביר לכל השחקנים (" + count + ") " + formatNum(amount) + " עוגיות!")
@@ -2597,6 +2605,16 @@ function adminAdjustCookies(direction) {
         // never a full-object rewrite of someone else's account.
         updates["users/" + found.uid + "/cookies"] = newCookies;
         updates["users/" + found.uid + "/totalCookiesBaked"] = newTotal;
+        // BUGFIX: if the admin targets their own account, the write above succeeds on the
+        // server, but the LIVE global "cookies"/"totalCookiesBaked" vars (used both for display
+        // AND as the source of truth for the periodic autosave) are never touched. Without this,
+        // the next autosave tick silently overwrites the fresh amount back down to the stale
+        // local value — no error shown, but the change is gone after a refresh.
+        if (found.uid === currentUid) {
+            cookies = newCookies;
+            totalCookiesBaked = newTotal;
+            updateDisplay();
+        }
         var chatMsg = direction > 0
             ? ("👑 יוצר המשחק העביר ל" + target + " " + formatNum(amount) + " עוגיות!")
             : ("👑 יוצר המשחק הוריד מ" + target + " " + formatNum(amount) + " עוגיות!");
