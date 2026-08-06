@@ -901,7 +901,11 @@ function spawnGoldenCookie() {
         if (currentRainEv && currentRainEv.fixedBonus) {
             bonus = currentRainEv.fixedBonus;
         } else {
-            bonus = Math.floor(cookies*0.15) + Math.floor(cookiesPerSecond*77);
+            // Flat random range (1B–20B) instead of scaling with cookies/CPS — late-game CPS
+            // could reach the billions/trillions per second, making the old cookies*0.15 +
+            // cookiesPerSecond*77 formula balloon into disproportionate hundreds-of-trillions
+            // bonuses.
+            bonus = Math.floor(1000000000 + Math.random() * 19000000000);
         }
         cookies += bonus; totalCookiesBaked += bonus;
         showClickEffect(e.clientX, e.clientY, "+" + formatNum(bonus));
