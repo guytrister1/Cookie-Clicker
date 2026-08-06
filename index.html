@@ -40,6 +40,16 @@ body { font-family:Arial, sans-serif; background:linear-gradient(45deg,#FF6B6B,#
 .leaderboard-full-row.rank-3 { background:linear-gradient(45deg,#CD7F32,#B8732E); font-weight:bold; color:white; }
 .leaderboard-rank-num { font-weight:bold; min-width:26px; display:inline-block; }
 .badge-tag { font-size:0.78rem; background:rgba(142,68,173,0.15); color:#8E44AD; padding:2px 7px; border-radius:8px; margin-right:4px; }
+.duel-button { background:linear-gradient(45deg,#C0392B,#E74C3C); color:white; padding:10px 18px; border:none; border-radius:15px; font-size:0.95rem; font-weight:bold; cursor:pointer; box-shadow:0 5px 15px rgba(0,0,0,0.2); }
+.duel-button:hover { transform:translateY(-2px); }
+.duel-fullscreen { position:fixed; top:0; left:0; width:100%; height:100%; background:linear-gradient(135deg,#1a0000,#4d0000,#8B0000,#C0392B); background-size:400% 400%; animation:gradientShift 12s ease infinite; z-index:6500; display:none; flex-direction:column; align-items:center; overflow-y:auto; padding:70px 20px 40px 20px; }
+.duel-close-btn { position:fixed; top:20px; left:20px; background:rgba(255,255,255,0.15); color:white; border:2px solid rgba(255,255,255,0.5); padding:10px 22px; border-radius:15px; font-weight:bold; font-size:1rem; cursor:pointer; z-index:6501; }
+.duel-close-btn:hover { background:rgba(255,255,255,0.3); }
+.duel-menu-btn { background:rgba(255,255,255,0.15); color:white; border:2px solid rgba(255,255,255,0.6); padding:20px 40px; border-radius:20px; font-size:1.3rem; font-weight:bold; cursor:pointer; margin:10px; }
+.duel-menu-btn:hover { background:rgba(255,255,255,0.3); transform:translateY(-2px); }
+.duel-card { background:rgba(255,255,255,0.96); border-radius:18px; padding:18px; margin:0 auto 14px auto; max-width:500px; width:100%; box-shadow:0 10px 25px rgba(0,0,0,0.35); text-align:right; }
+.duel-arena-target { width:180px; height:180px; border-radius:50%; background:radial-gradient(circle at 30% 30%, #FF6B6B, #C0392B, #7B0000); border:8px solid #4d0000; cursor:pointer; box-shadow:0 15px 30px rgba(0,0,0,0.45); margin:20px auto; user-select:none; }
+.duel-arena-target:active { transform:scale(0.92); }
 .settings-button { position:fixed; top:20px; right:20px; background:linear-gradient(45deg,#34495E,#2C3E50); color:white; padding:10px 20px; border:none; border-radius:15px; font-size:1rem; font-weight:bold; cursor:pointer; z-index:1000; }
 .admin-button { position:fixed; top:80px; right:20px; background:linear-gradient(45deg,#9B59B6,#8E44AD); color:white; padding:10px 20px; border:none; border-radius:15px; font-size:1rem; font-weight:bold; cursor:pointer; z-index:1000; border:2px solid rgba(255,255,255,0.3); }
 .debug-button { position:fixed; top:140px; right:20px; background:linear-gradient(45deg,#7F8C8D,#2C3E50); color:white; padding:10px 20px; border:none; border-radius:15px; font-size:1rem; font-weight:bold; cursor:pointer; z-index:1000; border:2px dashed rgba(255,255,255,0.4); }
@@ -174,6 +184,7 @@ body { font-family:Arial, sans-serif; background:linear-gradient(45deg,#FF6B6B,#
     </div>
     <button class="donate-button" onclick="openDonateModal()">🎁 תרום עוגיות</button>
     <button class="competition-button" onclick="openCompetitionsModal()">🏁 תחרויות</button>
+    <button class="duel-button" onclick="openDuelModal()">⚔️ קרב</button>
 </div>
 
 <button class="settings-button" onclick="openSettingsModal()">⚙️ הגדרות</button>
@@ -258,6 +269,14 @@ body { font-family:Arial, sans-serif; background:linear-gradient(45deg,#FF6B6B,#
         <h2>🏁 תחרויות</h2>
     </div>
     <div id="competitionsContent" style="width:100%; max-width:650px;"></div>
+</div>
+
+<div class="duel-fullscreen" id="duelModal">
+    <button class="duel-close-btn" onclick="closeModal('duelModal')">✕ סגור</button>
+    <div style="color:white; text-align:center; margin-bottom:25px;">
+        <h2 style="font-size:2.3rem; text-shadow:0 2px 12px rgba(0,0,0,0.5);">⚔️ קרב</h2>
+    </div>
+    <div id="duelContent" style="width:100%; max-width:650px;"></div>
 </div>
 
 <div class="modal" id="settingsModal">
@@ -1854,6 +1873,391 @@ function renderCompetitionAdminStatus() {
     el.innerHTML = html;
 }
 
+// ---------- DUELS ----------
+var allDuelsCache = {};
+var duelsListenerAttached = false;
+var myCurrentDuelId = null;
+var duelCurrentView = "menu"; // "menu" | "create" | "joinlist" | "waiting" | "active" | "finished"
+var localDuelClickCount = 0;
+var duelClickFlushInterval = null;
+var duelCountdownInterval = null;
+
+function setupDuelsListener() {
+    if (!firebaseInit || duelsListenerAttached) return;
+    duelsListenerAttached = true;
+    database.ref("duels").on("value", function(snap) {
+        allDuelsCache = snap.exists() ? snap.val() : {};
+        handleDuelsUpdate();
+    });
+}
+
+// Runs on every update regardless of whether the duel screen is open, so duels progress
+// (start once full, finalize once time is up) even if this client is just a bystander.
+function handleDuelsUpdate() {
+    for (var id in allDuelsCache) {
+        var d = allDuelsCache[id];
+        if (d.status === "waiting") maybeStartDuel(id, d);
+        if (d.status === "active") maybeFinalizeDuel(id, d);
+    }
+
+    var modal = document.getElementById("duelModal");
+    if (!modal || modal.style.display !== "flex") return;
+
+    // Only auto-refresh views that actually depend on live duel data — never yank the player
+    // away from the create form or menu just because some unrelated duel changed elsewhere.
+    if (duelCurrentView === "waiting" || duelCurrentView === "active" || duelCurrentView === "finished") {
+        renderDuelScreen();
+    } else if (duelCurrentView === "joinlist") {
+        renderDuelJoinList();
+    }
+}
+
+// Guarded by a transaction so only one client actually flips "waiting" -> "active", even if
+// several clients notice the duel just filled up at the same moment.
+function maybeStartDuel(duelId, duel) {
+    var playerCount = Object.keys(duel.players || {}).length;
+    if (duel.status !== "waiting" || playerCount < duel.maxPlayers) return;
+    database.ref("duels/" + duelId + "/status").transaction(function(current) {
+        if (current !== "waiting") return; // someone else already started it — abort
+        return "starting";
+    }, function(error, committed) {
+        if (error) { console.log("Duel start transaction error:", error); return; }
+        if (committed) {
+            var now = Date.now();
+            withTimeout(database.ref("duels/" + duelId).update({ status: "active", startTime: now, endTime: now + duel.durationMs }), 10000)
+                .catch(function(e) { console.log(e); });
+        }
+    });
+}
+
+// Same transaction-guard pattern as competitions — prevents the prize pool from being paid
+// out twice if multiple participants' clients notice the expiry at the same moment.
+function maybeFinalizeDuel(duelId, duel) {
+    if (duel.status !== "active" || !duel.endTime || duel.endTime > Date.now()) return;
+    database.ref("duels/" + duelId + "/finalizing").transaction(function(current) {
+        if (current === true) return;
+        return true;
+    }, function(error, committed) {
+        if (error) { console.log("Duel finalize transaction error:", error); return; }
+        if (committed) finalizeDuel(duelId, duel);
+    });
+}
+
+function finalizeDuel(duelId, duel) {
+    var players = duel.players || {};
+    var bestUid = null, bestClicks = -1;
+    for (var uid in players) {
+        var c = players[uid].clicks || 0;
+        if (c > bestClicks) { bestClicks = c; bestUid = uid; }
+    }
+    var playerCount = Object.keys(players).length;
+    var pool = (duel.betAmount || 0) * playerCount;
+
+    function finish(extraUpdates) {
+        var updates = extraUpdates || {};
+        updates["duels/" + duelId + "/status"] = "finished";
+        updates["duels/" + duelId + "/winnerUid"] = bestUid;
+        return withTimeout(database.ref().update(updates), 10000).catch(function(e) { console.log("Duel finish error:", e); });
+    }
+
+    if (pool > 0 && bestUid) {
+        withTimeout(database.ref("users/" + bestUid).once("value"), 10000).then(function(snap) {
+            var udata = snap.exists() ? snap.val() : {};
+            var newCookies = (udata.cookies || 0) + pool;
+            var newTotal = (udata.totalCookiesBaked || 0) + pool;
+            var updates = {};
+            if (Number.isFinite(newCookies) && Number.isFinite(newTotal)) {
+                updates["users/" + bestUid + "/cookies"] = newCookies;
+                updates["users/" + bestUid + "/totalCookiesBaked"] = newTotal;
+                if (bestUid === currentUid) {
+                    // Same fix as the admin cookie transfer bug — update the live globals too,
+                    // or the next autosave would silently revert the prize.
+                    cookies = newCookies; totalCookiesBaked = newTotal; updateDisplay();
+                }
+            }
+            return finish(updates);
+        }).catch(function(e) { console.log("Duel prize read error:", e); finish(); });
+    } else {
+        finish();
+    }
+}
+
+function openDuelModal() {
+    document.getElementById("duelModal").style.display = "flex";
+    renderDuelScreen();
+}
+
+function renderDuelScreen() {
+    if (myCurrentDuelId) {
+        var duel = allDuelsCache[myCurrentDuelId];
+        if (!duel) { myCurrentDuelId = null; }
+        else if (duel.status === "waiting") { duelCurrentView = "waiting"; renderDuelWaitingRoom(duel); return; }
+        else if (duel.status === "active") { duelCurrentView = "active"; renderDuelArena(duel); return; }
+        else if (duel.status === "finished") { duelCurrentView = "finished"; renderDuelFinished(duel); return; }
+    }
+    duelCurrentView = "menu";
+    renderDuelMenu();
+}
+
+function renderDuelMenu() {
+    duelCurrentView = "menu";
+    var content = document.getElementById("duelContent");
+    content.innerHTML =
+        "<div style='text-align:center;'>" +
+        "<button class='duel-menu-btn' onclick='showDuelCreateForm()'>🆚 צור דו-קרב</button>" +
+        "<button class='duel-menu-btn' onclick='showDuelJoinList()'>🔍 הצטרף לקרב</button>" +
+        "</div>";
+}
+
+function showDuelCreateForm() {
+    duelCurrentView = "create";
+    var content = document.getElementById("duelContent");
+    content.innerHTML =
+        "<div class='duel-card'>" +
+        "<h3 style='margin-bottom:14px;'>🆚 יצירת דו-קרב</h3>" +
+        "<div style='margin-bottom:10px;'><strong>⏱️ משך הקרב</strong><br>" +
+        "<input type='number' id='duelDurationMinutes' placeholder='דקות' min='0' style='width:45%;'> " +
+        "<input type='number' id='duelDurationSeconds' placeholder='שניות' min='0' max='59' style='width:45%;'></div>" +
+        "<div style='margin-bottom:10px;'><strong>👥 מספר שחקנים</strong><br>" +
+        "<select id='duelMaxPlayersSelect'><option value='2'>2</option><option value='3'>3</option><option value='4'>4</option></select></div>" +
+        "<div style='margin-bottom:10px;'><strong>🍪 הימור עוגיות (0 = בלי הימור)</strong><br>" +
+        "<input type='number' id='duelBetInput' min='0' value='0'></div>" +
+        "<button onclick='createDuel()'>🆚 צור קרב</button> " +
+        "<button class='close-button' onclick='renderDuelMenu()'>ביטול</button>" +
+        "<div id='duelCreateMessage'></div>" +
+        "</div>";
+}
+
+function createDuel() {
+    var mins = parseInt(document.getElementById("duelDurationMinutes").value) || 0;
+    var secs = parseInt(document.getElementById("duelDurationSeconds").value) || 0;
+    var durationMs = (mins * 60 + secs) * 1000;
+    var maxPlayers = parseInt(document.getElementById("duelMaxPlayersSelect").value);
+    var betAmount = parseInt(document.getElementById("duelBetInput").value) || 0;
+    var msg = document.getElementById("duelCreateMessage");
+
+    if (durationMs <= 0) { msg.innerHTML = "<div class='error-message'>הזן משך זמן תקין</div>"; return; }
+    if (!Number.isFinite(betAmount) || betAmount < 0) { msg.innerHTML = "<div class='error-message'>סכום הימור לא תקין</div>"; return; }
+    if (betAmount > 0 && betAmount > cookies) { msg.innerHTML = "<div class='error-message'>אין לך מספיק עוגיות להימור הזה</div>"; return; }
+
+    var duelId = "duel_" + Date.now();
+    var duelData = {
+        id: duelId,
+        createdBy: currentUid,
+        durationMs: durationMs,
+        maxPlayers: maxPlayers,
+        betAmount: betAmount,
+        status: "waiting",
+        players: {}
+    };
+    duelData.players[currentUid] = { username: currentUsername, clicks: 0, joinedAt: Date.now() };
+
+    var updates = {};
+    updates["duels/" + duelId] = duelData;
+    if (betAmount > 0) updates["users/" + currentUid + "/cookies"] = cookies - betAmount;
+
+    msg.innerHTML = "<div class='info-message'>יוצר קרב...</div>";
+    withTimeout(database.ref().update(updates), 10000).then(function() {
+        if (betAmount > 0) { cookies -= betAmount; updateDisplay(); hasUnsavedChanges = true; }
+        myCurrentDuelId = duelId;
+        renderDuelScreen();
+    }).catch(function(e) {
+        msg.innerHTML = "<div class='error-message'>שגיאה: " + (e.message||e.code) + "</div>";
+    });
+}
+
+function showDuelJoinList() {
+    duelCurrentView = "joinlist";
+    renderDuelJoinList();
+}
+
+function renderDuelJoinList() {
+    var content = document.getElementById("duelContent");
+    var waiting = [];
+    for (var id in allDuelsCache) {
+        var d = allDuelsCache[id];
+        if (d.status === "waiting") waiting.push(d);
+    }
+    waiting.sort(function(a,b){ return (b.players?Object.keys(b.players).length:0) - (a.players?Object.keys(a.players).length:0); });
+
+    var html = "<div style='text-align:center; margin-bottom:14px;'><button class='close-button' onclick='renderDuelMenu()'>⬅ חזרה</button></div>";
+    if (waiting.length === 0) {
+        html += "<p style='color:white; text-align:center; font-size:1.1rem; text-shadow:0 2px 6px rgba(0,0,0,0.4);'>אין קרבות ממתינים כרגע — תיצור אחד!</p>";
+    } else {
+        waiting.forEach(function(d) {
+            var count = d.players ? Object.keys(d.players).length : 0;
+            var creatorName = (d.players && d.players[d.createdBy]) ? d.players[d.createdBy].username : "שחקן";
+            var alreadyIn = d.players && d.players[currentUid];
+            html += "<div class='duel-card'>" +
+                "<div style='font-weight:bold; margin-bottom:6px;'>⚔️ קרב מאת " + creatorName + "</div>" +
+                "<div>⏱️ משך: " + formatDurationHebrew(d.durationMs) + "</div>" +
+                "<div>👥 שחקנים: " + count + " / " + d.maxPlayers + "</div>" +
+                "<div>🍪 הימור: " + (d.betAmount > 0 ? (formatNum(d.betAmount) + " עוגיות (הזוכה מקבל " + formatNum(d.betAmount * d.maxPlayers) + ")") : "ללא הימור") + "</div>" +
+                (alreadyIn ? "<div style='color:#27AE60; font-weight:bold; margin-top:8px;'>אתה כבר בקרב הזה</div>" : "<button onclick=\"joinDuel('" + d.id + "')\" style='margin-top:8px;'>הצטרף</button>") +
+                "</div>";
+        });
+    }
+    content.innerHTML = html;
+}
+
+// Joining uses a transaction on the players list itself, so two people racing for the last
+// open slot can never both get in — Firebase guarantees only one transaction commits.
+function joinDuel(duelId) {
+    var duel = allDuelsCache[duelId];
+    if (!duel) { alert("הקרב כבר לא קיים"); return; }
+    if (duel.betAmount > cookies) { alert("אין לך מספיק עוגיות להימור הזה"); return; }
+
+    database.ref("duels/" + duelId + "/players").transaction(function(current) {
+        current = current || {};
+        if (Object.keys(current).length >= duel.maxPlayers) return; // abort — full
+        if (current[currentUid]) return; // abort — already joined
+        current[currentUid] = { username: currentUsername, clicks: 0, joinedAt: Date.now() };
+        return current;
+    }, function(error, committed) {
+        if (error) { alert("שגיאה: " + error.message); return; }
+        if (!committed) { alert("הקרב כבר מלא"); return; }
+        if (duel.betAmount > 0) {
+            withTimeout(database.ref("users/" + currentUid + "/cookies").set(cookies - duel.betAmount), 10000).then(function() {
+                cookies -= duel.betAmount; updateDisplay(); hasUnsavedChanges = true;
+            }).catch(function(e){ console.log(e); });
+        }
+        myCurrentDuelId = duelId;
+        renderDuelScreen();
+    });
+}
+
+function renderDuelWaitingRoom(duel) {
+    var content = document.getElementById("duelContent");
+    var players = duel.players || {};
+    var isCreator = duel.createdBy === currentUid;
+    var playersHtml = "";
+    for (var uid in players) {
+        playersHtml += "<div class='player-item'>👤 " + players[uid].username + (uid === duel.createdBy ? " (יוצר)" : "") + "</div>";
+    }
+    content.innerHTML =
+        "<div class='duel-card' style='text-align:center;'>" +
+        "<h3>⏳ ממתין לשחקנים...</h3>" +
+        "<div style='font-size:1.1rem; margin:8px 0;'>👥 " + Object.keys(players).length + " / " + duel.maxPlayers + "</div>" +
+        "<div style='margin:10px 0; text-align:right;'>" + playersHtml + "</div>" +
+        "<div>⏱️ משך הקרב: " + formatDurationHebrew(duel.durationMs) + "</div>" +
+        (duel.betAmount > 0 ? "<div>🍪 הימור: " + formatNum(duel.betAmount) + " עוגיות</div>" : "") +
+        "<button class='danger-button' style='margin-top:12px;' onclick=\"" + (isCreator ? ("cancelDuel('" + duel.id + "')") : ("leaveDuel('" + duel.id + "')")) + "\">" + (isCreator ? "בטל קרב" : "עזוב קרב") + "</button>" +
+        "</div>";
+}
+
+function cancelDuel(duelId) {
+    var duel = allDuelsCache[duelId];
+    if (!duel) return;
+    var refund = duel.betAmount || 0;
+    var updates = {};
+    updates["duels/" + duelId] = null;
+    if (refund > 0) updates["users/" + currentUid + "/cookies"] = cookies + refund;
+    withTimeout(database.ref().update(updates), 10000).then(function() {
+        if (refund > 0) { cookies += refund; updateDisplay(); hasUnsavedChanges = true; }
+        myCurrentDuelId = null;
+        renderDuelScreen();
+    }).catch(function(e) { console.log(e); });
+}
+
+function leaveDuel(duelId) {
+    var duel = allDuelsCache[duelId];
+    if (!duel) return;
+    if (duel.createdBy === currentUid) { cancelDuel(duelId); return; }
+    var refund = duel.betAmount || 0;
+    var updates = {};
+    updates["duels/" + duelId + "/players/" + currentUid] = null;
+    if (refund > 0) updates["users/" + currentUid + "/cookies"] = cookies + refund;
+    withTimeout(database.ref().update(updates), 10000).then(function() {
+        if (refund > 0) { cookies += refund; updateDisplay(); hasUnsavedChanges = true; }
+        myCurrentDuelId = null;
+        renderDuelScreen();
+    }).catch(function(e) { console.log(e); });
+}
+
+function renderDuelArena(duel) {
+    var content = document.getElementById("duelContent");
+    var players = duel.players || {};
+    var sortedUids = Object.keys(players).sort(function(a,b){ return (players[b].clicks||0) - (players[a].clicks||0); });
+    var scoresHtml = "";
+    sortedUids.forEach(function(uid) {
+        var isMe = uid === currentUid;
+        scoresHtml += "<div class='player-item'" + (isMe ? " style='border:2px solid #E74C3C;'" : "") + ">👤 " + players[uid].username + (isMe ? " (אתה)" : "") + " — " + (players[uid].clicks||0) + " לחיצות</div>";
+    });
+
+    content.innerHTML =
+        "<div style='text-align:center; color:white; text-shadow:0 2px 8px rgba(0,0,0,0.5);'>" +
+        "<div id='duelCountdown' style='font-size:1.4rem; font-weight:bold; color:#FFD700; margin-bottom:10px;'></div>" +
+        "<div class='duel-arena-target' id='duelArenaTarget'></div>" +
+        "<div style='font-size:1.1rem; margin:10px 0;'>הלחיצות שלך: <span id='duelMyClicks'>" + localDuelClickCount + "</span></div>" +
+        "</div>" +
+        "<div class='duel-card'><h4 style='margin-top:0;'>🏆 תוצאות חיות</h4>" + scoresHtml + "</div>";
+
+    document.getElementById("duelArenaTarget").onclick = function() {
+        if (Date.now() >= duel.endTime) return;
+        localDuelClickCount++;
+        var el = document.getElementById("duelMyClicks");
+        if (el) el.textContent = localDuelClickCount;
+    };
+
+    startDuelCountdown(duel);
+    startDuelClickFlush(duel.id);
+}
+
+function startDuelCountdown(duel) {
+    if (duelCountdownInterval) clearInterval(duelCountdownInterval);
+    duelCountdownInterval = setInterval(function() {
+        var el = document.getElementById("duelCountdown");
+        if (!el) { clearInterval(duelCountdownInterval); duelCountdownInterval = null; return; }
+        var remaining = duel.endTime - Date.now();
+        if (remaining <= 0) {
+            el.textContent = "⏱️ הזמן נגמר! מחשב תוצאות...";
+            clearInterval(duelCountdownInterval); duelCountdownInterval = null;
+            return;
+        }
+        el.textContent = "⏱️ " + Math.ceil(remaining / 1000) + " שניות נותרו";
+    }, 250);
+}
+
+// Flushes the local click tally every 400ms instead of on every click — snappy for the
+// clicking player, without hammering Firebase.
+function startDuelClickFlush(duelId) {
+    if (duelClickFlushInterval) clearInterval(duelClickFlushInterval);
+    duelClickFlushInterval = setInterval(function() {
+        if (!myCurrentDuelId || myCurrentDuelId !== duelId) { clearInterval(duelClickFlushInterval); duelClickFlushInterval = null; return; }
+        var d = allDuelsCache[duelId];
+        if (!d || d.status !== "active") { clearInterval(duelClickFlushInterval); duelClickFlushInterval = null; return; }
+        withTimeout(database.ref("duels/" + duelId + "/players/" + currentUid + "/clicks").set(localDuelClickCount), 8000).catch(function(e){ console.log(e); });
+    }, 400);
+}
+
+function renderDuelFinished(duel) {
+    var content = document.getElementById("duelContent");
+    var players = duel.players || {};
+    var winner = players[duel.winnerUid];
+    var pool = (duel.betAmount || 0) * Object.keys(players).length;
+    var sortedUids = Object.keys(players).sort(function(a,b){ return (players[b].clicks||0) - (players[a].clicks||0); });
+    var medals = ["🥇", "🥈", "🥉"];
+    var scoresHtml = "";
+    sortedUids.forEach(function(uid, i) {
+        var rank = i < 3 ? medals[i] : (i+1) + ".";
+        scoresHtml += "<div class='player-item'>" + rank + " " + players[uid].username + " — " + (players[uid].clicks||0) + " לחיצות</div>";
+    });
+    content.innerHTML =
+        "<div class='duel-card' style='text-align:center;'>" +
+        "<h2>🏆 " + (winner ? winner.username : "לא ידוע") + " ניצח/ה!</h2>" +
+        (pool > 0 ? "<div style='font-size:1.1rem; color:#27AE60; font-weight:bold; margin:10px 0;'>זכה ב-" + formatNum(pool) + " עוגיות!</div>" : "") +
+        "<div style='margin-top:14px; text-align:right;'>" + scoresHtml + "</div>" +
+        "<button onclick='leaveDuelResultsScreen()' style='margin-top:14px;'>חזרה לתפריט</button>" +
+        "</div>";
+    localDuelClickCount = 0;
+}
+
+function leaveDuelResultsScreen() {
+    myCurrentDuelId = null;
+    duelCurrentView = "menu";
+    renderDuelMenu();
+}
+
 // ---------- MODERATION ----------
 function checkPendingWarnings(uid) {
     return withTimeout(database.ref("moderation/pendingWarnings/" + uid).once("value"), 10000).then(function(snap) {
@@ -3058,6 +3462,7 @@ function startGameLoops() {
     setupBroadcastListener();
     setupModerationListenerForSelf();
     setupCompetitionsListener();
+    setupDuelsListener();
     renderChat();
     updateClubButtons();
 
