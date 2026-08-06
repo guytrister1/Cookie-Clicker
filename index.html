@@ -2120,6 +2120,7 @@ function renderDuelScreen() {
 
 function renderDuelMenu() {
     duelCurrentView = "menu";
+    duelArenaBuiltFor = null;
     var content = document.getElementById("duelContent");
     content.innerHTML =
         "<div style='text-align:center;'>" +
@@ -2249,6 +2250,7 @@ function joinDuel(duelId) {
 }
 
 function renderDuelWaitingRoom(duel) {
+    duelArenaBuiltFor = null;
     var content = document.getElementById("duelContent");
     var players = duel.players || {};
     var isCreator = duel.createdBy === currentUid;
@@ -2336,21 +2338,21 @@ function leaveDuel(duelId) {
     }).catch(function(e) { console.log(e); });
 }
 
+var duelArenaBuiltFor = null; // which duel id the arena's static DOM is currently built for
+
 function renderDuelArena(duel) {
     var content = document.getElementById("duelContent");
-    var players = duel.players || {};
-    var sortedUids = Object.keys(players).sort(function(a,b){ return (players[b].clicks||0) - (players[a].clicks||0); });
-    var maxClicks = Math.max(1, players[sortedUids[0]] ? (players[sortedUids[0]].clicks || 0) : 0);
-    var scoresHtml = "";
-    sortedUids.forEach(function(uid) {
-        var isMe = uid === currentUid;
-        var c = players[uid].clicks || 0;
-        var pct = Math.max(4, Math.round((c / maxClicks) * 100));
-        scoresHtml += "<div class='duel-score-row" + (isMe ? " is-me" : "") + "'>" +
-            "<div class='duel-score-header'><span>👤 " + players[uid].username + (isMe ? " (אתה)" : "") + "</span><span>" + c + "</span></div>" +
-            "<div class='duel-score-track'><div class='duel-score-fill' style='width:" + pct + "%;'></div></div>" +
-            "</div>";
-    });
+
+    // If the arena's static shell (target, countdown, my-clicks counter) is already built for
+    // THIS duel, only refresh the live scoreboard numbers/bars — rebuilding the whole innerHTML
+    // on every listener update (which fires roughly every 400ms from any player's click-flush)
+    // was destroying and recreating the clickable target element each time, which is what
+    // caused it to visibly flicker/disappear-and-reappear.
+    if (duelArenaBuiltFor === duel.id && document.getElementById("duelArenaTarget")) {
+        updateDuelScoreboard(duel);
+        return;
+    }
+    duelArenaBuiltFor = duel.id;
 
     content.innerHTML =
         "<div style='text-align:center;'>" +
@@ -2358,7 +2360,7 @@ function renderDuelArena(duel) {
         "<div class='duel-arena-target' id='duelArenaTarget'></div>" +
         "<div class='duel-my-clicks'>הלחיצות שלך: <span id='duelMyClicks'>" + localDuelClickCount + "</span></div>" +
         "</div>" +
-        "<div class='duel-card'><h3 style='margin-top:0;'>🏆 תוצאות חיות</h3>" + scoresHtml + "</div>";
+        "<div class='duel-card' id='duelScoreboardCard'><h3 style='margin-top:0;'>🏆 תוצאות חיות</h3><div id='duelScoreboardRows'></div></div>";
 
     document.getElementById("duelArenaTarget").onclick = function() {
         if (Date.now() >= duel.endTime) return;
@@ -2367,9 +2369,31 @@ function renderDuelArena(duel) {
         if (el) el.textContent = localDuelClickCount;
     };
 
+    updateDuelScoreboard(duel);
     startDuelCountdown(duel);
     startDuelClickFlush(duel.id);
     startDuelWatchdog();
+}
+
+// Refreshes just the score rows/bars in place — never touches the target/countdown DOM nodes,
+// so the arena stays perfectly still while live updates keep the numbers current.
+function updateDuelScoreboard(duel) {
+    var rowsEl = document.getElementById("duelScoreboardRows");
+    if (!rowsEl) return;
+    var players = duel.players || {};
+    var sortedUids = Object.keys(players).sort(function(a,b){ return (players[b].clicks||0) - (players[a].clicks||0); });
+    var maxClicks = Math.max(1, players[sortedUids[0]] ? (players[sortedUids[0]].clicks || 0) : 0);
+    var html = "";
+    sortedUids.forEach(function(uid) {
+        var isMe = uid === currentUid;
+        var c = players[uid].clicks || 0;
+        var pct = Math.max(4, Math.round((c / maxClicks) * 100));
+        html += "<div class='duel-score-row" + (isMe ? " is-me" : "") + "'>" +
+            "<div class='duel-score-header'><span>👤 " + players[uid].username + (isMe ? " (אתה)" : "") + "</span><span>" + c + "</span></div>" +
+            "<div class='duel-score-track'><div class='duel-score-fill' style='width:" + pct + "%;'></div></div>" +
+            "</div>";
+    });
+    rowsEl.innerHTML = html;
 }
 
 function startDuelCountdown(duel) {
@@ -2400,6 +2424,7 @@ function startDuelClickFlush(duelId) {
 }
 
 function renderDuelFinished(duel) {
+    duelArenaBuiltFor = null;
     var content = document.getElementById("duelContent");
     var players = duel.players || {};
     var winner = players[duel.winnerUid];
