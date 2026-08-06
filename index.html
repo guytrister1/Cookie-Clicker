@@ -2021,7 +2021,13 @@ function renderDuelScreen() {
     if (myCurrentDuelId) {
         var duel = allDuelsCache[myCurrentDuelId];
         if (!duel) { myCurrentDuelId = null; }
-        else if (duel.status === "waiting") { duelCurrentView = "waiting"; renderDuelWaitingRoom(duel); return; }
+        // "starting" is a real (if fleeting) status: maybeStartDuel() briefly sets it via a
+        // transaction to claim the right to start the duel, just before flipping to "active".
+        // Firebase transactions apply optimistically/locally before the server round-trip
+        // completes, so a render can land exactly on this value — treating it the same as
+        // "waiting" here (rather than falling through to the menu) keeps the screen correct
+        // through that split-second instead of bouncing the player back to the main menu.
+        else if (duel.status === "waiting" || duel.status === "starting") { duelCurrentView = "waiting"; renderDuelWaitingRoom(duel); return; }
         else if (duel.status === "active") { duelCurrentView = "active"; renderDuelArena(duel); return; }
         else if (duel.status === "finished") { duelCurrentView = "finished"; renderDuelFinished(duel); return; }
     }
@@ -2180,7 +2186,7 @@ function renderDuelWaitingRoom(duel) {
     content.innerHTML =
         "<div class='duel-card' style='text-align:center;'>" +
         "<h3>⏳ ממתין לשחקנים</h3>" +
-        "<div class='duel-waiting-pill'>👥 " + uids.length + " / " + duel.maxPlayers + "</div>" +
+        "<div class='duel-waiting-pill'>👥 <bdi style='unicode-bidi:embed; direction:ltr;'>" + uids.length + " / " + duel.maxPlayers + "</bdi></div>" +
         "<div class='duel-vs-row'>" + slotsHtml + "</div>" +
         "<div style='color:#555; margin-top:10px;'>⏱️ משך הקרב: <strong>" + formatDurationHebrew(duel.durationMs) + "</strong></div>" +
         (duel.betAmount > 0 ? "<div style='color:#555;'>🍪 הימור: <strong>" + formatNum(duel.betAmount) + " עוגיות</strong> (הזוכה מקבל " + formatNum(duel.betAmount * duel.maxPlayers) + ")</div>" : "") +
