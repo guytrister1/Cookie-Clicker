@@ -1794,6 +1794,7 @@ function awardCompetitionPrizes(comp) {
                 (bestClub.members || []).forEach(function(m) {
                     var udata = usersData[m.uid];
                     if (!udata) return;
+                    if (adminUids[m.uid]) return; // admins contribute to the club's score but don't personally collect the club's prize
                     if (comp.prizeCookiesClub > 0) {
                         var newMemberCookies = (udata.cookies || 0) + comp.prizeCookiesClub;
                         var newMemberTotal = (udata.totalCookiesBaked || 0) + comp.prizeCookiesClub;
