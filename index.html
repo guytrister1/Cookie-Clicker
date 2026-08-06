@@ -80,6 +80,10 @@ body { font-family:Arial, sans-serif; background:linear-gradient(45deg,#FF6B6B,#
 .duel-result-row.rank-1 { background:linear-gradient(45deg,#FFD700,#FFA500); }
 .duel-result-row.rank-2 { background:linear-gradient(45deg,#D9D9D9,#B0B0B0); }
 .duel-result-row.rank-3 { background:linear-gradient(45deg,#CD7F32,#B8732E); color:white; }
+.codes-button { background:linear-gradient(45deg,#8E44AD,#F1C40F); color:white; padding:10px 18px; border:none; border-radius:15px; font-size:0.95rem; font-weight:bold; cursor:pointer; box-shadow:0 5px 15px rgba(142,68,173,0.4); }
+.codes-button:hover { transform:translateY(-2px); }
+.code-item { background:rgba(0,0,0,0.05); padding:10px 14px; margin:6px 0; border-radius:10px; text-align:right; }
+.code-item-text { font-weight:bold; color:#2C3E50; font-family:monospace; font-size:1rem; }
 .settings-button { position:fixed; top:20px; right:20px; background:linear-gradient(45deg,#34495E,#2C3E50); color:white; padding:10px 20px; border:none; border-radius:15px; font-size:1rem; font-weight:bold; cursor:pointer; z-index:1000; }
 .admin-button { position:fixed; top:80px; right:20px; background:linear-gradient(45deg,#9B59B6,#8E44AD); color:white; padding:10px 20px; border:none; border-radius:15px; font-size:1rem; font-weight:bold; cursor:pointer; z-index:1000; border:2px solid rgba(255,255,255,0.3); }
 .debug-button { position:fixed; top:140px; right:20px; background:linear-gradient(45deg,#7F8C8D,#2C3E50); color:white; padding:10px 20px; border:none; border-radius:15px; font-size:1rem; font-weight:bold; cursor:pointer; z-index:1000; border:2px dashed rgba(255,255,255,0.4); }
@@ -215,6 +219,7 @@ body { font-family:Arial, sans-serif; background:linear-gradient(45deg,#FF6B6B,#
     <button class="donate-button" onclick="openDonateModal()">🎁 תרום עוגיות</button>
     <button class="competition-button" onclick="openCompetitionsModal()">🏁 תחרויות</button>
     <button class="duel-button" onclick="openDuelModal()">⚔️ קרב</button>
+    <button class="codes-button" onclick="openCodesModal()">🎁 קודים</button>
 </div>
 
 <button class="settings-button" onclick="openSettingsModal()">⚙️ הגדרות</button>
@@ -505,6 +510,37 @@ body { font-family:Arial, sans-serif; background:linear-gradient(45deg,#FF6B6B,#
             </div>
             <div id="competitionsAdminMessage"></div>
         </div>
+        <div class="admin-section" id="codesAdminSection" style="display:none;">
+            <h4>🎁 ניהול קודים</h4>
+            <div style="text-align:right; margin-bottom:10px;">
+                <strong>📛 טקסט הקוד</strong>
+                <input type="text" id="createCodeTextInput" placeholder="למשל: WELCOME2026" maxlength="30" style="text-transform:uppercase;">
+            </div>
+            <div style="text-align:right; margin-bottom:10px;">
+                <strong>🎁 סוג המתנה</strong>
+                <select id="codeRewardTypeSelect" onchange="toggleCodeRewardInputs()">
+                    <option value="cookies">🍪 עוגיות</option>
+                    <option value="title">🏅 סמל שחקן (תואר)</option>
+                </select>
+            </div>
+            <div id="codeCookiesRewardSection">
+                <input type="number" id="codeCookieAmountInput" placeholder="כמות עוגיות" min="1">
+            </div>
+            <div id="codeTitleRewardSection" style="display:none;">
+                <select id="codeTitleTypeSelect" onchange="toggleCodeTitleCustomText()">
+                    <option value="champion">🏆 אלוף העולם</option>
+                    <option value="custom">✏️ תואר מותאם אישית</option>
+                </select>
+                <input type="text" id="codeTitleCustomTextInput" placeholder="הקלד את התואר" maxlength="30" style="display:none; margin-top:6px;">
+            </div>
+            <button onclick="createRedeemCode()">🎁 צור קוד</button>
+            <div id="codesAdminMessage"></div>
+            <div style="text-align:right; margin-top:14px; padding-top:12px; border-top:1px solid rgba(0,0,0,0.15);">
+                <strong>📋 קודים קיימים</strong>
+                <button onclick="loadAdminCodesList()" style="margin-right:8px;">🔄 רענן</button>
+                <div id="adminCodesListDiv" style="max-height:260px; overflow-y:auto; margin-top:10px;"></div>
+            </div>
+        </div>
         <button class="close-button" onclick="closeModal('adminModal')">סגור</button>
         <div id="adminMessage"></div>
     </div>
@@ -560,6 +596,17 @@ body { font-family:Arial, sans-serif; background:linear-gradient(45deg,#FF6B6B,#
         <h3>⚠️ אזהרה!</h3>
         <div id="warningPopupText" style="font-size:1.1rem; color:#C0392B; font-weight:bold; margin:15px 0;"></div>
         <button class="close-button" onclick="closeModal('warningPopupModal')">הבנתי</button>
+    </div>
+</div>
+
+<div class="modal" id="codesModal">
+    <div class="modal-content">
+        <h3>🎁 מימוש קוד</h3>
+        <p style="color:#555; margin-bottom:12px;">הקלד קוד שקיבלת מיוצר המשחק או מאדמין</p>
+        <input type="text" id="redeemCodeInput" placeholder="הקלד קוד כאן" maxlength="30" style="text-transform:uppercase;">
+        <button onclick="redeemCode()">🎁 ממש קוד</button>
+        <button class="close-button" onclick="closeModal('codesModal')">סגור</button>
+        <div id="redeemCodeMessage"></div>
     </div>
 </div>
 
@@ -2382,6 +2429,147 @@ function leaveDuelResultsScreen() {
     renderDuelMenu();
 }
 
+// ---------- REDEEM CODES ----------
+// Firebase keys can't contain . # $ [ ] / — strip those out, and normalize case/whitespace so
+// "welcome2026", "WELCOME2026 ", " Welcome2026" all resolve to the exact same code.
+function normalizeCode(code) {
+    return code.trim().toUpperCase().replace(/[.#$\[\]\/]/g, "");
+}
+
+function openCodesModal() {
+    if (!currentUid) { alert("התחבר קודם"); return; }
+    document.getElementById("redeemCodeInput").value = "";
+    document.getElementById("redeemCodeMessage").innerHTML = "";
+    document.getElementById("codesModal").style.display = "flex";
+}
+
+function redeemCode() {
+    var raw = document.getElementById("redeemCodeInput").value;
+    var code = normalizeCode(raw);
+    var msg = document.getElementById("redeemCodeMessage");
+    if (!code) { msg.innerHTML = "<div class='error-message'>הזן קוד</div>"; return; }
+
+    msg.innerHTML = "<div class='info-message'>בודק קוד...</div>";
+    withTimeout(database.ref("redeemCodes/" + code).once("value"), 10000).then(function(snap) {
+        if (!snap.exists()) { msg.innerHTML = "<div class='error-message'>הקוד לא קיים</div>"; return; }
+        var data = snap.val();
+        if (data.redeemedBy && data.redeemedBy[currentUid]) {
+            msg.innerHTML = "<div class='error-message'>כבר מימשת את הקוד הזה בעבר</div>";
+            return;
+        }
+
+        // Mark ourselves as redeemed first (a self-write on our own uid key, always allowed) —
+        // this is what actually prevents re-redeeming, and is safe even if two tabs race since
+        // each player only ever touches their own uid entry, never anyone else's.
+        return withTimeout(database.ref("redeemCodes/" + code + "/redeemedBy/" + currentUid).set(true), 10000).then(function() {
+            if (data.rewardType === "cookies") {
+                var amount = data.cookieAmount || 0;
+                var newCookies = cookies + amount;
+                var newTotal = totalCookiesBaked + amount;
+                return withTimeout(database.ref("users/" + currentUid).update({ cookies: newCookies, totalCookiesBaked: newTotal }), 10000).then(function() {
+                    cookies = newCookies; totalCookiesBaked = newTotal; updateDisplay();
+                    msg.innerHTML = "<div class='success-message'>קיבלת " + formatNum(amount) + " עוגיות! 🎁</div>";
+                });
+            } else if (data.rewardType === "title") {
+                var titleText = data.titleText || "";
+                return withTimeout(database.ref("users/" + currentUid + "/title").set(titleText), 10000).then(function() {
+                    if (usersCache[currentUid]) usersCache[currentUid].title = titleText;
+                    msg.innerHTML = "<div class='success-message'>קיבלת את התואר '" + titleText + "'! 🏅</div>";
+                });
+            } else {
+                msg.innerHTML = "<div class='error-message'>סוג מתנה לא מוכר בקוד הזה</div>";
+            }
+        });
+    }).catch(function(e) {
+        console.log(e);
+        msg.innerHTML = "<div class='error-message'>שגיאה: " + (e.message||e.code) + "</div>";
+    });
+}
+
+function toggleCodeRewardInputs() {
+    var type = document.getElementById("codeRewardTypeSelect").value;
+    document.getElementById("codeCookiesRewardSection").style.display = type === "cookies" ? "block" : "none";
+    document.getElementById("codeTitleRewardSection").style.display = type === "title" ? "block" : "none";
+}
+function toggleCodeTitleCustomText() {
+    var type = document.getElementById("codeTitleTypeSelect").value;
+    document.getElementById("codeTitleCustomTextInput").style.display = type === "custom" ? "block" : "none";
+}
+
+function createRedeemCode() {
+    var rawCode = document.getElementById("createCodeTextInput").value;
+    var code = normalizeCode(rawCode);
+    var rewardType = document.getElementById("codeRewardTypeSelect").value;
+    var msg = document.getElementById("codesAdminMessage");
+    if (!code) { msg.innerHTML = "<div class='error-message'>הזן טקסט לקוד</div>"; return; }
+
+    var codeData = {
+        code: code,
+        createdBy: currentUsername,
+        createdAt: Date.now(),
+        rewardType: rewardType,
+        redeemedBy: {}
+    };
+
+    if (rewardType === "cookies") {
+        var amount = parseInt(document.getElementById("codeCookieAmountInput").value);
+        if (!amount || !Number.isFinite(amount) || amount <= 0) { msg.innerHTML = "<div class='error-message'>הזן כמות עוגיות תקינה</div>"; return; }
+        codeData.cookieAmount = amount;
+    } else {
+        var titleType = document.getElementById("codeTitleTypeSelect").value;
+        var customText = document.getElementById("codeTitleCustomTextInput").value.trim();
+        var titleText = titleType === "champion" ? "🏆 אלוף העולם" : customText;
+        if (titleType === "custom" && !customText) { msg.innerHTML = "<div class='error-message'>הזן טקסט לתואר</div>"; return; }
+        codeData.titleText = titleText;
+    }
+
+    msg.innerHTML = "<div class='info-message'>יוצר קוד...</div>";
+    withTimeout(database.ref("redeemCodes/" + code).once("value"), 10000).then(function(existingSnap) {
+        if (existingSnap.exists()) { throw { code: "code-exists" }; }
+        return withTimeout(database.ref("redeemCodes/" + code).set(codeData), 10000);
+    }).then(function() {
+        msg.innerHTML = "<div class='success-message'>הקוד '" + code + "' נוצר בהצלחה!</div>";
+        document.getElementById("createCodeTextInput").value = "";
+        document.getElementById("codeCookieAmountInput").value = "";
+        document.getElementById("codeTitleCustomTextInput").value = "";
+        loadAdminCodesList();
+    }).catch(function(e) {
+        if (e.code === "code-exists") { msg.innerHTML = "<div class='error-message'>קוד בשם '" + code + "' כבר קיים</div>"; return; }
+        console.log(e);
+        msg.innerHTML = "<div class='error-message'>שגיאה: " + (e.message||e.code) + "</div>";
+    });
+}
+
+function loadAdminCodesList() {
+    var listDiv = document.getElementById("adminCodesListDiv");
+    if (!listDiv) return;
+    listDiv.innerHTML = "<div class='info-message'>טוען...</div>";
+    withTimeout(database.ref("redeemCodes").once("value"), 10000).then(function(snap) {
+        if (!snap.exists()) { listDiv.innerHTML = "<div style='color:#888;'>אין קודים עדיין</div>"; return; }
+        var html = "";
+        snap.forEach(function(child) {
+            var d = child.val();
+            var redeemCount = d.redeemedBy ? Object.keys(d.redeemedBy).length : 0;
+            var rewardText = d.rewardType === "cookies" ? ("🍪 " + formatNum(d.cookieAmount || 0) + " עוגיות") : ("🏅 " + d.titleText);
+            html += "<div class='code-item'>" +
+                "<div class='code-item-text'>" + child.key + "</div>" +
+                "<div style='font-size:0.85rem; color:#555; margin-top:3px;'>" + rewardText + " · מומש " + redeemCount + " פעמים</div>" +
+                "<button class='danger-button' style='margin-top:6px; padding:4px 12px; font-size:0.85rem;' onclick=\"deleteRedeemCode('" + child.key + "')\">מחק קוד</button>" +
+                "</div>";
+        });
+        listDiv.innerHTML = html;
+    }).catch(function(e) {
+        listDiv.innerHTML = "<div class='error-message'>שגיאה: " + (e.message||e.code) + "</div>";
+    });
+}
+
+function deleteRedeemCode(code) {
+    if (!confirm("למחוק את הקוד '" + code + "'? שחקנים שעדיין לא מימשו אותו לא יוכלו יותר.")) return;
+    withTimeout(database.ref("redeemCodes/" + code).remove(), 10000).then(function() {
+        loadAdminCodesList();
+    }).catch(function(e) { console.log(e); });
+}
+
 // ---------- MODERATION ----------
 function checkPendingWarnings(uid) {
     return withTimeout(database.ref("moderation/pendingWarnings/" + uid).once("value"), 10000).then(function(snap) {
@@ -3033,10 +3221,12 @@ function showAdminSections() {
     document.getElementById("eventsSection").style.display = "block";
     document.getElementById("competitionsAdminSection").style.display = "block";
     document.getElementById("playersListSection").style.display = "block";
+    document.getElementById("codesAdminSection").style.display = "block";
     loadModerationLists();
     populateMusicSelects();
     renderCompetitionAdminStatus();
     loadAdminPlayersList();
+    loadAdminCodesList();
 }
 
 function openAdminModal() {
@@ -3053,6 +3243,7 @@ function openAdminModal() {
         document.getElementById("eventsSection").style.display = "none";
         document.getElementById("competitionsAdminSection").style.display = "none";
         document.getElementById("playersListSection").style.display = "none";
+        document.getElementById("codesAdminSection").style.display = "none";
         document.getElementById("adminPasswordInput").value = "";
     }
 }
