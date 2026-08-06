@@ -2203,8 +2203,19 @@ function startDuelWatchdog() {
         }
         var modal = document.getElementById("duelModal");
         if (!modal || modal.style.display !== "flex") return;
+
+        // Actively re-attempt the start/finalize check ourselves too, instead of only passively
+        // re-rendering whatever the live listener already delivered — this way the screen we're
+        // actually looking at can't get stuck even in an edge case where the listener-driven
+        // trigger doesn't fire for this specific duel on this specific client.
+        if (myCurrentDuelId && allDuelsCache[myCurrentDuelId]) {
+            var d = allDuelsCache[myCurrentDuelId];
+            if (d.status === "waiting") maybeStartDuel(myCurrentDuelId, d);
+            if (d.status === "active") maybeFinalizeDuel(myCurrentDuelId, d);
+        }
+
         renderDuelScreen();
-    }, 1000);
+    }, 500);
 }
 
 function cancelDuel(duelId) {
@@ -2269,6 +2280,7 @@ function renderDuelArena(duel) {
 
     startDuelCountdown(duel);
     startDuelClickFlush(duel.id);
+    startDuelWatchdog();
 }
 
 function startDuelCountdown(duel) {
