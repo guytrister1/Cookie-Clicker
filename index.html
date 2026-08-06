@@ -1662,6 +1662,13 @@ function adminGiveTitle() {
     findUserByUsername(target).then(function(found) {
         if (!found) { msg.innerHTML = "<div class='error-message'>שחקן '" + target + "' לא נמצא</div>"; return; }
         return withTimeout(database.ref("users/" + found.uid + "/title").set(titleText), 10000).then(function() {
+            // BUGFIX: if you (the admin) are the target, saveUserData()'s periodic autosave
+            // reuses usersCache[currentUid] as its base object — including whatever stale
+            // "title" was cached there from login. Without updating it here too, the next
+            // autosave tick would silently write the OLD title right back over this change.
+            if (found.uid === currentUid && usersCache[currentUid]) {
+                usersCache[currentUid].title = titleText;
+            }
             msg.innerHTML = "<div class='success-message'>התואר '" + titleText + "' ניתן ל" + target + "!</div>";
             document.getElementById("giveTitleTargetInput").value = "";
             document.getElementById("giveTitleCustomText").value = "";
@@ -1681,6 +1688,9 @@ function adminRemoveTitle() {
         if (!found) { msg.innerHTML = "<div class='error-message'>שחקן '" + target + "' לא נמצא</div>"; return; }
         if (!found.data.title) { msg.innerHTML = "<div class='error-message'>לשחקן '" + target + "' אין תואר כרגע</div>"; return; }
         return withTimeout(database.ref("users/" + found.uid + "/title").remove(), 10000).then(function() {
+            if (found.uid === currentUid && usersCache[currentUid]) {
+                delete usersCache[currentUid].title;
+            }
             msg.innerHTML = "<div class='success-message'>התואר של " + target + " הוסר!</div>";
             document.getElementById("removeTitleTargetInput").value = "";
         });
@@ -2265,7 +2275,15 @@ function saveUserData() {
     u.club = currentClub; u.lastSave = Date.now();
     usersCache[currentUid] = u;
     if (!firebaseInit) return Promise.resolve();
-    return withTimeout(database.ref("users/" + currentUid).update(u), 10000).catch(function(e){ console.log("Save error:", e); });
+    // BUGFIX: "title" is admin-managed only (via the give/remove title panel or competition
+    // prizes) — the player's own client has no live, authoritative copy of it, so sending
+    // whatever stale value happens to be cached here risks silently overwriting a fresh title
+    // (given by an admin, or won as a prize) back to an old value on the next autosave tick.
+    // We build a separate payload without it — usersCache itself still keeps it locally (for
+    // the settings screen etc.), we just never write it back out from here.
+    var payload = {};
+    for (var k in u) { if (k !== "title") payload[k] = u[k]; }
+    return withTimeout(database.ref("users/" + currentUid).update(payload), 10000).catch(function(e){ console.log("Save error:", e); });
 }
 
 function reauth(currentPassword) {
