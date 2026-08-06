@@ -1912,11 +1912,38 @@ var localDuelClickCount = 0;
 var duelClickFlushInterval = null;
 var duelCountdownInterval = null;
 
+var DUEL_RESUME_KEY = "cookieGameResumeDuelId";
+
+// See renderDuelScreen()'s "active" case for why this exists — a full reload is a more
+// reliable way to pick up the waiting->active transition than an in-place re-render.
+function scheduleDuelReload(duelId) {
+    try { localStorage.setItem(DUEL_RESUME_KEY, duelId); } catch (e) { console.log(e); }
+    location.reload();
+}
+
+// Runs once, right after the very first fresh load of duels data post-reload/login — if we
+// were mid-reload specifically to catch a duel starting, this jumps the player straight back
+// into it (opening the duel screen automatically) instead of leaving them on the main game
+// screen having to manually reopen "קרב" themselves.
+function checkDuelResume() {
+    var savedId;
+    try { savedId = localStorage.getItem(DUEL_RESUME_KEY); } catch (e) { savedId = null; }
+    if (!savedId) return;
+    try { localStorage.removeItem(DUEL_RESUME_KEY); } catch (e) { console.log(e); }
+    if (allDuelsCache[savedId]) {
+        myCurrentDuelId = savedId;
+        document.getElementById("duelModal").style.display = "flex";
+        renderDuelScreen();
+    }
+}
+
 function setupDuelsListener() {
     if (!firebaseInit || duelsListenerAttached) return;
     duelsListenerAttached = true;
+    var firstLoad = true;
     database.ref("duels").on("value", function(snap) {
         allDuelsCache = snap.exists() ? snap.val() : {};
+        if (firstLoad) { firstLoad = false; checkDuelResume(); }
         handleDuelsUpdate();
     });
 }
@@ -2028,7 +2055,16 @@ function renderDuelScreen() {
         // "waiting" here (rather than falling through to the menu) keeps the screen correct
         // through that split-second instead of bouncing the player back to the main menu.
         else if (duel.status === "waiting" || duel.status === "starting") { duelCurrentView = "waiting"; renderDuelWaitingRoom(duel); return; }
-        else if (duel.status === "active") { duelCurrentView = "active"; renderDuelArena(duel); return; }
+        else if (duel.status === "active") {
+            // The waiting-room -> arena transition was the one spot proving unreliable to do
+            // as a smooth in-place re-render (some client/network combinations never seem to
+            // pick up the live update). A full reload sidesteps that class of bug entirely —
+            // scheduleDuelReload() saves myCurrentDuelId first, and the resume check below
+            // automatically drops the player straight back into the (now-active) duel right
+            // after the page comes back up, instead of leaving them on the main game screen.
+            if (duelCurrentView === "waiting") { scheduleDuelReload(myCurrentDuelId); return; }
+            duelCurrentView = "active"; renderDuelArena(duel); return;
+        }
         else if (duel.status === "finished") { duelCurrentView = "finished"; renderDuelFinished(duel); return; }
     }
     duelCurrentView = "menu";
