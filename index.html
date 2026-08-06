@@ -50,6 +50,12 @@ body { font-family:Arial, sans-serif; background:linear-gradient(45deg,#FF6B6B,#
 .duel-card { background:rgba(255,255,255,0.97); border-radius:22px; padding:24px; margin:0 auto 16px auto; max-width:520px; width:100%; box-shadow:0 15px 40px rgba(0,0,0,0.4); text-align:right; border:1px solid rgba(255,255,255,0.6); }
 .duel-card h3 { color:#7a1414; font-size:1.4rem; margin-bottom:14px; text-align:center; }
 .duel-field-label { display:block; color:#7a1414; font-weight:bold; font-size:0.95rem; margin-bottom:6px; }
+.duel-card input[type="number"], .duel-card input[type="text"], .duel-card select { padding:11px 14px; border:2px solid #eecfcf; border-radius:12px; font-size:1rem; font-family:Arial, sans-serif; text-align:center; background:#fff9f9; color:#2C3E50; transition:border-color 0.2s ease, box-shadow 0.2s ease; }
+.duel-card input[type="number"]:focus, .duel-card input[type="text"]:focus, .duel-card select:focus { outline:none; border-color:#C0392B; box-shadow:0 0 0 3px rgba(192,57,43,0.15); }
+.duel-card select { -webkit-appearance:none; appearance:none; cursor:pointer; padding-left:30px; background-image:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%237a1414'><path d='M7 10l5 5 5-5z'/></svg>"); background-repeat:no-repeat; background-position:10px center; background-size:18px; }
+.duel-card button:not(.close-button):not(.danger-button) { background:linear-gradient(45deg,#C0392B,#E74C3C); color:white; border:none; padding:11px 24px; border-radius:12px; font-size:1rem; font-weight:bold; cursor:pointer; margin:6px 4px; box-shadow:0 4px 10px rgba(192,57,43,0.3); transition:all 0.2s ease; }
+.duel-card button:not(.close-button):not(.danger-button):hover { transform:translateY(-2px); box-shadow:0 6px 14px rgba(192,57,43,0.45); }
+.duel-card .close-button, .duel-card .danger-button { border-radius:12px; padding:11px 24px; margin:6px 4px; }
 .duel-vs-row { display:flex; align-items:center; justify-content:center; gap:10px; flex-wrap:wrap; margin:16px 0; }
 .duel-player-slot { display:flex; flex-direction:column; align-items:center; gap:6px; min-width:80px; }
 .duel-avatar { width:56px; height:56px; border-radius:50%; background:linear-gradient(135deg,#E74C3C,#C0392B); color:white; font-size:1.4rem; font-weight:bold; display:flex; align-items:center; justify-content:center; box-shadow:0 6px 14px rgba(192,57,43,0.5); border:3px solid rgba(255,255,255,0.8); }
@@ -2041,12 +2047,14 @@ function showDuelCreateForm() {
         "<div class='duel-card'>" +
         "<h3>🆚 יצירת דו-קרב</h3>" +
         "<div style='margin-bottom:14px;'><span class='duel-field-label'>⏱️ משך הקרב</span>" +
-        "<input type='number' id='duelDurationMinutes' placeholder='דקות' min='0' style='width:45%;'> " +
-        "<input type='number' id='duelDurationSeconds' placeholder='שניות' min='0' max='59' style='width:45%;'></div>" +
+        "<div style='display:flex; gap:10px;'>" +
+        "<input type='number' id='duelDurationMinutes' placeholder='דקות' min='0' style='flex:1;'>" +
+        "<input type='number' id='duelDurationSeconds' placeholder='שניות' min='0' max='59' style='flex:1;'>" +
+        "</div></div>" +
         "<div style='margin-bottom:14px;'><span class='duel-field-label'>👥 מספר שחקנים</span>" +
-        "<select id='duelMaxPlayersSelect'><option value='2'>2</option><option value='3'>3</option><option value='4'>4</option></select></div>" +
+        "<select id='duelMaxPlayersSelect' style='width:100%;'><option value='2'>2</option><option value='3'>3</option><option value='4'>4</option></select></div>" +
         "<div style='margin-bottom:14px;'><span class='duel-field-label'>🍪 הימור עוגיות (0 = בלי הימור)</span>" +
-        "<input type='number' id='duelBetInput' min='0' value='0'></div>" +
+        "<input type='number' id='duelBetInput' min='0' value='0' style='width:100%;'></div>" +
         "<button onclick='createDuel()'>🆚 צור קרב</button> " +
         "<button class='close-button' onclick='renderDuelMenu()'>ביטול</button>" +
         "<div id='duelCreateMessage'></div>" +
