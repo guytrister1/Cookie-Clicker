@@ -222,34 +222,34 @@ body { font-family:Arial, sans-serif; background:linear-gradient(45deg,#FF6B6B,#
 
 <div class="login-screen" id="loginScreen">
     <div class="login-form">
-        <h2>🍪 משחק האימפריית עוגיות 🍪</h2>
-        <input type="text" id="usernameInput" placeholder="שם משתמש" maxlength="20">
-        <input type="password" id="passwordInput" placeholder="סיסמה">
+        <h2 data-i18n="login_title">🍪 משחק האימפריית עוגיות 🍪</h2>
+        <input type="text" id="usernameInput" data-i18n-ph="login_username_ph" placeholder="שם משתמש" maxlength="20">
+        <input type="password" id="passwordInput" data-i18n-ph="login_password_ph" placeholder="סיסמה">
         <div class="remember-me">
             <input type="checkbox" id="rememberMe" checked>
-            <label for="rememberMe">זכור אותי</label>
+            <label for="rememberMe" data-i18n="login_remember_me">זכור אותי</label>
         </div>
-        <button id="loginBtn" onclick="login()">התחבר</button>
-        <button id="registerBtn" onclick="register()">הרשם</button>
+        <button id="loginBtn" onclick="login()" data-i18n="login_btn">התחבר</button>
+        <button id="registerBtn" onclick="register()" data-i18n="register_btn">הרשם</button>
         <div id="loginMessage"></div>
     </div>
 </div>
 
 <div class="top-buttons">
     <div id="clubButtonsContainer">
-        <button class="club-button" onclick="openJoinClubModal()">🏆 הצטרף למועדון</button>
-        <button class="club-button" onclick="openCreateClubModal()">⭐ צור מועדון</button>
+        <button class="club-button" onclick="openJoinClubModal()" data-i18n="club_join_btn">🏆 הצטרף למועדון</button>
+        <button class="club-button" onclick="openCreateClubModal()" data-i18n="club_create_btn">⭐ צור מועדון</button>
     </div>
-    <button class="donate-button" onclick="openDonateModal()">🎁 תרום עוגיות</button>
-    <button class="competition-button" onclick="openCompetitionsModal()">🏁 תחרויות</button>
-    <button class="duel-button" onclick="openDuelModal()">⚔️ קרב</button>
-    <button class="codes-button" onclick="openCodesModal()">🎁 קודים</button>
-    <button class="games-button" onclick="openGamesModal()">🎮 משחקים</button>
+    <button class="donate-button" onclick="openDonateModal()" data-i18n="donate_btn">🎁 תרום עוגיות</button>
+    <button class="competition-button" onclick="openCompetitionsModal()" data-i18n="competitions_btn">🏁 תחרויות</button>
+    <button class="duel-button" onclick="openDuelModal()" data-i18n="duel_btn">⚔️ קרב</button>
+    <button class="codes-button" onclick="openCodesModal()" data-i18n="codes_btn">🎁 קודים</button>
+    <button class="games-button" onclick="openGamesModal()" data-i18n="games_btn">🎮 משחקים</button>
 </div>
 
-<button class="settings-button" onclick="openSettingsModal()">⚙️ הגדרות</button>
-<button class="admin-button" id="adminButton" onclick="openAdminModal()" style="display:none;">👑 מסך יוצר</button>
-<button class="debug-button" id="debugButton" onclick="openDebugModal()" style="display:none;">🐛 מצב באגים</button>
+<button class="settings-button" onclick="openSettingsModal()" data-i18n="settings_btn">⚙️ הגדרות</button>
+<button class="admin-button" id="adminButton" onclick="openAdminModal()" style="display:none;" data-i18n="admin_btn">👑 מסך יוצר</button>
+<button class="debug-button" id="debugButton" onclick="openDebugModal()" style="display:none;" data-i18n="debug_btn">🐛 מצב באגים</button>
 
 <div class="modal" id="debugModal">
     <div class="modal-content">
@@ -341,17 +341,32 @@ body { font-family:Arial, sans-serif; background:linear-gradient(45deg,#FF6B6B,#
 
 <div class="modal" id="settingsModal">
     <div class="modal-content">
-        <h3>⚙️ הגדרות חשבון</h3>
+        <h3 data-i18n="settings_title">⚙️ הגדרות חשבון</h3>
         <div class="settings-section">
-            <h4>👤 שם משתמש</h4>
-            <div class="current-info">נוכחי: <span id="currentUsername"></span></div>
-            <div class="current-info" id="currentTitleInfo" style="display:none;">תואר: <span id="currentTitleText"></span></div>
-            <input type="text" id="newUsernameInput" placeholder="שם משתמש חדש" maxlength="20">
-            <input type="password" id="usernameChangePasswordInput" placeholder="הסיסמה שלך (לאימות)">
-            <button id="changeUsernameBtn" onclick="changeUsername()">שנה שם משתמש</button>
+            <h4 data-i18n="settings_language_header">🌐 שפה</h4>
+            <select id="languageSelect" onchange="changeLanguage(this.value)">
+                <option value="he">עברית</option>
+                <option value="en">English</option>
+                <option value="ar">العربية</option>
+                <option value="es">Español</option>
+                <option value="fr">Français</option>
+                <option value="ru">Русский</option>
+                <option value="pt">Português</option>
+                <option value="de">Deutsch</option>
+                <option value="zh">中文</option>
+                <option value="hi">हिन्दी</option>
+            </select>
         </div>
         <div class="settings-section">
-            <h4>🔒 סיסמה</h4>
+            <h4 data-i18n="settings_username_header">👤 שם משתמש</h4>
+            <div class="current-info"><span data-i18n="settings_current_label">נוכחי:</span> <span id="currentUsername"></span></div>
+            <div class="current-info" id="currentTitleInfo" style="display:none;"><span data-i18n="settings_title_label">תואר:</span> <span id="currentTitleText"></span></div>
+            <input type="text" id="newUsernameInput" data-i18n-ph="settings_new_username_ph" placeholder="שם משתמש חדש" maxlength="20">
+            <input type="password" id="usernameChangePasswordInput" data-i18n-ph="settings_password_verify_ph" placeholder="הסיסמה שלך (לאימות)">
+            <button id="changeUsernameBtn" onclick="changeUsername()" data-i18n="settings_change_username_btn">שנה שם משתמש</button>
+        </div>
+        <div class="settings-section">
+            <h4 data-i18n="settings_password_header">🔒 סיסמה</h4>
             <input type="password" id="currentPasswordInput" placeholder="סיסמה נוכחית">
             <input type="password" id="newPasswordInput" placeholder="סיסמה חדשה">
             <input type="password" id="confirmPasswordInput" placeholder="אשר סיסמה חדשה">
@@ -670,16 +685,16 @@ body { font-family:Arial, sans-serif; background:linear-gradient(45deg,#FF6B6B,#
             <div class="cookies-per-second" id="cpsDisplay">0 עוגיות לשנייה</div>
             <div class="cookies-per-click" id="cpcDisplay">+1 ללחיצה</div>
             <div class="prestige-info" id="prestigeInfo">רמת יוקרה: 0 | כפולה: x1</div>
-            <button class="prestige-button" onclick="prestige()">🌟 איפוס יוקרה 🌟</button>
+            <button class="prestige-button" onclick="prestige()" data-i18n="prestige_btn">🌟 איפוס יוקרה 🌟</button>
         </div>
         <div class="cookie-container"><div class="cookie" id="cookie"></div></div>
     </div>
     <div class="shop">
-        <h2>🛒 חנות 🛒</h2>
-        <div class="shop-section"><h3>🏭 מבנים</h3><div id="buildingItems"></div></div>
-        <div class="shop-section"><h3>👆 שדרוגי לחיצה</h3><div id="clickUpgradeItems"></div></div>
-        <div class="shop-section"><h3>⚡ שדרוגים</h3><div id="upgradeItems"></div></div>
-        <div class="shop-section"><h3>🎯 הישגים</h3><div id="achievementItems"></div></div>
+        <h2 data-i18n="shop_title">🛒 חנות 🛒</h2>
+        <div class="shop-section"><h3 data-i18n="shop_buildings">🏭 מבנים</h3><div id="buildingItems"></div></div>
+        <div class="shop-section"><h3 data-i18n="shop_click_upgrades">👆 שדרוגי לחיצה</h3><div id="clickUpgradeItems"></div></div>
+        <div class="shop-section"><h3 data-i18n="shop_upgrades">⚡ שדרוגים</h3><div id="upgradeItems"></div></div>
+        <div class="shop-section"><h3 data-i18n="shop_achievements">🎯 הישגים</h3><div id="achievementItems"></div></div>
     </div>
 </div>
 
@@ -738,6 +753,198 @@ async function sha256Hex(str) {
     var hashArray = Array.from(new Uint8Array(hashBuffer));
     return hashArray.map(function(b) { return b.toString(16).padStart(2, "0"); }).join("");
 }
+
+// ---------- TRANSLATIONS (i18n) ----------
+// Covers the core, most-visible UI (login, top buttons, settings, shop headers, live stats).
+// Further screens (admin panel, duels, competitions, codes, obstacle game) will be added to
+// this dictionary incrementally in future updates, per standing instruction to translate all
+// new UI text into every supported language going forward.
+var translations = {
+    he: {
+        settings_title: "⚙️ הגדרות חשבון", settings_language_header: "🌐 שפה", settings_username_header: "👤 שם משתמש",
+        settings_current_label: "נוכחי:", settings_title_label: "תואר:", settings_new_username_ph: "שם משתמש חדש",
+        settings_password_verify_ph: "הסיסמה שלך (לאימות)", settings_change_username_btn: "שנה שם משתמש", settings_password_header: "🔒 סיסמה",
+        login_title: "🍪 משחק האימפריית עוגיות 🍪", login_username_ph: "שם משתמש", login_password_ph: "סיסמה",
+        login_remember_me: "זכור אותי", login_btn: "התחבר", register_btn: "הרשם",
+        club_join_btn: "🏆 הצטרף למועדון", club_create_btn: "⭐ צור מועדון", club_my_club: "🏆 המועדון שלי",
+        donate_btn: "🎁 תרום עוגיות", competitions_btn: "🏁 תחרויות", duel_btn: "⚔️ קרב", codes_btn: "🎁 קודים",
+        games_btn: "🎮 משחקים", settings_btn: "⚙️ הגדרות", admin_btn: "👑 מסך יוצר", debug_btn: "🐛 מצב באגים",
+        shop_title: "🛒 חנות 🛒", shop_buildings: "🏭 מבנים", shop_click_upgrades: "👆 שדרוגי לחיצה",
+        shop_upgrades: "⚡ שדרוגים", shop_achievements: "🎯 הישגים", prestige_btn: "🌟 איפוס יוקרה 🌟",
+        cps_line: "{num} עוגיות לשנייה", cpc_line: "+{num} ללחיצה",
+        prestige_line: "רמת יוקרה: {level} | כפולה: x{mult} | לאיפוס הבא: {next} עוגיות"
+    },
+    en: {
+        settings_title: "⚙️ Account Settings", settings_language_header: "🌐 Language", settings_username_header: "👤 Username",
+        settings_current_label: "Current:", settings_title_label: "Title:", settings_new_username_ph: "New username",
+        settings_password_verify_ph: "Your password (to verify)", settings_change_username_btn: "Change username", settings_password_header: "🔒 Password",
+        login_title: "🍪 Cookie Empire Game 🍪", login_username_ph: "Username", login_password_ph: "Password",
+        login_remember_me: "Remember me", login_btn: "Log in", register_btn: "Sign up",
+        club_join_btn: "🏆 Join Club", club_create_btn: "⭐ Create Club", club_my_club: "🏆 My Club",
+        donate_btn: "🎁 Donate Cookies", competitions_btn: "🏁 Competitions", duel_btn: "⚔️ Duel", codes_btn: "🎁 Codes",
+        games_btn: "🎮 Games", settings_btn: "⚙️ Settings", admin_btn: "👑 Creator Screen", debug_btn: "🐛 Debug Mode",
+        shop_title: "🛒 Shop 🛒", shop_buildings: "🏭 Buildings", shop_click_upgrades: "👆 Click Upgrades",
+        shop_upgrades: "⚡ Upgrades", shop_achievements: "🎯 Achievements", prestige_btn: "🌟 Prestige Reset 🌟",
+        cps_line: "{num} cookies per second", cpc_line: "+{num} per click",
+        prestige_line: "Prestige Level: {level} | Multiplier: x{mult} | Next reset: {next} cookies"
+    },
+    ar: {
+        settings_title: "⚙️ إعدادات الحساب", settings_language_header: "🌐 اللغة", settings_username_header: "👤 اسم المستخدم",
+        settings_current_label: "الحالي:", settings_title_label: "اللقب:", settings_new_username_ph: "اسم مستخدم جديد",
+        settings_password_verify_ph: "كلمة المرور (للتحقق)", settings_change_username_btn: "تغيير اسم المستخدم", settings_password_header: "🔒 كلمة المرور",
+        login_title: "🍪 لعبة إمبراطورية الكوكيز 🍪", login_username_ph: "اسم المستخدم", login_password_ph: "كلمة المرور",
+        login_remember_me: "تذكرني", login_btn: "تسجيل الدخول", register_btn: "إنشاء حساب",
+        club_join_btn: "🏆 انضم للنادي", club_create_btn: "⭐ أنشئ نادي", club_my_club: "🏆 النادي الخاص بي",
+        donate_btn: "🎁 تبرع بالكوكيز", competitions_btn: "🏁 مسابقات", duel_btn: "⚔️ مبارزة", codes_btn: "🎁 أكواد",
+        games_btn: "🎮 ألعاب", settings_btn: "⚙️ إعدادات", admin_btn: "👑 شاشة المنشئ", debug_btn: "🐛 وضع التصحيح",
+        shop_title: "🛒 المتجر 🛒", shop_buildings: "🏭 مبانٍ", shop_click_upgrades: "👆 ترقيات النقر",
+        shop_upgrades: "⚡ ترقيات", shop_achievements: "🎯 إنجازات", prestige_btn: "🌟 إعادة تعيين المكانة 🌟",
+        cps_line: "{num} كوكيز في الثانية", cpc_line: "+{num} لكل نقرة",
+        prestige_line: "مستوى المكانة: {level} | المضاعف: x{mult} | الهدف التالي: {next} كوكيز"
+    },
+    es: {
+        settings_title: "⚙️ Ajustes de cuenta", settings_language_header: "🌐 Idioma", settings_username_header: "👤 Nombre de usuario",
+        settings_current_label: "Actual:", settings_title_label: "Título:", settings_new_username_ph: "Nuevo nombre de usuario",
+        settings_password_verify_ph: "Tu contraseña (verificar)", settings_change_username_btn: "Cambiar nombre de usuario", settings_password_header: "🔒 Contraseña",
+        login_title: "🍪 Juego Imperio de Galletas 🍪", login_username_ph: "Usuario", login_password_ph: "Contraseña",
+        login_remember_me: "Recordarme", login_btn: "Iniciar sesión", register_btn: "Registrarse",
+        club_join_btn: "🏆 Unirse al club", club_create_btn: "⭐ Crear club", club_my_club: "🏆 Mi club",
+        donate_btn: "🎁 Donar galletas", competitions_btn: "🏁 Competencias", duel_btn: "⚔️ Duelo", codes_btn: "🎁 Códigos",
+        games_btn: "🎮 Juegos", settings_btn: "⚙️ Ajustes", admin_btn: "👑 Panel de creador", debug_btn: "🐛 Modo depuración",
+        shop_title: "🛒 Tienda 🛒", shop_buildings: "🏭 Edificios", shop_click_upgrades: "👆 Mejoras de clic",
+        shop_upgrades: "⚡ Mejoras", shop_achievements: "🎯 Logros", prestige_btn: "🌟 Reinicio de prestigio 🌟",
+        cps_line: "{num} galletas por segundo", cpc_line: "+{num} por clic",
+        prestige_line: "Nivel de prestigio: {level} | Multiplicador: x{mult} | Próxima meta: {next} galletas"
+    },
+    fr: {
+        settings_title: "⚙️ Paramètres du compte", settings_language_header: "🌐 Langue", settings_username_header: "👤 Nom d'utilisateur",
+        settings_current_label: "Actuel :", settings_title_label: "Titre :", settings_new_username_ph: "Nouveau nom d'utilisateur",
+        settings_password_verify_ph: "Votre mot de passe (vérification)", settings_change_username_btn: "Changer le nom d'utilisateur", settings_password_header: "🔒 Mot de passe",
+        login_title: "🍪 Jeu Empire des Cookies 🍪", login_username_ph: "Nom d'utilisateur", login_password_ph: "Mot de passe",
+        login_remember_me: "Se souvenir de moi", login_btn: "Connexion", register_btn: "S'inscrire",
+        club_join_btn: "🏆 Rejoindre un club", club_create_btn: "⭐ Créer un club", club_my_club: "🏆 Mon club",
+        donate_btn: "🎁 Donner des cookies", competitions_btn: "🏁 Compétitions", duel_btn: "⚔️ Duel", codes_btn: "🎁 Codes",
+        games_btn: "🎮 Jeux", settings_btn: "⚙️ Paramètres", admin_btn: "👑 Écran créateur", debug_btn: "🐛 Mode débogage",
+        shop_title: "🛒 Boutique 🛒", shop_buildings: "🏭 Bâtiments", shop_click_upgrades: "👆 Améliorations de clic",
+        shop_upgrades: "⚡ Améliorations", shop_achievements: "🎯 Succès", prestige_btn: "🌟 Réinitialisation prestige 🌟",
+        cps_line: "{num} cookies par seconde", cpc_line: "+{num} par clic",
+        prestige_line: "Niveau de prestige : {level} | Multiplicateur : x{mult} | Prochain objectif : {next} cookies"
+    },
+    ru: {
+        settings_title: "⚙️ Настройки аккаунта", settings_language_header: "🌐 Язык", settings_username_header: "👤 Имя пользователя",
+        settings_current_label: "Текущее:", settings_title_label: "Титул:", settings_new_username_ph: "Новое имя пользователя",
+        settings_password_verify_ph: "Ваш пароль (проверка)", settings_change_username_btn: "Изменить имя пользователя", settings_password_header: "🔒 Пароль",
+        login_title: "🍪 Игра Империя Печенья 🍪", login_username_ph: "Имя пользователя", login_password_ph: "Пароль",
+        login_remember_me: "Запомнить меня", login_btn: "Войти", register_btn: "Регистрация",
+        club_join_btn: "🏆 Вступить в клуб", club_create_btn: "⭐ Создать клуб", club_my_club: "🏆 Мой клуб",
+        donate_btn: "🎁 Подарить печенье", competitions_btn: "🏁 Соревнования", duel_btn: "⚔️ Дуэль", codes_btn: "🎁 Коды",
+        games_btn: "🎮 Игры", settings_btn: "⚙️ Настройки", admin_btn: "👑 Экран создателя", debug_btn: "🐛 Режим отладки",
+        shop_title: "🛒 Магазин 🛒", shop_buildings: "🏭 Здания", shop_click_upgrades: "👆 Улучшения клика",
+        shop_upgrades: "⚡ Улучшения", shop_achievements: "🎯 Достижения", prestige_btn: "🌟 Сброс престижа 🌟",
+        cps_line: "{num} печенек в секунду", cpc_line: "+{num} за клик",
+        prestige_line: "Уровень престижа: {level} | Множитель: x{mult} | Следующая цель: {next} печенек"
+    },
+    pt: {
+        settings_title: "⚙️ Configurações da conta", settings_language_header: "🌐 Idioma", settings_username_header: "👤 Nome de usuário",
+        settings_current_label: "Atual:", settings_title_label: "Título:", settings_new_username_ph: "Novo nome de usuário",
+        settings_password_verify_ph: "Sua senha (verificação)", settings_change_username_btn: "Alterar nome de usuário", settings_password_header: "🔒 Senha",
+        login_title: "🍪 Jogo Império dos Cookies 🍪", login_username_ph: "Usuário", login_password_ph: "Senha",
+        login_remember_me: "Lembrar de mim", login_btn: "Entrar", register_btn: "Cadastrar",
+        club_join_btn: "🏆 Entrar no clube", club_create_btn: "⭐ Criar clube", club_my_club: "🏆 Meu clube",
+        donate_btn: "🎁 Doar cookies", competitions_btn: "🏁 Competições", duel_btn: "⚔️ Duelo", codes_btn: "🎁 Códigos",
+        games_btn: "🎮 Jogos", settings_btn: "⚙️ Configurações", admin_btn: "👑 Painel do criador", debug_btn: "🐛 Modo de depuração",
+        shop_title: "🛒 Loja 🛒", shop_buildings: "🏭 Construções", shop_click_upgrades: "👆 Melhorias de clique",
+        shop_upgrades: "⚡ Melhorias", shop_achievements: "🎯 Conquistas", prestige_btn: "🌟 Reinício de prestígio 🌟",
+        cps_line: "{num} cookies por segundo", cpc_line: "+{num} por clique",
+        prestige_line: "Nível de prestígio: {level} | Multiplicador: x{mult} | Próxima meta: {next} cookies"
+    },
+    de: {
+        settings_title: "⚙️ Kontoeinstellungen", settings_language_header: "🌐 Sprache", settings_username_header: "👤 Benutzername",
+        settings_current_label: "Aktuell:", settings_title_label: "Titel:", settings_new_username_ph: "Neuer Benutzername",
+        settings_password_verify_ph: "Dein Passwort (zur Bestätigung)", settings_change_username_btn: "Benutzername ändern", settings_password_header: "🔒 Passwort",
+        login_title: "🍪 Cookie-Imperium Spiel 🍪", login_username_ph: "Benutzername", login_password_ph: "Passwort",
+        login_remember_me: "Angemeldet bleiben", login_btn: "Anmelden", register_btn: "Registrieren",
+        club_join_btn: "🏆 Klub beitreten", club_create_btn: "⭐ Klub erstellen", club_my_club: "🏆 Mein Klub",
+        donate_btn: "🎁 Cookies spenden", competitions_btn: "🏁 Wettbewerbe", duel_btn: "⚔️ Duell", codes_btn: "🎁 Codes",
+        games_btn: "🎮 Spiele", settings_btn: "⚙️ Einstellungen", admin_btn: "👑 Ersteller-Bildschirm", debug_btn: "🐛 Debug-Modus",
+        shop_title: "🛒 Shop 🛒", shop_buildings: "🏭 Gebäude", shop_click_upgrades: "👆 Klick-Upgrades",
+        shop_upgrades: "⚡ Upgrades", shop_achievements: "🎯 Erfolge", prestige_btn: "🌟 Prestige-Reset 🌟",
+        cps_line: "{num} Cookies pro Sekunde", cpc_line: "+{num} pro Klick",
+        prestige_line: "Prestige-Level: {level} | Multiplikator: x{mult} | Nächstes Ziel: {next} Cookies"
+    },
+    zh: {
+        settings_title: "⚙️ 账户设置", settings_language_header: "🌐 语言", settings_username_header: "👤 用户名",
+        settings_current_label: "当前：", settings_title_label: "称号：", settings_new_username_ph: "新用户名",
+        settings_password_verify_ph: "您的密码（验证）", settings_change_username_btn: "更改用户名", settings_password_header: "🔒 密码",
+        login_title: "🍪 饼干帝国游戏 🍪", login_username_ph: "用户名", login_password_ph: "密码",
+        login_remember_me: "记住我", login_btn: "登录", register_btn: "注册",
+        club_join_btn: "🏆 加入俱乐部", club_create_btn: "⭐ 创建俱乐部", club_my_club: "🏆 我的俱乐部",
+        donate_btn: "🎁 捐赠饼干", competitions_btn: "🏁 比赛", duel_btn: "⚔️ 对决", codes_btn: "🎁 兑换码",
+        games_btn: "🎮 游戏", settings_btn: "⚙️ 设置", admin_btn: "👑 创建者面板", debug_btn: "🐛 调试模式",
+        shop_title: "🛒 商店 🛒", shop_buildings: "🏭 建筑", shop_click_upgrades: "👆 点击升级",
+        shop_upgrades: "⚡ 升级", shop_achievements: "🎯 成就", prestige_btn: "🌟 声望重置 🌟",
+        cps_line: "每秒 {num} 块饼干", cpc_line: "+{num} 每次点击",
+        prestige_line: "声望等级：{level} | 倍数：x{mult} | 下一目标：{next} 块饼干"
+    },
+    hi: {
+        settings_title: "⚙️ खाता सेटिंग्स", settings_language_header: "🌐 भाषा", settings_username_header: "👤 उपयोगकर्ता नाम",
+        settings_current_label: "वर्तमान:", settings_title_label: "उपाधि:", settings_new_username_ph: "नया उपयोगकर्ता नाम",
+        settings_password_verify_ph: "आपका पासवर्ड (सत्यापन)", settings_change_username_btn: "उपयोगकर्ता नाम बदलें", settings_password_header: "🔒 पासवर्ड",
+        login_title: "🍪 कुकी एम्पायर गेम 🍪", login_username_ph: "उपयोगकर्ता नाम", login_password_ph: "पासवर्ड",
+        login_remember_me: "मुझे याद रखें", login_btn: "लॉग इन करें", register_btn: "साइन अप करें",
+        club_join_btn: "🏆 क्लब से जुड़ें", club_create_btn: "⭐ क्लब बनाएं", club_my_club: "🏆 मेरा क्लब",
+        donate_btn: "🎁 कुकीज़ दान करें", competitions_btn: "🏁 प्रतियोगिताएं", duel_btn: "⚔️ द्वंद्व", codes_btn: "🎁 कोड",
+        games_btn: "🎮 खेल", settings_btn: "⚙️ सेटिंग्स", admin_btn: "👑 क्रिएटर स्क्रीन", debug_btn: "🐛 डिबग मोड",
+        shop_title: "🛒 दुकान 🛒", shop_buildings: "🏭 इमारतें", shop_click_upgrades: "👆 क्लिक अपग्रेड",
+        shop_upgrades: "⚡ अपग्रेड", shop_achievements: "🎯 उपलब्धियां", prestige_btn: "🌟 प्रतिष्ठा रीसेट 🌟",
+        cps_line: "{num} कुकीज़ प्रति सेकंड", cpc_line: "+{num} प्रति क्लिक",
+        prestige_line: "प्रतिष्ठा स्तर: {level} | गुणक: x{mult} | अगला लक्ष्य: {next} कुकीज़"
+    }
+};
+
+var currentLanguage = "he";
+
+function t(key) {
+    var dict = translations[currentLanguage] || translations.he;
+    return dict[key] !== undefined ? dict[key] : (translations.he[key] || key);
+}
+
+function tFormat(key, vals) {
+    var str = t(key);
+    for (var k in vals) { str = str.split("{" + k + "}").join(vals[k]); }
+    return str;
+}
+
+function applyLanguage() {
+    document.querySelectorAll("[data-i18n]").forEach(function(el) {
+        el.textContent = t(el.getAttribute("data-i18n"));
+    });
+    document.querySelectorAll("[data-i18n-ph]").forEach(function(el) {
+        el.placeholder = t(el.getAttribute("data-i18n-ph"));
+    });
+    var sel = document.getElementById("languageSelect");
+    if (sel) sel.value = currentLanguage;
+    updateClubButtons();
+    updateDisplay();
+}
+
+// Language choice persists locally always, and syncs to the player's Firebase profile once
+// logged in so it follows them across devices too.
+function changeLanguage(lang) {
+    if (!translations[lang]) return;
+    currentLanguage = lang;
+    try { localStorage.setItem("cookieGameLanguage", lang); } catch (e) { console.log(e); }
+    applyLanguage();
+    if (currentUid && firebaseInit) {
+        withTimeout(database.ref("users/" + currentUid + "/language").set(lang), 10000).catch(function(e) { console.log(e); });
+    }
+}
+
+(function initLanguage() {
+    var saved = null;
+    try { saved = localStorage.getItem("cookieGameLanguage"); } catch (e) {}
+    if (saved && translations[saved]) currentLanguage = saved;
+})();
 
 var cookies = 0, cookiesPerSecond = 0, clickPower = 1;
 var hasUnsavedChanges = false;
@@ -859,9 +1066,9 @@ function recalcBuildingCps() {
 }
 function updateDisplay() {
     document.getElementById("cookieCount").textContent = formatNum(cookies);
-    document.getElementById("cpsDisplay").textContent = formatNum(cookiesPerSecond) + " עוגיות לשנייה";
-    document.getElementById("cpcDisplay").textContent = "+" + formatNum(Math.floor(clickPower*prestigeMultiplier)) + " ללחיצה";
-    document.getElementById("prestigeInfo").textContent = "רמת יוקרה: " + prestigeLevel + " | כפולה: x" + prestigeMultiplier.toFixed(1) + " | לאיפוס הבא: " + formatNum(getPrestigeRequirement()) + " עוגיות";
+    document.getElementById("cpsDisplay").textContent = tFormat("cps_line", { num: formatNum(cookiesPerSecond) });
+    document.getElementById("cpcDisplay").textContent = tFormat("cpc_line", { num: formatNum(Math.floor(clickPower*prestigeMultiplier)) });
+    document.getElementById("prestigeInfo").textContent = tFormat("prestige_line", { level: prestigeLevel, mult: prestigeMultiplier.toFixed(1), next: formatNum(getPrestigeRequirement()) });
 }
 
 function getCost(b) {
@@ -3241,6 +3448,10 @@ function finishLogin(uid, data) {
     currentUid = uid;
     currentUsername = data.username;
     usersCache[uid] = data;
+    if (data.language && translations[data.language]) {
+        currentLanguage = data.language;
+        try { localStorage.setItem("cookieGameLanguage", data.language); } catch (e) {}
+    }
     cookies = data.cookies || 0;
     totalClicks = data.totalClicks || 0;
     totalCookiesBaked = data.totalCookiesBaked || 0;
@@ -3264,7 +3475,7 @@ function finishLogin(uid, data) {
     for (var k3 in upgrades) upgrades[k3].purchased = (data.upgrades && data.upgrades[k3]) ? (data.upgrades[k3].purchased||false) : false;
 
     recalcBuildingCps();
-    calcClickPower(); calcCPS(); updateDisplay(); makeShop(); updateClubButtons();
+    calcClickPower(); calcCPS(); updateDisplay(); makeShop(); updateClubButtons(); applyLanguage();
     if (currentClub) {
         // BUGFIX: currentClub was correctly restored from data.club, but clubsCache (a separate,
         // in-memory-only cache) was never populated on login — it only ever got filled by
@@ -3934,9 +4145,9 @@ function updateClubButtons() {
     } else if (currentClub) {
         // We know the player is in a club (currentClub is set) but haven't fetched its name yet
         // — show a safe placeholder instead of falsely implying they have no club at all.
-        c.innerHTML = "<button class='club-button' onclick='showClubInfo()'>🏆 המועדון שלי</button>";
+        c.innerHTML = "<button class='club-button' onclick='showClubInfo()'>" + t("club_my_club") + "</button>";
     } else {
-        c.innerHTML = "<button class='club-button' onclick='openJoinClubModal()'>🏆 הצטרף למועדון</button><button class='club-button' onclick='openCreateClubModal()'>⭐ צור מועדון</button>";
+        c.innerHTML = "<button class='club-button' onclick='openJoinClubModal()'>" + t("club_join_btn") + "</button><button class='club-button' onclick='openCreateClubModal()'>" + t("club_create_btn") + "</button>";
     }
 }
 
@@ -4211,6 +4422,7 @@ function setupModerationListenerForSelf() {
 updateDisplay();
 makeShop();
 populateMusicSelects();
+applyLanguage();
 
 if (firebaseInit) {
     auth.onAuthStateChanged(function(user) {
