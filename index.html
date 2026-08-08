@@ -99,7 +99,7 @@ body { font-family:Arial, sans-serif; background:linear-gradient(45deg,#FF6B6B,#
 .obstacle-game-wrap { position:relative; width:100%; max-width:480px; margin:0 auto; }
 .obstacle-score-display { position:absolute; top:10px; left:10px; z-index:50; background:rgba(0,0,0,0.5); color:#FFD700; font-weight:bold; padding:8px 14px; border-radius:14px; font-size:1.05rem; box-shadow:0 4px 10px rgba(0,0,0,0.3); }
 .obstacle-game-area { position:relative; width:100%; height:70vh; max-height:640px; min-height:420px; background:linear-gradient(180deg,#87CEEB,#B0E0E6); border-radius:18px; overflow:hidden; box-shadow:0 15px 40px rgba(0,0,0,0.5); border:4px solid rgba(255,255,255,0.5); touch-action:none; }
-.obstacle-lane-row { position:absolute; left:0; width:100%; display:flex; }
+.obstacle-lane-row { position:absolute; left:0; width:100%; display:flex; direction:ltr; }
 .obstacle-cell-slot { flex:1; display:flex; align-items:center; justify-content:center; }
 .obstacle-cell { border-radius:12px; display:flex; align-items:center; justify-content:center; box-shadow:0 4px 8px rgba(0,0,0,0.3); }
 .obstacle-player { position:absolute; border-radius:50%; background:radial-gradient(circle at 30% 30%, #DEB887, #D2691E, #8B4513); border:4px solid #654321; box-shadow:0 6px 14px rgba(0,0,0,0.4); transition:left 0.12s ease-out; display:flex; align-items:center; justify-content:center; font-size:1.4rem; z-index:20; }
@@ -2696,12 +2696,13 @@ function startObstacleGame() {
         rows: [],
         earnedCookies: 0,
         rowsPassed: 0,
-        speed: 1.8,
+        speed: 1.6,
         tickMs: 30,
-        spawnEveryMs: 1400,
+        spawnEveryMs: 2200,
         msSinceLastSpawn: 0,
         running: true,
-        playerSize: 70
+        playerSize: 70,
+        lastOpenLanes: [0, 1, 2, 3, 4]
     };
 
     positionObstaclePlayer();
@@ -2758,6 +2759,25 @@ function spawnObstacleRow() {
         var tmp = lanes[i]; lanes[i] = lanes[j]; lanes[j] = tmp;
     }
     var blockedLanes = lanes.slice(0, blockedCount);
+
+    // Guarantee solvability: make sure at least one lane that was open in the PREVIOUS row is
+    // still open here too, so there's always a reachable path from wherever the player safely
+    // is right now — never a row-to-row jump that's geometrically impossible to react to.
+    var prevOpenLanes = obstacleGameState.lastOpenLanes || [0, 1, 2, 3, 4];
+    var stillOpen = prevOpenLanes.filter(function(l) { return blockedLanes.indexOf(l) === -1; });
+    if (stillOpen.length === 0) {
+        var forceOpen = prevOpenLanes[Math.floor(Math.random() * prevOpenLanes.length)];
+        var idx = blockedLanes.indexOf(forceOpen);
+        if (idx !== -1) {
+            var candidates = [0, 1, 2, 3, 4].filter(function(l) { return blockedLanes.indexOf(l) === -1 && l !== forceOpen; });
+            if (candidates.length > 0) {
+                blockedLanes[idx] = candidates[Math.floor(Math.random() * candidates.length)];
+            } else {
+                blockedLanes.splice(idx, 1); // no replacement available — just open this lane
+            }
+        }
+    }
+    obstacleGameState.lastOpenLanes = [0, 1, 2, 3, 4].filter(function(l) { return blockedLanes.indexOf(l) === -1; });
 
     var rowEl = document.createElement("div");
     rowEl.className = "obstacle-lane-row";
@@ -2823,7 +2843,7 @@ function obstacleGameTick() {
             state.rowsPassed++;
             state.earnedCookies += 1000000000; // 1B per row cleared
             updateObstacleScoreDisplay();
-            state.speed = Math.min(state.speed + 0.04, 6); // gentle difficulty ramp
+            state.speed = Math.min(state.speed + 0.03, 5); // gentle difficulty ramp
         }
         if (row.y > areaHeight + 50) {
             row.el.remove();
