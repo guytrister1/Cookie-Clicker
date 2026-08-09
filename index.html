@@ -2458,8 +2458,10 @@ function loadCompetitionStandings(comp) {
             var clubRows = [];
             for (var code in clubsData) {
                 var club = clubsData[code];
+                var members = club.members || [];
+                if (members.some(function(m) { return adminUids[m.uid]; })) continue; // a club with an admin in it doesn't count in the competitions leaderboard at all
                 var total = 0;
-                (club.members || []).forEach(function(m) {
+                members.forEach(function(m) {
                     var udata = usersData[m.uid];
                     if (udata) total += getCompetitionScoreForUser(comp, m.uid, udata, clickCountsMap);
                 });
@@ -2706,8 +2708,10 @@ function awardCompetitionPrizes(comp) {
             var bestCode = null, bestClubScore = -1, bestClub = null;
             for (var code in clubsData) {
                 var club = clubsData[code];
+                var members = club.members || [];
+                if (members.some(function(m) { return adminUids[m.uid]; })) continue; // a club with an admin in it can never win a competition
                 var total = 0;
-                (club.members || []).forEach(function(m) {
+                members.forEach(function(m) {
                     var udata = usersData[m.uid];
                     if (udata) total += scoreOf(m.uid, udata, clickCountsMap);
                 });
@@ -2718,7 +2722,7 @@ function awardCompetitionPrizes(comp) {
                 (bestClub.members || []).forEach(function(m) {
                     var udata = usersData[m.uid];
                     if (!udata) return;
-                    if (adminUids[m.uid]) return; // admins contribute to the club's score but don't personally collect the club's prize
+                    if (adminUids[m.uid]) return; // extra safety net — should be unreachable now that admin clubs are excluded above
                     if (comp.prizeCookiesClub > 0) {
                         var newMemberCookies = (udata.cookies || 0) + comp.prizeCookiesClub;
                         var newMemberTotal = (udata.totalCookiesBaked || 0) + comp.prizeCookiesClub;
