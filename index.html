@@ -324,17 +324,17 @@ body { font-family:Arial, sans-serif; background:linear-gradient(45deg,#FF6B6B,#
 </div>
 
 <div class="competitions-fullscreen" id="competitionsModal">
-    <button class="competitions-close-btn" onclick="closeModal('competitionsModal')">✕ סגור</button>
+    <button class="competitions-close-btn" onclick="closeModal('competitionsModal')">✕ <span data-i18n="close_btn">סגור</span></button>
     <div class="competitions-fullscreen-header">
-        <h2>🏁 תחרויות</h2>
+        <h2 data-i18n="competitions_btn">🏁 תחרויות</h2>
     </div>
     <div id="competitionsContent" style="width:100%; max-width:650px;"></div>
 </div>
 
 <div class="duel-fullscreen" id="duelModal">
-    <button class="duel-close-btn" onclick="closeModal('duelModal')">✕ סגור</button>
+    <button class="duel-close-btn" onclick="closeModal('duelModal')">✕ <span data-i18n="close_btn">סגור</span></button>
     <div style="color:white; text-align:center; margin-bottom:25px;">
-        <h2 style="font-size:2.3rem; text-shadow:0 2px 12px rgba(0,0,0,0.5);">⚔️ קרב</h2>
+        <h2 style="font-size:2.3rem; text-shadow:0 2px 12px rgba(0,0,0,0.5);" data-i18n="duel_btn">⚔️ קרב</h2>
     </div>
     <div id="duelContent" style="width:100%; max-width:650px;"></div>
 </div>
@@ -647,19 +647,19 @@ body { font-family:Arial, sans-serif; background:linear-gradient(45deg,#FF6B6B,#
 
 <div class="modal" id="codesModal">
     <div class="modal-content">
-        <h3>🎁 מימוש קוד</h3>
-        <p style="color:#555; margin-bottom:12px;">הקלד קוד שקיבלת מיוצר המשחק או מאדמין</p>
-        <input type="text" id="redeemCodeInput" placeholder="הקלד קוד כאן" maxlength="30" style="text-transform:uppercase;">
-        <button onclick="redeemCode()">🎁 ממש קוד</button>
-        <button class="close-button" onclick="closeModal('codesModal')">סגור</button>
+        <h3 data-i18n="codes_modal_title">🎁 מימוש קוד</h3>
+        <p style="color:#555; margin-bottom:12px;" data-i18n="codes_modal_desc">הקלד קוד שקיבלת מיוצר המשחק או מאדמין</p>
+        <input type="text" id="redeemCodeInput" data-i18n-ph="redeem_code_ph" placeholder="הקלד קוד כאן" maxlength="30" style="text-transform:uppercase;">
+        <button onclick="redeemCode()" data-i18n="redeem_code_btn">🎁 ממש קוד</button>
+        <button class="close-button" onclick="closeModal('codesModal')" data-i18n="close_btn">סגור</button>
         <div id="redeemCodeMessage"></div>
     </div>
 </div>
 
 <div class="games-fullscreen" id="gamesModal">
-    <button class="games-close-btn" id="gamesCloseBtn" onclick="closeGamesModal()">✕ סגור</button>
+    <button class="games-close-btn" id="gamesCloseBtn" onclick="closeGamesModal()">✕ <span data-i18n="close_btn">סגור</span></button>
     <div style="color:white; text-align:center; margin-bottom:25px;">
-        <h2 style="font-size:2.3rem; text-shadow:0 2px 12px rgba(0,0,0,0.5);">🎮 משחקים</h2>
+        <h2 style="font-size:2.3rem; text-shadow:0 2px 12px rgba(0,0,0,0.5);" data-i18n="games_modal_title">🎮 משחקים</h2>
     </div>
     <div id="gamesContent" style="width:100%; max-width:650px;"></div>
 </div>
@@ -772,7 +772,48 @@ var translations = {
         shop_title: "🛒 חנות 🛒", shop_buildings: "🏭 מבנים", shop_click_upgrades: "👆 שדרוגי לחיצה",
         shop_upgrades: "⚡ שדרוגים", shop_achievements: "🎯 הישגים", prestige_btn: "🌟 איפוס יוקרה 🌟",
         cps_line: "{num} עוגיות לשנייה", cpc_line: "+{num} ללחיצה",
-        prestige_line: "רמת יוקרה: {level} | כפולה: x{mult} | לאיפוס הבא: {next} עוגיות"
+        prestige_line: "רמת יוקרה: {level} | כפולה: x{mult} | לאיפוס הבא: {next} עוגיות",
+close_btn: "סגור", back_btn: "⬅ חזרה", cancel_btn: "ביטול",
+        ach_first_click_name: "הלחיצה הראשונה", ach_first_click_desc: "לחצת על העוגייה!",
+        ach_hundred_name: "מאה עוגיות", ach_hundred_desc: "100 עוגיות!",
+        ach_first_building_name: "הבנייה הראשונה", ach_first_building_desc: "קנית בניין!",
+        ach_thousand_name: "אלף עוגיות", ach_thousand_desc: "1,000 עוגיות!",
+        ach_ten_thousand_name: "עשרת אלפים", ach_ten_thousand_desc: "10,000 עוגיות!",
+        ach_hundred_thousand_name: "מאה אלף", ach_hundred_thousand_desc: "100,000 עוגיות!",
+        ach_million_name: "מיליון עוגיות", ach_million_desc: "מיליון עוגיות!",
+        ach_first_golden_name: "עוגיית הזהב", ach_first_golden_desc: "לחצת על עוגיית זהב!",
+        ach_golden_master_name: "מאסטר הזהב", ach_golden_master_desc: "10 עוגיות זהב!",
+        ach_hundred_buildings_name: "מאה בניינים", ach_hundred_buildings_desc: "100 בניינים!",
+        ach_first_prestige_name: "יוקרה ראשונה", ach_first_prestige_desc: "איפוס יוקרה!",
+        games_modal_title: "🎮 משחקים", games_tracks_btn: "🏁 מסלולים",
+        games_obstacles_title: "🚧 מכשולים", games_obstacles_desc: "תזוז עם העוגייה שלך בין המכשולים! כל שורה שעוברים = 1B עוגיות. פגיעה אחת והמשחק נגמר.",
+        games_start_btn: "▶️ התחל משחק", games_over_title: "המשחק נגמר",
+        games_over_cookies_label: "🍪 עוגיות שהרווחת:", games_over_rows_label: "🏁 שורות שעברת:",
+        games_my_clicks_label: "הלחיצות שלך:",
+        codes_modal_title: "🎁 מימוש קוד", codes_modal_desc: "הקלד קוד שקיבלת מיוצר המשחק או מאדמין",
+        redeem_code_ph: "הקלד קוד כאן", redeem_code_btn: "🎁 ממש קוד",
+        duel_subtitle: "קרב לחיצות 1 על 1 (עד 4) — מי שלוחץ הכי הרבה מנצח",
+        duel_create_btn: "🆚 צור דו-קרב", duel_join_btn: "🔍 הצטרף לקרב",
+        duel_create_title: "🆚 יצירת דו-קרב", duel_duration_label: "⏱️ משך הקרב",
+        duel_minutes_ph: "דקות", duel_seconds_ph: "שניות", duel_players_label: "👥 מספר שחקנים",
+        duel_bet_label: "🍪 הימור עוגיות (0 = בלי הימור)", duel_create_confirm_btn: "🆚 צור קרב",
+        duel_no_duels_msg: "אין קרבות ממתינים כרגע — תיצור אחד!",
+        duel_card_by: "⚔️ קרב מאת", duel_card_duration: "⏱️ משך:", duel_card_players: "👥 שחקנים:",
+        duel_card_bet: "🍪 הימור:", duel_card_no_bet: "ללא הימור", duel_card_winner_gets: "(הזוכה מקבל {amount})",
+        duel_already_in: "אתה כבר בקרב הזה", duel_join_this_btn: "הצטרף",
+        duel_waiting_title: "⏳ ממתין לשחקנים", duel_waiting_for: "מחכה...",
+        duel_cancel_btn: "בטל קרב", duel_leave_btn: "עזוב קרב",
+        duel_results_title: "🏆 תוצאות חיות", duel_you_marker: "(אתה)",
+        duel_time_up: "⏱️ הזמן נגמר! מחשב תוצאות...", duel_seconds_left: "⏱️ {num} שניות נותרו",
+        duel_winner_line: "{name} ניצח/ה!", duel_won_cookies: "🍪 זכה ב-{amount} עוגיות!",
+        duel_back_to_menu_btn: "חזרה לתפריט", duel_unknown_winner: "לא ידוע",
+        comp_none_active: "אין תחרויות כרגע", comp_refresh_leaderboard_btn: "🔄 עדכן טבלאות מובילים",
+        comp_type_clicks: "🖱 הכי הרבה לחיצות", comp_type_cookies: "🍪 הכי הרבה עוגיות", comp_type_prestige: "⭐ הכי הרבה איפוסי יוקרה",
+        comp_scope_players: "שחקנים יחידים", comp_scope_clubs: "מועדונים", comp_scope_both: "שחקנים ומועדונים",
+        comp_table_players: "👤 שחקנים יחידים", comp_table_clubs: "🏆 מועדונים",
+        comp_participants_suffix: "משתתפים", comp_no_participants: "אין עדיין משתתפים",
+        err_enter_user_pass: "הזן שם וסיסמה",
+        err_already_in_club: "אתה כבר במועדון", err_club_not_found: "מועדון לא נמצא", err_invalid_club_code: "קוד לא תקין", success_left_club: "עזבת את המועדון בהצלחה!", success_joined_club: "הצטרפת בהצלחה!", success_club_created_prefix: "נוצר! קוד:", info_searching_club: "מחפש מועדון...", err_login_first: "התחבר קודם", err_not_enough_cookies: "אין לך מספיק עוגיות", err_invalid_amount: "כמות לא תקינה", err_corrupted_recipient: "נתוני השחקן המקבל פגומים — אי אפשר לתרום לו כרגע", info_transferring: "מעביר...", success_donated: "נתרם בהצלחה!", err_invalid_name: "שם לא תקין", err_enter_password_verify: "הזן את הסיסמה שלך לאימות", err_already_your_name: "זה כבר השם שלך", info_updating: "מעדכן...", success_changed: "שונה בהצלחה!", err_fill_all_fields: "מלא את כל השדות", err_passwords_mismatch: "הסיסמאות לא תואמות", success_password_changed: "הסיסמה שונתה!", err_wrong_current_password: "סיסמה נוכחית שגויה", err_select_gender: "בחר מגדר", success_updated: "עודכן!", err_enter_password_confirm: "הזן סיסמה לאישור", info_deleting_account: "מוחק חשבון...", err_wrong_password: "סיסמה שגויה", err_not_enough_for_bet: "אין לך מספיק עוגיות להימור הזה", info_creating_duel: "יוצר קרב...", err_invalid_duration: "הזן משך זמן תקין", err_invalid_bet: "סכום הימור לא תקין", err_enter_code: "הזן קוד", info_checking_code: "בודק קוד...", err_code_not_found: "הקוד לא קיים", err_already_redeemed: "כבר מימשת את הקוד הזה בעבר", err_unknown_reward_type: "סוג מתנה לא מוכר בקוד הזה", success_redeemed_cookies: "קיבלת {amount} עוגיות! 🎁", success_redeemed_title: "קיבלת את התואר '{title}'! 🏅", info_loading: "טוען...", err_enter_message_content: "הזן תוכן הודעה", success_broadcast_sent: "ההודעה נשלחה לכולם!", success_broadcast_cleared: "ההודעה הוסרה מכולם!", err_enter_player_name: "הזן שם שחקן", err_player_not_found: "שחקן '{name}' לא נמצא", err_no_players_found: "לא נמצאו שחקנים", info_deleting_player: "מוחק שחקן...", info_searching_player: "מחפש שחקן...", err_enter_bonus: "הזן בונוס תקין", err_choose_duration: "בחר משך זמן", err_invalid_discount: "הזן אחוז הנחה תקין (1-99)", success_event_started: "האירוע הופעל!", success_event_stopped: "האירוע הופסק!", success_all_events_stopped: "כל האירועים הופסקו!", err_enter_competition_name: "הזן שם לתחרות", err_invalid_prize_amount: "סכום פרס לא תקין", success_competition_started: "התחרות הופעלה!", err_competition_not_found: "התחרות לא נמצאה (כבר הסתיימה?)", success_competition_ending: "התחרות מסתיימת ומחלקת פרסים...", err_enter_title_text2: "הזן טקסט לתואר", success_title_given: "התואר '{title}' ניתן ל{name}!", success_title_removed: "התואר של {name} הוסר!", success_code_created: "הקוד '{code}' נוצר בהצלחה!", err_code_already_exists: "קוד בשם '{code}' כבר קיים", success_player_data_deleted: "נתוני '{name}' נמחקו בהצלחה!", err_firebase_down: "Firebase לא מחובר", err_wrong_credentials: "שם משתמש או סיסמה שגויים", err_no_server_response: "אין תגובה מהשרת - נסה שוב", err_prefix: "שגיאה:", err_username_short: "שם קצר מדי", err_password_short: "סיסמה חייבת 6 תווים לפחות", err_username_taken: "שם המשתמש כבר תפוס", err_weak_password: "סיסמה חלשה מדי", login_connecting: "מתחבר...", register_registering: "נרשם...", register_success: "נרשמת בהצלחה!"
     },
     en: {
         settings_title: "⚙️ Account Settings", settings_language_header: "🌐 Language", settings_username_header: "👤 Username",
@@ -786,7 +827,48 @@ var translations = {
         shop_title: "🛒 Shop 🛒", shop_buildings: "🏭 Buildings", shop_click_upgrades: "👆 Click Upgrades",
         shop_upgrades: "⚡ Upgrades", shop_achievements: "🎯 Achievements", prestige_btn: "🌟 Prestige Reset 🌟",
         cps_line: "{num} cookies per second", cpc_line: "+{num} per click",
-        prestige_line: "Prestige Level: {level} | Multiplier: x{mult} | Next reset: {next} cookies"
+        prestige_line: "Prestige Level: {level} | Multiplier: x{mult} | Next reset: {next} cookies",
+close_btn: "Close", back_btn: "⬅ Back", cancel_btn: "Cancel",
+        ach_first_click_name: "First Click", ach_first_click_desc: "You clicked the cookie!",
+        ach_hundred_name: "Hundred Cookies", ach_hundred_desc: "100 cookies!",
+        ach_first_building_name: "First Building", ach_first_building_desc: "You bought a building!",
+        ach_thousand_name: "Thousand Cookies", ach_thousand_desc: "1,000 cookies!",
+        ach_ten_thousand_name: "Ten Thousand", ach_ten_thousand_desc: "10,000 cookies!",
+        ach_hundred_thousand_name: "Hundred Thousand", ach_hundred_thousand_desc: "100,000 cookies!",
+        ach_million_name: "Million Cookies", ach_million_desc: "A million cookies!",
+        ach_first_golden_name: "Golden Cookie", ach_first_golden_desc: "You clicked a golden cookie!",
+        ach_golden_master_name: "Golden Master", ach_golden_master_desc: "10 golden cookies!",
+        ach_hundred_buildings_name: "Hundred Buildings", ach_hundred_buildings_desc: "100 buildings!",
+        ach_first_prestige_name: "First Prestige", ach_first_prestige_desc: "Prestige reset!",
+        games_modal_title: "🎮 Games", games_tracks_btn: "🏁 Tracks",
+        games_obstacles_title: "🚧 Obstacles", games_obstacles_desc: "Dodge between the obstacles with your cookie! Each row cleared = 1B cookies. One hit ends the game.",
+        games_start_btn: "▶️ Start Game", games_over_title: "Game Over",
+        games_over_cookies_label: "🍪 Cookies earned:", games_over_rows_label: "🏁 Rows cleared:",
+        games_my_clicks_label: "Your clicks:",
+        codes_modal_title: "🎁 Redeem Code", codes_modal_desc: "Enter a code you received from the game creator or an admin",
+        redeem_code_ph: "Enter code here", redeem_code_btn: "🎁 Redeem",
+        duel_subtitle: "1v1 click duel (up to 4) — whoever clicks the most wins",
+        duel_create_btn: "🆚 Create Duel", duel_join_btn: "🔍 Join Duel",
+        duel_create_title: "🆚 Create a Duel", duel_duration_label: "⏱️ Duel duration",
+        duel_minutes_ph: "Minutes", duel_seconds_ph: "Seconds", duel_players_label: "👥 Number of players",
+        duel_bet_label: "🍪 Cookie bet (0 = no bet)", duel_create_confirm_btn: "🆚 Create Duel",
+        duel_no_duels_msg: "No duels waiting right now — create one!",
+        duel_card_by: "⚔️ Duel by", duel_card_duration: "⏱️ Duration:", duel_card_players: "👥 Players:",
+        duel_card_bet: "🍪 Bet:", duel_card_no_bet: "No bet", duel_card_winner_gets: "(winner gets {amount})",
+        duel_already_in: "You're already in this duel", duel_join_this_btn: "Join",
+        duel_waiting_title: "⏳ Waiting for players", duel_waiting_for: "Waiting...",
+        duel_cancel_btn: "Cancel Duel", duel_leave_btn: "Leave Duel",
+        duel_results_title: "🏆 Live Results", duel_you_marker: "(you)",
+        duel_time_up: "⏱️ Time's up! Calculating results...", duel_seconds_left: "⏱️ {num} seconds left",
+        duel_winner_line: "{name} won!", duel_won_cookies: "🍪 Won {amount} cookies!",
+        duel_back_to_menu_btn: "Back to menu", duel_unknown_winner: "Unknown",
+        comp_none_active: "No competitions right now", comp_refresh_leaderboard_btn: "🔄 Refresh leaderboards",
+        comp_type_clicks: "🖱 Most clicks", comp_type_cookies: "🍪 Most cookies", comp_type_prestige: "⭐ Most prestige resets",
+        comp_scope_players: "Individual players", comp_scope_clubs: "Clubs", comp_scope_both: "Players and clubs",
+        comp_table_players: "👤 Individual players", comp_table_clubs: "🏆 Clubs",
+        comp_participants_suffix: "participants", comp_no_participants: "No participants yet",
+        err_enter_user_pass: "Enter username and password",
+        err_already_in_club: "You're already in a club", err_club_not_found: "Club not found", err_invalid_club_code: "Invalid code", success_left_club: "You left the club successfully!", success_joined_club: "Joined successfully!", success_club_created_prefix: "Created! Code:", info_searching_club: "Searching for club...", err_login_first: "Log in first", err_not_enough_cookies: "You don't have enough cookies", err_invalid_amount: "Invalid amount", err_corrupted_recipient: "Recipient's data is corrupted — can't donate to them right now", info_transferring: "Transferring...", success_donated: "Donated successfully!", err_invalid_name: "Invalid name", err_enter_password_verify: "Enter your password to verify", err_already_your_name: "That's already your name", info_updating: "Updating...", success_changed: "Changed successfully!", err_fill_all_fields: "Fill in all fields", err_passwords_mismatch: "Passwords don't match", success_password_changed: "Password changed!", err_wrong_current_password: "Current password is incorrect", err_select_gender: "Select gender", success_updated: "Updated!", err_enter_password_confirm: "Enter password to confirm", info_deleting_account: "Deleting account...", err_wrong_password: "Incorrect password", err_not_enough_for_bet: "You don't have enough cookies for this bet", info_creating_duel: "Creating duel...", err_invalid_duration: "Enter a valid duration", err_invalid_bet: "Invalid bet amount", err_enter_code: "Enter a code", info_checking_code: "Checking code...", err_code_not_found: "Code doesn't exist", err_already_redeemed: "You already redeemed this code before", err_unknown_reward_type: "Unknown reward type on this code", success_redeemed_cookies: "You got {amount} cookies! 🎁", success_redeemed_title: "You got the title '{title}'! 🏅", info_loading: "Loading...", err_enter_message_content: "Enter message content", success_broadcast_sent: "Message sent to everyone!", success_broadcast_cleared: "Message cleared for everyone!", err_enter_player_name: "Enter player name", err_player_not_found: "Player '{name}' not found", err_no_players_found: "No players found", info_deleting_player: "Deleting player...", info_searching_player: "Searching for player...", err_enter_bonus: "Enter a valid bonus", err_choose_duration: "Choose a duration", err_invalid_discount: "Enter a valid discount percentage (1-99)", success_event_started: "Event started!", success_event_stopped: "Event stopped!", success_all_events_stopped: "All events stopped!", err_enter_competition_name: "Enter a competition name", err_invalid_prize_amount: "Invalid prize amount", success_competition_started: "Competition started!", err_competition_not_found: "Competition not found (already ended?)", success_competition_ending: "Competition ending and awarding prizes...", err_enter_title_text2: "Enter title text", success_title_given: "Title '{title}' given to {name}!", success_title_removed: "{name}'s title was removed!", success_code_created: "Code '{code}' created successfully!", err_code_already_exists: "A code named '{code}' already exists", success_player_data_deleted: "'{name}''s data was deleted successfully!", err_firebase_down: "Firebase not connected", err_wrong_credentials: "Incorrect username or password", err_no_server_response: "No response from server - try again", err_prefix: "Error:", err_username_short: "Username too short", err_password_short: "Password must be at least 6 characters", err_username_taken: "Username already taken", err_weak_password: "Password too weak", login_connecting: "Logging in...", register_registering: "Signing up...", register_success: "Signed up successfully!"
     },
     ar: {
         settings_title: "⚙️ إعدادات الحساب", settings_language_header: "🌐 اللغة", settings_username_header: "👤 اسم المستخدم",
@@ -800,7 +882,48 @@ var translations = {
         shop_title: "🛒 المتجر 🛒", shop_buildings: "🏭 مبانٍ", shop_click_upgrades: "👆 ترقيات النقر",
         shop_upgrades: "⚡ ترقيات", shop_achievements: "🎯 إنجازات", prestige_btn: "🌟 إعادة تعيين المكانة 🌟",
         cps_line: "{num} كوكيز في الثانية", cpc_line: "+{num} لكل نقرة",
-        prestige_line: "مستوى المكانة: {level} | المضاعف: x{mult} | الهدف التالي: {next} كوكيز"
+        prestige_line: "مستوى المكانة: {level} | المضاعف: x{mult} | الهدف التالي: {next} كوكيز",
+close_btn: "إغلاق", back_btn: "⬅ رجوع", cancel_btn: "إلغاء",
+        ach_first_click_name: "النقرة الأولى", ach_first_click_desc: "لقد نقرت على الكوكيز!",
+        ach_hundred_name: "مئة كوكيز", ach_hundred_desc: "100 كوكيز!",
+        ach_first_building_name: "أول مبنى", ach_first_building_desc: "اشتريت مبنى!",
+        ach_thousand_name: "ألف كوكيز", ach_thousand_desc: "1,000 كوكيز!",
+        ach_ten_thousand_name: "عشرة آلاف", ach_ten_thousand_desc: "10,000 كوكيز!",
+        ach_hundred_thousand_name: "مئة ألف", ach_hundred_thousand_desc: "100,000 كوكيز!",
+        ach_million_name: "مليون كوكيز", ach_million_desc: "مليون كوكيز!",
+        ach_first_golden_name: "الكوكيز الذهبية", ach_first_golden_desc: "لقد نقرت على كوكيز ذهبية!",
+        ach_golden_master_name: "سيد الذهب", ach_golden_master_desc: "10 كوكيز ذهبية!",
+        ach_hundred_buildings_name: "مئة مبنى", ach_hundred_buildings_desc: "100 مبنى!",
+        ach_first_prestige_name: "أول مكانة", ach_first_prestige_desc: "إعادة تعيين المكانة!",
+        games_modal_title: "🎮 ألعاب", games_tracks_btn: "🏁 مسارات",
+        games_obstacles_title: "🚧 عوائق", games_obstacles_desc: "تنقل بكوكيزتك بين العوائق! كل صف تتجاوزه = 1B كوكيز. لمسة واحدة تنهي اللعبة.",
+        games_start_btn: "▶️ ابدأ اللعبة", games_over_title: "انتهت اللعبة",
+        games_over_cookies_label: "🍪 الكوكيز المكتسبة:", games_over_rows_label: "🏁 الصفوف المجتازة:",
+        games_my_clicks_label: "نقراتك:",
+        codes_modal_title: "🎁 استخدام كود", codes_modal_desc: "أدخل كودًا حصلت عليه من منشئ اللعبة أو أحد المسؤولين",
+        redeem_code_ph: "أدخل الكود هنا", redeem_code_btn: "🎁 استخدام",
+        duel_subtitle: "مبارزة نقر 1 ضد 1 (حتى 4) — من ينقر أكثر يفوز",
+        duel_create_btn: "🆚 إنشاء مبارزة", duel_join_btn: "🔍 انضم لمبارزة",
+        duel_create_title: "🆚 إنشاء مبارزة", duel_duration_label: "⏱️ مدة المبارزة",
+        duel_minutes_ph: "دقائق", duel_seconds_ph: "ثوانٍ", duel_players_label: "👥 عدد اللاعبين",
+        duel_bet_label: "🍪 رهان الكوكيز (0 = بدون رهان)", duel_create_confirm_btn: "🆚 إنشاء مبارزة",
+        duel_no_duels_msg: "لا توجد مبارزات بانتظار الآن — أنشئ واحدة!",
+        duel_card_by: "⚔️ مبارزة من", duel_card_duration: "⏱️ المدة:", duel_card_players: "👥 اللاعبون:",
+        duel_card_bet: "🍪 الرهان:", duel_card_no_bet: "بدون رهان", duel_card_winner_gets: "(الفائز يحصل على {amount})",
+        duel_already_in: "أنت بالفعل في هذه المبارزة", duel_join_this_btn: "انضمام",
+        duel_waiting_title: "⏳ في انتظار اللاعبين", duel_waiting_for: "بالانتظار...",
+        duel_cancel_btn: "إلغاء المبارزة", duel_leave_btn: "مغادرة المبارزة",
+        duel_results_title: "🏆 نتائج حية", duel_you_marker: "(أنت)",
+        duel_time_up: "⏱️ انتهى الوقت! جارٍ حساب النتائج...", duel_seconds_left: "⏱️ {num} ثانية متبقية",
+        duel_winner_line: "فاز {name}!", duel_won_cookies: "🍪 فاز بـ {amount} كوكيز!",
+        duel_back_to_menu_btn: "العودة للقائمة", duel_unknown_winner: "غير معروف",
+        comp_none_active: "لا توجد مسابقات حالياً", comp_refresh_leaderboard_btn: "🔄 تحديث لوحة المتصدرين",
+        comp_type_clicks: "🖱 الأكثر نقراً", comp_type_cookies: "🍪 الأكثر كوكيز", comp_type_prestige: "⭐ الأكثر إعادة تعيين مكانة",
+        comp_scope_players: "لاعبون أفراد", comp_scope_clubs: "أندية", comp_scope_both: "لاعبون وأندية",
+        comp_table_players: "👤 لاعبون أفراد", comp_table_clubs: "🏆 أندية",
+        comp_participants_suffix: "مشاركين", comp_no_participants: "لا يوجد مشاركون بعد",
+        err_enter_user_pass: "أدخل اسم المستخدم وكلمة المرور",
+        err_already_in_club: "أنت بالفعل في نادٍ", err_club_not_found: "النادي غير موجود", err_invalid_club_code: "كود غير صالح", success_left_club: "لقد غادرت النادي بنجاح!", success_joined_club: "تم الانضمام بنجاح!", success_club_created_prefix: "تم الإنشاء! الكود:", info_searching_club: "جارٍ البحث عن نادٍ...", err_login_first: "سجل الدخول أولاً", err_not_enough_cookies: "ليس لديك ما يكفي من الكوكيز", err_invalid_amount: "كمية غير صالحة", err_corrupted_recipient: "بيانات المستلم تالفة — لا يمكن التبرع له الآن", info_transferring: "جارٍ التحويل...", success_donated: "تم التبرع بنجاح!", err_invalid_name: "اسم غير صالح", err_enter_password_verify: "أدخل كلمة المرور للتحقق", err_already_your_name: "هذا هو اسمك بالفعل", info_updating: "جارٍ التحديث...", success_changed: "تم التغيير بنجاح!", err_fill_all_fields: "املأ جميع الحقول", err_passwords_mismatch: "كلمتا المرور غير متطابقتين", success_password_changed: "تم تغيير كلمة المرور!", err_wrong_current_password: "كلمة المرور الحالية غير صحيحة", err_select_gender: "اختر الجنس", success_updated: "تم التحديث!", err_enter_password_confirm: "أدخل كلمة المرور للتأكيد", info_deleting_account: "جارٍ حذف الحساب...", err_wrong_password: "كلمة مرور غير صحيحة", err_not_enough_for_bet: "ليس لديك ما يكفي من الكوكيز لهذا الرهان", info_creating_duel: "جارٍ إنشاء المبارزة...", err_invalid_duration: "أدخل مدة صالحة", err_invalid_bet: "مبلغ الرهان غير صالح", err_enter_code: "أدخل كودًا", info_checking_code: "جارٍ التحقق من الكود...", err_code_not_found: "الكود غير موجود", err_already_redeemed: "لقد استخدمت هذا الكود من قبل", err_unknown_reward_type: "نوع هدية غير معروف في هذا الكود", success_redeemed_cookies: "حصلت على {amount} كوكيز! 🎁", success_redeemed_title: "حصلت على اللقب '{title}'! 🏅", info_loading: "جارٍ التحميل...", err_enter_message_content: "أدخل محتوى الرسالة", success_broadcast_sent: "تم إرسال الرسالة للجميع!", success_broadcast_cleared: "تمت إزالة الرسالة للجميع!", err_enter_player_name: "أدخل اسم اللاعب", err_player_not_found: "اللاعب '{name}' غير موجود", err_no_players_found: "لم يتم العثور على لاعبين", info_deleting_player: "جارٍ حذف اللاعب...", info_searching_player: "جارٍ البحث عن اللاعب...", err_enter_bonus: "أدخل مكافأة صالحة", err_choose_duration: "اختر مدة", err_invalid_discount: "أدخل نسبة خصم صالحة (1-99)", success_event_started: "تم تفعيل الحدث!", success_event_stopped: "تم إيقاف الحدث!", success_all_events_stopped: "تم إيقاف جميع الأحداث!", err_enter_competition_name: "أدخل اسم المسابقة", err_invalid_prize_amount: "مبلغ الجائزة غير صالح", success_competition_started: "تم بدء المسابقة!", err_competition_not_found: "المسابقة غير موجودة (هل انتهت بالفعل؟)", success_competition_ending: "المسابقة تنتهي ويتم توزيع الجوائز...", err_enter_title_text2: "أدخل نص اللقب", success_title_given: "تم منح اللقب '{title}' إلى {name}!", success_title_removed: "تمت إزالة لقب {name}!", success_code_created: "تم إنشاء الكود '{code}' بنجاح!", err_code_already_exists: "يوجد بالفعل كود باسم '{code}'", success_player_data_deleted: "تم حذف بيانات '{name}' بنجاح!", err_firebase_down: "Firebase غير متصل", err_wrong_credentials: "اسم المستخدم أو كلمة المرور غير صحيحة", err_no_server_response: "لا توجد استجابة من الخادم - حاول مرة أخرى", err_prefix: "خطأ:", err_username_short: "الاسم قصير جداً", err_password_short: "يجب أن تتكون كلمة المرور من 6 أحرف على الأقل", err_username_taken: "اسم المستخدم مستخدم بالفعل", err_weak_password: "كلمة المرور ضعيفة جداً", login_connecting: "جارٍ تسجيل الدخول...", register_registering: "جارٍ التسجيل...", register_success: "تم التسجيل بنجاح!"
     },
     es: {
         settings_title: "⚙️ Ajustes de cuenta", settings_language_header: "🌐 Idioma", settings_username_header: "👤 Nombre de usuario",
@@ -814,7 +937,48 @@ var translations = {
         shop_title: "🛒 Tienda 🛒", shop_buildings: "🏭 Edificios", shop_click_upgrades: "👆 Mejoras de clic",
         shop_upgrades: "⚡ Mejoras", shop_achievements: "🎯 Logros", prestige_btn: "🌟 Reinicio de prestigio 🌟",
         cps_line: "{num} galletas por segundo", cpc_line: "+{num} por clic",
-        prestige_line: "Nivel de prestigio: {level} | Multiplicador: x{mult} | Próxima meta: {next} galletas"
+        prestige_line: "Nivel de prestigio: {level} | Multiplicador: x{mult} | Próxima meta: {next} galletas",
+close_btn: "Cerrar", back_btn: "⬅ Volver", cancel_btn: "Cancelar",
+        ach_first_click_name: "Primer clic", ach_first_click_desc: "¡Hiciste clic en la galleta!",
+        ach_hundred_name: "Cien galletas", ach_hundred_desc: "¡100 galletas!",
+        ach_first_building_name: "Primer edificio", ach_first_building_desc: "¡Compraste un edificio!",
+        ach_thousand_name: "Mil galletas", ach_thousand_desc: "¡1.000 galletas!",
+        ach_ten_thousand_name: "Diez mil", ach_ten_thousand_desc: "¡10.000 galletas!",
+        ach_hundred_thousand_name: "Cien mil", ach_hundred_thousand_desc: "¡100.000 galletas!",
+        ach_million_name: "Millón de galletas", ach_million_desc: "¡Un millón de galletas!",
+        ach_first_golden_name: "Galleta dorada", ach_first_golden_desc: "¡Hiciste clic en una galleta dorada!",
+        ach_golden_master_name: "Maestro dorado", ach_golden_master_desc: "¡10 galletas doradas!",
+        ach_hundred_buildings_name: "Cien edificios", ach_hundred_buildings_desc: "¡100 edificios!",
+        ach_first_prestige_name: "Primer prestigio", ach_first_prestige_desc: "¡Reinicio de prestigio!",
+        games_modal_title: "🎮 Juegos", games_tracks_btn: "🏁 Circuitos",
+        games_obstacles_title: "🚧 Obstáculos", games_obstacles_desc: "¡Esquiva los obstáculos con tu galleta! Cada fila superada = 1B galletas. Un golpe termina el juego.",
+        games_start_btn: "▶️ Iniciar juego", games_over_title: "Juego terminado",
+        games_over_cookies_label: "🍪 Galletas ganadas:", games_over_rows_label: "🏁 Filas superadas:",
+        games_my_clicks_label: "Tus clics:",
+        codes_modal_title: "🎁 Canjear código", codes_modal_desc: "Introduce un código que recibiste del creador del juego o un admin",
+        redeem_code_ph: "Introduce el código aquí", redeem_code_btn: "🎁 Canjear",
+        duel_subtitle: "Duelo de clics 1 contra 1 (hasta 4) — quien más clics haga gana",
+        duel_create_btn: "🆚 Crear duelo", duel_join_btn: "🔍 Unirse a duelo",
+        duel_create_title: "🆚 Crear un duelo", duel_duration_label: "⏱️ Duración del duelo",
+        duel_minutes_ph: "Minutos", duel_seconds_ph: "Segundos", duel_players_label: "👥 Número de jugadores",
+        duel_bet_label: "🍪 Apuesta de galletas (0 = sin apuesta)", duel_create_confirm_btn: "🆚 Crear duelo",
+        duel_no_duels_msg: "No hay duelos esperando ahora — ¡crea uno!",
+        duel_card_by: "⚔️ Duelo de", duel_card_duration: "⏱️ Duración:", duel_card_players: "👥 Jugadores:",
+        duel_card_bet: "🍪 Apuesta:", duel_card_no_bet: "Sin apuesta", duel_card_winner_gets: "(el ganador recibe {amount})",
+        duel_already_in: "Ya estás en este duelo", duel_join_this_btn: "Unirse",
+        duel_waiting_title: "⏳ Esperando jugadores", duel_waiting_for: "Esperando...",
+        duel_cancel_btn: "Cancelar duelo", duel_leave_btn: "Salir del duelo",
+        duel_results_title: "🏆 Resultados en vivo", duel_you_marker: "(tú)",
+        duel_time_up: "⏱️ ¡Se acabó el tiempo! Calculando resultados...", duel_seconds_left: "⏱️ Quedan {num} segundos",
+        duel_winner_line: "¡{name} ganó!", duel_won_cookies: "🍪 ¡Ganó {amount} galletas!",
+        duel_back_to_menu_btn: "Volver al menú", duel_unknown_winner: "Desconocido",
+        comp_none_active: "No hay competencias ahora", comp_refresh_leaderboard_btn: "🔄 Actualizar clasificación",
+        comp_type_clicks: "🖱 Más clics", comp_type_cookies: "🍪 Más galletas", comp_type_prestige: "⭐ Más reinicios de prestigio",
+        comp_scope_players: "Jugadores individuales", comp_scope_clubs: "Clubes", comp_scope_both: "Jugadores y clubes",
+        comp_table_players: "👤 Jugadores individuales", comp_table_clubs: "🏆 Clubes",
+        comp_participants_suffix: "participantes", comp_no_participants: "Aún no hay participantes",
+        err_enter_user_pass: "Introduce usuario y contraseña",
+        err_already_in_club: "Ya estás en un club", err_club_not_found: "Club no encontrado", err_invalid_club_code: "Código no válido", success_left_club: "¡Has salido del club con éxito!", success_joined_club: "¡Te uniste con éxito!", success_club_created_prefix: "¡Creado! Código:", info_searching_club: "Buscando club...", err_login_first: "Inicia sesión primero", err_not_enough_cookies: "No tienes suficientes galletas", err_invalid_amount: "Cantidad no válida", err_corrupted_recipient: "Los datos del destinatario están dañados — no se puede donar ahora", info_transferring: "Transfiriendo...", success_donated: "¡Donado con éxito!", err_invalid_name: "Nombre no válido", err_enter_password_verify: "Introduce tu contraseña para verificar", err_already_your_name: "Ese ya es tu nombre", info_updating: "Actualizando...", success_changed: "¡Cambiado con éxito!", err_fill_all_fields: "Completa todos los campos", err_passwords_mismatch: "Las contraseñas no coinciden", success_password_changed: "¡Contraseña cambiada!", err_wrong_current_password: "La contraseña actual es incorrecta", err_select_gender: "Selecciona género", success_updated: "¡Actualizado!", err_enter_password_confirm: "Introduce la contraseña para confirmar", info_deleting_account: "Eliminando cuenta...", err_wrong_password: "Contraseña incorrecta", err_not_enough_for_bet: "No tienes suficientes galletas para esta apuesta", info_creating_duel: "Creando duelo...", err_invalid_duration: "Introduce una duración válida", err_invalid_bet: "Importe de apuesta no válido", err_enter_code: "Introduce un código", info_checking_code: "Verificando código...", err_code_not_found: "El código no existe", err_already_redeemed: "Ya canjeaste este código antes", err_unknown_reward_type: "Tipo de recompensa desconocido en este código", success_redeemed_cookies: "¡Obtuviste {amount} galletas! 🎁", success_redeemed_title: "¡Obtuviste el título '{title}'! 🏅", info_loading: "Cargando...", err_enter_message_content: "Introduce el contenido del mensaje", success_broadcast_sent: "¡Mensaje enviado a todos!", success_broadcast_cleared: "¡Mensaje eliminado para todos!", err_enter_player_name: "Introduce el nombre del jugador", err_player_not_found: "Jugador '{name}' no encontrado", err_no_players_found: "No se encontraron jugadores", info_deleting_player: "Eliminando jugador...", info_searching_player: "Buscando jugador...", err_enter_bonus: "Introduce una bonificación válida", err_choose_duration: "Elige una duración", err_invalid_discount: "Introduce un porcentaje de descuento válido (1-99)", success_event_started: "¡Evento iniciado!", success_event_stopped: "¡Evento detenido!", success_all_events_stopped: "¡Todos los eventos detenidos!", err_enter_competition_name: "Introduce un nombre para la competencia", err_invalid_prize_amount: "Importe del premio no válido", success_competition_started: "¡Competencia iniciada!", err_competition_not_found: "Competencia no encontrada (¿ya terminó?)", success_competition_ending: "La competencia está terminando y otorgando premios...", err_enter_title_text2: "Introduce el texto del título", success_title_given: "¡Título '{title}' otorgado a {name}!", success_title_removed: "¡El título de {name} fue eliminado!", success_code_created: "¡Código '{code}' creado con éxito!", err_code_already_exists: "Ya existe un código llamado '{code}'", success_player_data_deleted: "¡Los datos de '{name}' se eliminaron con éxito!", err_firebase_down: "Firebase no conectado", err_wrong_credentials: "Usuario o contraseña incorrectos", err_no_server_response: "Sin respuesta del servidor - inténtalo de nuevo", err_prefix: "Error:", err_username_short: "Nombre demasiado corto", err_password_short: "La contraseña debe tener al menos 6 caracteres", err_username_taken: "Nombre de usuario ya en uso", err_weak_password: "Contraseña demasiado débil", login_connecting: "Iniciando sesión...", register_registering: "Registrando...", register_success: "¡Registrado con éxito!"
     },
     fr: {
         settings_title: "⚙️ Paramètres du compte", settings_language_header: "🌐 Langue", settings_username_header: "👤 Nom d'utilisateur",
@@ -828,7 +992,48 @@ var translations = {
         shop_title: "🛒 Boutique 🛒", shop_buildings: "🏭 Bâtiments", shop_click_upgrades: "👆 Améliorations de clic",
         shop_upgrades: "⚡ Améliorations", shop_achievements: "🎯 Succès", prestige_btn: "🌟 Réinitialisation prestige 🌟",
         cps_line: "{num} cookies par seconde", cpc_line: "+{num} par clic",
-        prestige_line: "Niveau de prestige : {level} | Multiplicateur : x{mult} | Prochain objectif : {next} cookies"
+        prestige_line: "Niveau de prestige : {level} | Multiplicateur : x{mult} | Prochain objectif : {next} cookies",
+close_btn: "Fermer", back_btn: "⬅ Retour", cancel_btn: "Annuler",
+        ach_first_click_name: "Premier clic", ach_first_click_desc: "Vous avez cliqué sur le cookie !",
+        ach_hundred_name: "Cent cookies", ach_hundred_desc: "100 cookies !",
+        ach_first_building_name: "Premier bâtiment", ach_first_building_desc: "Vous avez acheté un bâtiment !",
+        ach_thousand_name: "Mille cookies", ach_thousand_desc: "1 000 cookies !",
+        ach_ten_thousand_name: "Dix mille", ach_ten_thousand_desc: "10 000 cookies !",
+        ach_hundred_thousand_name: "Cent mille", ach_hundred_thousand_desc: "100 000 cookies !",
+        ach_million_name: "Million de cookies", ach_million_desc: "Un million de cookies !",
+        ach_first_golden_name: "Cookie doré", ach_first_golden_desc: "Vous avez cliqué sur un cookie doré !",
+        ach_golden_master_name: "Maître doré", ach_golden_master_desc: "10 cookies dorés !",
+        ach_hundred_buildings_name: "Cent bâtiments", ach_hundred_buildings_desc: "100 bâtiments !",
+        ach_first_prestige_name: "Premier prestige", ach_first_prestige_desc: "Réinitialisation de prestige !",
+        games_modal_title: "🎮 Jeux", games_tracks_btn: "🏁 Parcours",
+        games_obstacles_title: "🚧 Obstacles", games_obstacles_desc: "Esquivez les obstacles avec votre cookie ! Chaque rangée franchie = 1B cookies. Un seul coup termine la partie.",
+        games_start_btn: "▶️ Démarrer le jeu", games_over_title: "Partie terminée",
+        games_over_cookies_label: "🍪 Cookies gagnés :", games_over_rows_label: "🏁 Rangées franchies :",
+        games_my_clicks_label: "Vos clics :",
+        codes_modal_title: "🎁 Utiliser un code", codes_modal_desc: "Entrez un code reçu du créateur du jeu ou d'un admin",
+        redeem_code_ph: "Entrez le code ici", redeem_code_btn: "🎁 Utiliser",
+        duel_subtitle: "Duel de clics 1 contre 1 (jusqu'à 4) — celui qui clique le plus gagne",
+        duel_create_btn: "🆚 Créer un duel", duel_join_btn: "🔍 Rejoindre un duel",
+        duel_create_title: "🆚 Créer un duel", duel_duration_label: "⏱️ Durée du duel",
+        duel_minutes_ph: "Minutes", duel_seconds_ph: "Secondes", duel_players_label: "👥 Nombre de joueurs",
+        duel_bet_label: "🍪 Mise de cookies (0 = sans mise)", duel_create_confirm_btn: "🆚 Créer le duel",
+        duel_no_duels_msg: "Aucun duel en attente actuellement — créez-en un !",
+        duel_card_by: "⚔️ Duel par", duel_card_duration: "⏱️ Durée :", duel_card_players: "👥 Joueurs :",
+        duel_card_bet: "🍪 Mise :", duel_card_no_bet: "Sans mise", duel_card_winner_gets: "(le gagnant reçoit {amount})",
+        duel_already_in: "Vous êtes déjà dans ce duel", duel_join_this_btn: "Rejoindre",
+        duel_waiting_title: "⏳ En attente de joueurs", duel_waiting_for: "En attente...",
+        duel_cancel_btn: "Annuler le duel", duel_leave_btn: "Quitter le duel",
+        duel_results_title: "🏆 Résultats en direct", duel_you_marker: "(vous)",
+        duel_time_up: "⏱️ Temps écoulé ! Calcul des résultats...", duel_seconds_left: "⏱️ {num} secondes restantes",
+        duel_winner_line: "{name} a gagné !", duel_won_cookies: "🍪 A gagné {amount} cookies !",
+        duel_back_to_menu_btn: "Retour au menu", duel_unknown_winner: "Inconnu",
+        comp_none_active: "Aucune compétition actuellement", comp_refresh_leaderboard_btn: "🔄 Actualiser le classement",
+        comp_type_clicks: "🖱 Le plus de clics", comp_type_cookies: "🍪 Le plus de cookies", comp_type_prestige: "⭐ Le plus de resets de prestige",
+        comp_scope_players: "Joueurs individuels", comp_scope_clubs: "Clubs", comp_scope_both: "Joueurs et clubs",
+        comp_table_players: "👤 Joueurs individuels", comp_table_clubs: "🏆 Clubs",
+        comp_participants_suffix: "participants", comp_no_participants: "Aucun participant pour l'instant",
+        err_enter_user_pass: "Entrez un nom d'utilisateur et un mot de passe",
+        err_already_in_club: "Vous êtes déjà dans un club", err_club_not_found: "Club introuvable", err_invalid_club_code: "Code invalide", success_left_club: "Vous avez quitté le club avec succès !", success_joined_club: "Vous avez rejoint avec succès !", success_club_created_prefix: "Créé ! Code :", info_searching_club: "Recherche du club...", err_login_first: "Connectez-vous d'abord", err_not_enough_cookies: "Vous n'avez pas assez de cookies", err_invalid_amount: "Montant invalide", err_corrupted_recipient: "Les données du destinataire sont corrompues — impossible de faire un don pour le moment", info_transferring: "Transfert...", success_donated: "Don effectué avec succès !", err_invalid_name: "Nom invalide", err_enter_password_verify: "Entrez votre mot de passe pour vérifier", err_already_your_name: "C'est déjà votre nom", info_updating: "Mise à jour...", success_changed: "Modifié avec succès !", err_fill_all_fields: "Remplissez tous les champs", err_passwords_mismatch: "Les mots de passe ne correspondent pas", success_password_changed: "Mot de passe modifié !", err_wrong_current_password: "Le mot de passe actuel est incorrect", err_select_gender: "Sélectionnez un genre", success_updated: "Mis à jour !", err_enter_password_confirm: "Entrez le mot de passe pour confirmer", info_deleting_account: "Suppression du compte...", err_wrong_password: "Mot de passe incorrect", err_not_enough_for_bet: "Vous n'avez pas assez de cookies pour cette mise", info_creating_duel: "Création du duel...", err_invalid_duration: "Entrez une durée valide", err_invalid_bet: "Montant de mise invalide", err_enter_code: "Entrez un code", info_checking_code: "Vérification du code...", err_code_not_found: "Le code n'existe pas", err_already_redeemed: "Vous avez déjà utilisé ce code", err_unknown_reward_type: "Type de récompense inconnu pour ce code", success_redeemed_cookies: "Vous avez reçu {amount} cookies ! 🎁", success_redeemed_title: "Vous avez reçu le titre « {title} » ! 🏅", info_loading: "Chargement...", err_enter_message_content: "Entrez le contenu du message", success_broadcast_sent: "Message envoyé à tout le monde !", success_broadcast_cleared: "Message supprimé pour tout le monde !", err_enter_player_name: "Entrez le nom du joueur", err_player_not_found: "Joueur « {name} » introuvable", err_no_players_found: "Aucun joueur trouvé", info_deleting_player: "Suppression du joueur...", info_searching_player: "Recherche du joueur...", err_enter_bonus: "Entrez un bonus valide", err_choose_duration: "Choisissez une durée", err_invalid_discount: "Entrez un pourcentage de réduction valide (1-99)", success_event_started: "Événement démarré !", success_event_stopped: "Événement arrêté !", success_all_events_stopped: "Tous les événements arrêtés !", err_enter_competition_name: "Entrez un nom de compétition", err_invalid_prize_amount: "Montant du prix invalide", success_competition_started: "Compétition démarrée !", err_competition_not_found: "Compétition introuvable (déjà terminée ?)", success_competition_ending: "La compétition se termine et distribue les prix...", err_enter_title_text2: "Entrez le texte du titre", success_title_given: "Titre « {title} » attribué à {name} !", success_title_removed: "Le titre de {name} a été supprimé !", success_code_created: "Code « {code} » créé avec succès !", err_code_already_exists: "Un code nommé « {code} » existe déjà", success_player_data_deleted: "Les données de « {name} » ont été supprimées avec succès !", err_firebase_down: "Firebase non connecté", err_wrong_credentials: "Nom d'utilisateur ou mot de passe incorrect", err_no_server_response: "Aucune réponse du serveur - réessayez", err_prefix: "Erreur :", err_username_short: "Nom trop court", err_password_short: "Le mot de passe doit contenir au moins 6 caractères", err_username_taken: "Nom d'utilisateur déjà pris", err_weak_password: "Mot de passe trop faible", login_connecting: "Connexion...", register_registering: "Inscription...", register_success: "Inscription réussie !"
     },
     ru: {
         settings_title: "⚙️ Настройки аккаунта", settings_language_header: "🌐 Язык", settings_username_header: "👤 Имя пользователя",
@@ -842,7 +1047,48 @@ var translations = {
         shop_title: "🛒 Магазин 🛒", shop_buildings: "🏭 Здания", shop_click_upgrades: "👆 Улучшения клика",
         shop_upgrades: "⚡ Улучшения", shop_achievements: "🎯 Достижения", prestige_btn: "🌟 Сброс престижа 🌟",
         cps_line: "{num} печенек в секунду", cpc_line: "+{num} за клик",
-        prestige_line: "Уровень престижа: {level} | Множитель: x{mult} | Следующая цель: {next} печенек"
+        prestige_line: "Уровень престижа: {level} | Множитель: x{mult} | Следующая цель: {next} печенек",
+close_btn: "Закрыть", back_btn: "⬅ Назад", cancel_btn: "Отмена",
+        ach_first_click_name: "Первый клик", ach_first_click_desc: "Вы кликнули по печеньке!",
+        ach_hundred_name: "Сто печенек", ach_hundred_desc: "100 печенек!",
+        ach_first_building_name: "Первое здание", ach_first_building_desc: "Вы купили здание!",
+        ach_thousand_name: "Тысяча печенек", ach_thousand_desc: "1000 печенек!",
+        ach_ten_thousand_name: "Десять тысяч", ach_ten_thousand_desc: "10 000 печенек!",
+        ach_hundred_thousand_name: "Сто тысяч", ach_hundred_thousand_desc: "100 000 печенек!",
+        ach_million_name: "Миллион печенек", ach_million_desc: "Миллион печенек!",
+        ach_first_golden_name: "Золотая печенька", ach_first_golden_desc: "Вы кликнули золотую печеньку!",
+        ach_golden_master_name: "Золотой мастер", ach_golden_master_desc: "10 золотых печенек!",
+        ach_hundred_buildings_name: "Сто зданий", ach_hundred_buildings_desc: "100 зданий!",
+        ach_first_prestige_name: "Первый престиж", ach_first_prestige_desc: "Сброс престижа!",
+        games_modal_title: "🎮 Игры", games_tracks_btn: "🏁 Трассы",
+        games_obstacles_title: "🚧 Препятствия", games_obstacles_desc: "Уворачивайтесь от препятствий своей печенькой! Каждый пройденный ряд = 1B печенек. Одно попадание — конец игры.",
+        games_start_btn: "▶️ Начать игру", games_over_title: "Игра окончена",
+        games_over_cookies_label: "🍪 Заработано печенек:", games_over_rows_label: "🏁 Пройдено рядов:",
+        games_my_clicks_label: "Ваши клики:",
+        codes_modal_title: "🎁 Использовать код", codes_modal_desc: "Введите код, полученный от создателя игры или админа",
+        redeem_code_ph: "Введите код здесь", redeem_code_btn: "🎁 Использовать",
+        duel_subtitle: "Дуэль кликов 1 на 1 (до 4) — побеждает тот, кто кликнул больше всех",
+        duel_create_btn: "🆚 Создать дуэль", duel_join_btn: "🔍 Присоединиться",
+        duel_create_title: "🆚 Создание дуэли", duel_duration_label: "⏱️ Длительность дуэли",
+        duel_minutes_ph: "Минуты", duel_seconds_ph: "Секунды", duel_players_label: "👥 Количество игроков",
+        duel_bet_label: "🍪 Ставка печеньками (0 = без ставки)", duel_create_confirm_btn: "🆚 Создать дуэль",
+        duel_no_duels_msg: "Сейчас нет ожидающих дуэлей — создайте одну!",
+        duel_card_by: "⚔️ Дуэль от", duel_card_duration: "⏱️ Длительность:", duel_card_players: "👥 Игроки:",
+        duel_card_bet: "🍪 Ставка:", duel_card_no_bet: "Без ставки", duel_card_winner_gets: "(победитель получает {amount})",
+        duel_already_in: "Вы уже в этой дуэли", duel_join_this_btn: "Присоединиться",
+        duel_waiting_title: "⏳ Ожидание игроков", duel_waiting_for: "Ожидание...",
+        duel_cancel_btn: "Отменить дуэль", duel_leave_btn: "Покинуть дуэль",
+        duel_results_title: "🏆 Результаты вживую", duel_you_marker: "(вы)",
+        duel_time_up: "⏱️ Время вышло! Подсчёт результатов...", duel_seconds_left: "⏱️ Осталось {num} секунд",
+        duel_winner_line: "{name} победил(а)!", duel_won_cookies: "🍪 Выиграл(а) {amount} печенек!",
+        duel_back_to_menu_btn: "В меню", duel_unknown_winner: "Неизвестно",
+        comp_none_active: "Сейчас нет соревнований", comp_refresh_leaderboard_btn: "🔄 Обновить таблицу лидеров",
+        comp_type_clicks: "🖱 Больше всего кликов", comp_type_cookies: "🍪 Больше всего печенек", comp_type_prestige: "⭐ Больше всего сбросов престижа",
+        comp_scope_players: "Отдельные игроки", comp_scope_clubs: "Клубы", comp_scope_both: "Игроки и клубы",
+        comp_table_players: "👤 Отдельные игроки", comp_table_clubs: "🏆 Клубы",
+        comp_participants_suffix: "участников", comp_no_participants: "Пока нет участников",
+        err_enter_user_pass: "Введите имя пользователя и пароль",
+        err_already_in_club: "Вы уже в клубе", err_club_not_found: "Клуб не найден", err_invalid_club_code: "Неверный код", success_left_club: "Вы успешно покинули клуб!", success_joined_club: "Успешно присоединились!", success_club_created_prefix: "Создано! Код:", info_searching_club: "Поиск клуба...", err_login_first: "Сначала войдите", err_not_enough_cookies: "У вас недостаточно печенек", err_invalid_amount: "Неверное количество", err_corrupted_recipient: "Данные получателя повреждены — сейчас невозможно сделать пожертвование", info_transferring: "Перевод...", success_donated: "Успешно пожертвовано!", err_invalid_name: "Неверное имя", err_enter_password_verify: "Введите пароль для проверки", err_already_your_name: "Это уже ваше имя", info_updating: "Обновление...", success_changed: "Успешно изменено!", err_fill_all_fields: "Заполните все поля", err_passwords_mismatch: "Пароли не совпадают", success_password_changed: "Пароль изменён!", err_wrong_current_password: "Текущий пароль неверен", err_select_gender: "Выберите пол", success_updated: "Обновлено!", err_enter_password_confirm: "Введите пароль для подтверждения", info_deleting_account: "Удаление аккаунта...", err_wrong_password: "Неверный пароль", err_not_enough_for_bet: "У вас недостаточно печенек для этой ставки", info_creating_duel: "Создание дуэли...", err_invalid_duration: "Введите корректную длительность", err_invalid_bet: "Неверная сумма ставки", err_enter_code: "Введите код", info_checking_code: "Проверка кода...", err_code_not_found: "Код не существует", err_already_redeemed: "Вы уже использовали этот код ранее", err_unknown_reward_type: "Неизвестный тип награды в этом коде", success_redeemed_cookies: "Вы получили {amount} печенек! 🎁", success_redeemed_title: "Вы получили титул «{title}»! 🏅", info_loading: "Загрузка...", err_enter_message_content: "Введите текст сообщения", success_broadcast_sent: "Сообщение отправлено всем!", success_broadcast_cleared: "Сообщение удалено у всех!", err_enter_player_name: "Введите имя игрока", err_player_not_found: "Игрок «{name}» не найден", err_no_players_found: "Игроки не найдены", info_deleting_player: "Удаление игрока...", info_searching_player: "Поиск игрока...", err_enter_bonus: "Введите корректный бонус", err_choose_duration: "Выберите длительность", err_invalid_discount: "Введите корректный процент скидки (1-99)", success_event_started: "Событие запущено!", success_event_stopped: "Событие остановлено!", success_all_events_stopped: "Все события остановлены!", err_enter_competition_name: "Введите название соревнования", err_invalid_prize_amount: "Неверная сумма приза", success_competition_started: "Соревнование запущено!", err_competition_not_found: "Соревнование не найдено (уже завершилось?)", success_competition_ending: "Соревнование завершается и выдаёт призы...", err_enter_title_text2: "Введите текст титула", success_title_given: "Титул «{title}» присвоен {name}!", success_title_removed: "Титул {name} удалён!", success_code_created: "Код «{code}» успешно создан!", err_code_already_exists: "Код с именем «{code}» уже существует", success_player_data_deleted: "Данные «{name}» успешно удалены!", err_firebase_down: "Firebase не подключен", err_wrong_credentials: "Неверное имя пользователя или пароль", err_no_server_response: "Нет ответа от сервера - попробуйте снова", err_prefix: "Ошибка:", err_username_short: "Слишком короткое имя", err_password_short: "Пароль должен содержать не менее 6 символов", err_username_taken: "Имя пользователя уже занято", err_weak_password: "Слишком слабый пароль", login_connecting: "Вход...", register_registering: "Регистрация...", register_success: "Успешная регистрация!"
     },
     pt: {
         settings_title: "⚙️ Configurações da conta", settings_language_header: "🌐 Idioma", settings_username_header: "👤 Nome de usuário",
@@ -856,7 +1102,48 @@ var translations = {
         shop_title: "🛒 Loja 🛒", shop_buildings: "🏭 Construções", shop_click_upgrades: "👆 Melhorias de clique",
         shop_upgrades: "⚡ Melhorias", shop_achievements: "🎯 Conquistas", prestige_btn: "🌟 Reinício de prestígio 🌟",
         cps_line: "{num} cookies por segundo", cpc_line: "+{num} por clique",
-        prestige_line: "Nível de prestígio: {level} | Multiplicador: x{mult} | Próxima meta: {next} cookies"
+        prestige_line: "Nível de prestígio: {level} | Multiplicador: x{mult} | Próxima meta: {next} cookies",
+close_btn: "Fechar", back_btn: "⬅ Voltar", cancel_btn: "Cancelar",
+        ach_first_click_name: "Primeiro clique", ach_first_click_desc: "Você clicou no cookie!",
+        ach_hundred_name: "Cem cookies", ach_hundred_desc: "100 cookies!",
+        ach_first_building_name: "Primeira construção", ach_first_building_desc: "Você comprou uma construção!",
+        ach_thousand_name: "Mil cookies", ach_thousand_desc: "1.000 cookies!",
+        ach_ten_thousand_name: "Dez mil", ach_ten_thousand_desc: "10.000 cookies!",
+        ach_hundred_thousand_name: "Cem mil", ach_hundred_thousand_desc: "100.000 cookies!",
+        ach_million_name: "Milhão de cookies", ach_million_desc: "Um milhão de cookies!",
+        ach_first_golden_name: "Cookie dourado", ach_first_golden_desc: "Você clicou num cookie dourado!",
+        ach_golden_master_name: "Mestre dourado", ach_golden_master_desc: "10 cookies dourados!",
+        ach_hundred_buildings_name: "Cem construções", ach_hundred_buildings_desc: "100 construções!",
+        ach_first_prestige_name: "Primeiro prestígio", ach_first_prestige_desc: "Reinício de prestígio!",
+        games_modal_title: "🎮 Jogos", games_tracks_btn: "🏁 Pistas",
+        games_obstacles_title: "🚧 Obstáculos", games_obstacles_desc: "Desvie dos obstáculos com seu cookie! Cada fileira superada = 1B cookies. Um toque encerra o jogo.",
+        games_start_btn: "▶️ Iniciar jogo", games_over_title: "Fim de jogo",
+        games_over_cookies_label: "🍪 Cookies ganhos:", games_over_rows_label: "🏁 Fileiras superadas:",
+        games_my_clicks_label: "Seus cliques:",
+        codes_modal_title: "🎁 Resgatar código", codes_modal_desc: "Digite um código recebido do criador do jogo ou de um admin",
+        redeem_code_ph: "Digite o código aqui", redeem_code_btn: "🎁 Resgatar",
+        duel_subtitle: "Duelo de cliques 1 contra 1 (até 4) — quem clicar mais vence",
+        duel_create_btn: "🆚 Criar duelo", duel_join_btn: "🔍 Entrar em duelo",
+        duel_create_title: "🆚 Criar um duelo", duel_duration_label: "⏱️ Duração do duelo",
+        duel_minutes_ph: "Minutos", duel_seconds_ph: "Segundos", duel_players_label: "👥 Número de jogadores",
+        duel_bet_label: "🍪 Aposta de cookies (0 = sem aposta)", duel_create_confirm_btn: "🆚 Criar duelo",
+        duel_no_duels_msg: "Nenhum duelo esperando agora — crie um!",
+        duel_card_by: "⚔️ Duelo de", duel_card_duration: "⏱️ Duração:", duel_card_players: "👥 Jogadores:",
+        duel_card_bet: "🍪 Aposta:", duel_card_no_bet: "Sem aposta", duel_card_winner_gets: "(o vencedor recebe {amount})",
+        duel_already_in: "Você já está neste duelo", duel_join_this_btn: "Entrar",
+        duel_waiting_title: "⏳ Aguardando jogadores", duel_waiting_for: "Aguardando...",
+        duel_cancel_btn: "Cancelar duelo", duel_leave_btn: "Sair do duelo",
+        duel_results_title: "🏆 Resultados ao vivo", duel_you_marker: "(você)",
+        duel_time_up: "⏱️ Tempo esgotado! Calculando resultados...", duel_seconds_left: "⏱️ {num} segundos restantes",
+        duel_winner_line: "{name} venceu!", duel_won_cookies: "🍪 Ganhou {amount} cookies!",
+        duel_back_to_menu_btn: "Voltar ao menu", duel_unknown_winner: "Desconhecido",
+        comp_none_active: "Nenhuma competição no momento", comp_refresh_leaderboard_btn: "🔄 Atualizar classificação",
+        comp_type_clicks: "🖱 Mais cliques", comp_type_cookies: "🍪 Mais cookies", comp_type_prestige: "⭐ Mais reinícios de prestígio",
+        comp_scope_players: "Jogadores individuais", comp_scope_clubs: "Clubes", comp_scope_both: "Jogadores e clubes",
+        comp_table_players: "👤 Jogadores individuais", comp_table_clubs: "🏆 Clubes",
+        comp_participants_suffix: "participantes", comp_no_participants: "Ainda sem participantes",
+        err_enter_user_pass: "Digite usuário e senha",
+        err_already_in_club: "Você já está em um clube", err_club_not_found: "Clube não encontrado", err_invalid_club_code: "Código inválido", success_left_club: "Você saiu do clube com sucesso!", success_joined_club: "Entrou com sucesso!", success_club_created_prefix: "Criado! Código:", info_searching_club: "Buscando clube...", err_login_first: "Faça login primeiro", err_not_enough_cookies: "Você não tem cookies suficientes", err_invalid_amount: "Quantidade inválida", err_corrupted_recipient: "Os dados do destinatário estão corrompidos — não é possível doar agora", info_transferring: "Transferindo...", success_donated: "Doado com sucesso!", err_invalid_name: "Nome inválido", err_enter_password_verify: "Digite sua senha para verificar", err_already_your_name: "Esse já é o seu nome", info_updating: "Atualizando...", success_changed: "Alterado com sucesso!", err_fill_all_fields: "Preencha todos os campos", err_passwords_mismatch: "As senhas não coincidem", success_password_changed: "Senha alterada!", err_wrong_current_password: "Senha atual incorreta", err_select_gender: "Selecione o gênero", success_updated: "Atualizado!", err_enter_password_confirm: "Digite a senha para confirmar", info_deleting_account: "Excluindo conta...", err_wrong_password: "Senha incorreta", err_not_enough_for_bet: "Você não tem cookies suficientes para esta aposta", info_creating_duel: "Criando duelo...", err_invalid_duration: "Digite uma duração válida", err_invalid_bet: "Valor de aposta inválido", err_enter_code: "Digite um código", info_checking_code: "Verificando código...", err_code_not_found: "O código não existe", err_already_redeemed: "Você já resgatou este código antes", err_unknown_reward_type: "Tipo de recompensa desconhecido neste código", success_redeemed_cookies: "Você recebeu {amount} cookies! 🎁", success_redeemed_title: "Você recebeu o título '{title}'! 🏅", info_loading: "Carregando...", err_enter_message_content: "Digite o conteúdo da mensagem", success_broadcast_sent: "Mensagem enviada a todos!", success_broadcast_cleared: "Mensagem removida para todos!", err_enter_player_name: "Digite o nome do jogador", err_player_not_found: "Jogador '{name}' não encontrado", err_no_players_found: "Nenhum jogador encontrado", info_deleting_player: "Excluindo jogador...", info_searching_player: "Buscando jogador...", err_enter_bonus: "Digite um bônus válido", err_choose_duration: "Escolha uma duração", err_invalid_discount: "Digite uma porcentagem de desconto válida (1-99)", success_event_started: "Evento iniciado!", success_event_stopped: "Evento interrompido!", success_all_events_stopped: "Todos os eventos interrompidos!", err_enter_competition_name: "Digite um nome para a competição", err_invalid_prize_amount: "Valor do prêmio inválido", success_competition_started: "Competição iniciada!", err_competition_not_found: "Competição não encontrada (já terminou?)", success_competition_ending: "A competição está terminando e distribuindo prêmios...", err_enter_title_text2: "Digite o texto do título", success_title_given: "Título '{title}' dado a {name}!", success_title_removed: "O título de {name} foi removido!", success_code_created: "Código '{code}' criado com sucesso!", err_code_already_exists: "Já existe um código chamado '{code}'", success_player_data_deleted: "Os dados de '{name}' foram excluídos com sucesso!", err_firebase_down: "Firebase não conectado", err_wrong_credentials: "Usuário ou senha incorretos", err_no_server_response: "Sem resposta do servidor - tente novamente", err_prefix: "Erro:", err_username_short: "Nome muito curto", err_password_short: "A senha deve ter pelo menos 6 caracteres", err_username_taken: "Nome de usuário já em uso", err_weak_password: "Senha muito fraca", login_connecting: "Entrando...", register_registering: "Cadastrando...", register_success: "Cadastrado com sucesso!"
     },
     de: {
         settings_title: "⚙️ Kontoeinstellungen", settings_language_header: "🌐 Sprache", settings_username_header: "👤 Benutzername",
@@ -870,7 +1157,48 @@ var translations = {
         shop_title: "🛒 Shop 🛒", shop_buildings: "🏭 Gebäude", shop_click_upgrades: "👆 Klick-Upgrades",
         shop_upgrades: "⚡ Upgrades", shop_achievements: "🎯 Erfolge", prestige_btn: "🌟 Prestige-Reset 🌟",
         cps_line: "{num} Cookies pro Sekunde", cpc_line: "+{num} pro Klick",
-        prestige_line: "Prestige-Level: {level} | Multiplikator: x{mult} | Nächstes Ziel: {next} Cookies"
+        prestige_line: "Prestige-Level: {level} | Multiplikator: x{mult} | Nächstes Ziel: {next} Cookies",
+close_btn: "Schließen", back_btn: "⬅ Zurück", cancel_btn: "Abbrechen",
+        ach_first_click_name: "Erster Klick", ach_first_click_desc: "Du hast auf den Keks geklickt!",
+        ach_hundred_name: "Hundert Kekse", ach_hundred_desc: "100 Kekse!",
+        ach_first_building_name: "Erstes Gebäude", ach_first_building_desc: "Du hast ein Gebäude gekauft!",
+        ach_thousand_name: "Tausend Kekse", ach_thousand_desc: "1.000 Kekse!",
+        ach_ten_thousand_name: "Zehntausend", ach_ten_thousand_desc: "10.000 Kekse!",
+        ach_hundred_thousand_name: "Hunderttausend", ach_hundred_thousand_desc: "100.000 Kekse!",
+        ach_million_name: "Million Kekse", ach_million_desc: "Eine Million Kekse!",
+        ach_first_golden_name: "Goldener Keks", ach_first_golden_desc: "Du hast einen goldenen Keks angeklickt!",
+        ach_golden_master_name: "Goldmeister", ach_golden_master_desc: "10 goldene Kekse!",
+        ach_hundred_buildings_name: "Hundert Gebäude", ach_hundred_buildings_desc: "100 Gebäude!",
+        ach_first_prestige_name: "Erstes Prestige", ach_first_prestige_desc: "Prestige-Reset!",
+        games_modal_title: "🎮 Spiele", games_tracks_btn: "🏁 Strecken",
+        games_obstacles_title: "🚧 Hindernisse", games_obstacles_desc: "Weiche mit deinem Keks den Hindernissen aus! Jede geschaffte Reihe = 1B Kekse. Ein Treffer beendet das Spiel.",
+        games_start_btn: "▶️ Spiel starten", games_over_title: "Spiel vorbei",
+        games_over_cookies_label: "🍪 Verdiente Kekse:", games_over_rows_label: "🏁 Geschaffte Reihen:",
+        games_my_clicks_label: "Deine Klicks:",
+        codes_modal_title: "🎁 Code einlösen", codes_modal_desc: "Gib einen Code ein, den du vom Spielersteller oder einem Admin erhalten hast",
+        redeem_code_ph: "Code hier eingeben", redeem_code_btn: "🎁 Einlösen",
+        duel_subtitle: "1-gegen-1-Klick-Duell (bis zu 4) — wer am meisten klickt, gewinnt",
+        duel_create_btn: "🆚 Duell erstellen", duel_join_btn: "🔍 Duell beitreten",
+        duel_create_title: "🆚 Duell erstellen", duel_duration_label: "⏱️ Duell-Dauer",
+        duel_minutes_ph: "Minuten", duel_seconds_ph: "Sekunden", duel_players_label: "👥 Anzahl Spieler",
+        duel_bet_label: "🍪 Keks-Einsatz (0 = kein Einsatz)", duel_create_confirm_btn: "🆚 Duell erstellen",
+        duel_no_duels_msg: "Gerade wartet kein Duell — erstelle eins!",
+        duel_card_by: "⚔️ Duell von", duel_card_duration: "⏱️ Dauer:", duel_card_players: "👥 Spieler:",
+        duel_card_bet: "🍪 Einsatz:", duel_card_no_bet: "Kein Einsatz", duel_card_winner_gets: "(Gewinner erhält {amount})",
+        duel_already_in: "Du bist bereits in diesem Duell", duel_join_this_btn: "Beitreten",
+        duel_waiting_title: "⏳ Warten auf Spieler", duel_waiting_for: "Warten...",
+        duel_cancel_btn: "Duell abbrechen", duel_leave_btn: "Duell verlassen",
+        duel_results_title: "🏆 Live-Ergebnisse", duel_you_marker: "(du)",
+        duel_time_up: "⏱️ Zeit ist um! Ergebnisse werden berechnet...", duel_seconds_left: "⏱️ Noch {num} Sekunden",
+        duel_winner_line: "{name} hat gewonnen!", duel_won_cookies: "🍪 Hat {amount} Kekse gewonnen!",
+        duel_back_to_menu_btn: "Zurück zum Menü", duel_unknown_winner: "Unbekannt",
+        comp_none_active: "Gerade keine Wettbewerbe", comp_refresh_leaderboard_btn: "🔄 Bestenliste aktualisieren",
+        comp_type_clicks: "🖱 Meiste Klicks", comp_type_cookies: "🍪 Meiste Kekse", comp_type_prestige: "⭐ Meiste Prestige-Resets",
+        comp_scope_players: "Einzelspieler", comp_scope_clubs: "Klubs", comp_scope_both: "Spieler und Klubs",
+        comp_table_players: "👤 Einzelspieler", comp_table_clubs: "🏆 Klubs",
+        comp_participants_suffix: "Teilnehmer", comp_no_participants: "Noch keine Teilnehmer",
+        err_enter_user_pass: "Benutzername und Passwort eingeben",
+        err_already_in_club: "Du bist bereits in einem Klub", err_club_not_found: "Klub nicht gefunden", err_invalid_club_code: "Ungültiger Code", success_left_club: "Du hast den Klub erfolgreich verlassen!", success_joined_club: "Erfolgreich beigetreten!", success_club_created_prefix: "Erstellt! Code:", info_searching_club: "Klub wird gesucht...", err_login_first: "Zuerst anmelden", err_not_enough_cookies: "Du hast nicht genug Kekse", err_invalid_amount: "Ungültige Menge", err_corrupted_recipient: "Die Daten des Empfängers sind beschädigt — momentan keine Spende möglich", info_transferring: "Übertragung...", success_donated: "Erfolgreich gespendet!", err_invalid_name: "Ungültiger Name", err_enter_password_verify: "Gib dein Passwort zur Bestätigung ein", err_already_your_name: "Das ist bereits dein Name", info_updating: "Aktualisierung...", success_changed: "Erfolgreich geändert!", err_fill_all_fields: "Alle Felder ausfüllen", err_passwords_mismatch: "Passwörter stimmen nicht überein", success_password_changed: "Passwort geändert!", err_wrong_current_password: "Aktuelles Passwort ist falsch", err_select_gender: "Geschlecht auswählen", success_updated: "Aktualisiert!", err_enter_password_confirm: "Passwort zur Bestätigung eingeben", info_deleting_account: "Konto wird gelöscht...", err_wrong_password: "Falsches Passwort", err_not_enough_for_bet: "Du hast nicht genug Kekse für diesen Einsatz", info_creating_duel: "Duell wird erstellt...", err_invalid_duration: "Gib eine gültige Dauer ein", err_invalid_bet: "Ungültiger Einsatzbetrag", err_enter_code: "Code eingeben", info_checking_code: "Code wird geprüft...", err_code_not_found: "Code existiert nicht", err_already_redeemed: "Du hast diesen Code bereits eingelöst", err_unknown_reward_type: "Unbekannter Belohnungstyp bei diesem Code", success_redeemed_cookies: "Du hast {amount} Kekse erhalten! 🎁", success_redeemed_title: "Du hast den Titel „{title}“ erhalten! 🏅", info_loading: "Wird geladen...", err_enter_message_content: "Nachrichteninhalt eingeben", success_broadcast_sent: "Nachricht an alle gesendet!", success_broadcast_cleared: "Nachricht für alle entfernt!", err_enter_player_name: "Spielernamen eingeben", err_player_not_found: "Spieler „{name}“ nicht gefunden", err_no_players_found: "Keine Spieler gefunden", info_deleting_player: "Spieler wird gelöscht...", info_searching_player: "Spieler wird gesucht...", err_enter_bonus: "Gültigen Bonus eingeben", err_choose_duration: "Dauer wählen", err_invalid_discount: "Gültigen Rabattprozentsatz eingeben (1-99)", success_event_started: "Event gestartet!", success_event_stopped: "Event gestoppt!", success_all_events_stopped: "Alle Events gestoppt!", err_enter_competition_name: "Wettbewerbsnamen eingeben", err_invalid_prize_amount: "Ungültiger Preisbetrag", success_competition_started: "Wettbewerb gestartet!", err_competition_not_found: "Wettbewerb nicht gefunden (bereits beendet?)", success_competition_ending: "Wettbewerb endet und vergibt Preise...", err_enter_title_text2: "Titeltext eingeben", success_title_given: "Titel „{title}“ an {name} vergeben!", success_title_removed: "Titel von {name} wurde entfernt!", success_code_created: "Code „{code}“ erfolgreich erstellt!", err_code_already_exists: "Ein Code namens „{code}“ existiert bereits", success_player_data_deleted: "Daten von „{name}“ erfolgreich gelöscht!", err_firebase_down: "Firebase nicht verbunden", err_wrong_credentials: "Falscher Benutzername oder falsches Passwort", err_no_server_response: "Keine Antwort vom Server - erneut versuchen", err_prefix: "Fehler:", err_username_short: "Name zu kurz", err_password_short: "Passwort muss mindestens 6 Zeichen haben", err_username_taken: "Benutzername bereits vergeben", err_weak_password: "Passwort zu schwach", login_connecting: "Anmeldung...", register_registering: "Registrierung...", register_success: "Erfolgreich registriert!"
     },
     zh: {
         settings_title: "⚙️ 账户设置", settings_language_header: "🌐 语言", settings_username_header: "👤 用户名",
@@ -884,7 +1212,48 @@ var translations = {
         shop_title: "🛒 商店 🛒", shop_buildings: "🏭 建筑", shop_click_upgrades: "👆 点击升级",
         shop_upgrades: "⚡ 升级", shop_achievements: "🎯 成就", prestige_btn: "🌟 声望重置 🌟",
         cps_line: "每秒 {num} 块饼干", cpc_line: "+{num} 每次点击",
-        prestige_line: "声望等级：{level} | 倍数：x{mult} | 下一目标：{next} 块饼干"
+        prestige_line: "声望等级：{level} | 倍数：x{mult} | 下一目标：{next} 块饼干",
+close_btn: "关闭", back_btn: "⬅ 返回", cancel_btn: "取消",
+        ach_first_click_name: "第一次点击", ach_first_click_desc: "你点击了饼干！",
+        ach_hundred_name: "一百块饼干", ach_hundred_desc: "100块饼干！",
+        ach_first_building_name: "第一座建筑", ach_first_building_desc: "你购买了一座建筑！",
+        ach_thousand_name: "一千块饼干", ach_thousand_desc: "1,000块饼干！",
+        ach_ten_thousand_name: "一万", ach_ten_thousand_desc: "10,000块饼干！",
+        ach_hundred_thousand_name: "十万", ach_hundred_thousand_desc: "100,000块饼干！",
+        ach_million_name: "一百万饼干", ach_million_desc: "一百万块饼干！",
+        ach_first_golden_name: "金色饼干", ach_first_golden_desc: "你点击了金色饼干！",
+        ach_golden_master_name: "黄金大师", ach_golden_master_desc: "10块金色饼干！",
+        ach_hundred_buildings_name: "一百座建筑", ach_hundred_buildings_desc: "100座建筑！",
+        ach_first_prestige_name: "首次声望", ach_first_prestige_desc: "声望重置！",
+        games_modal_title: "🎮 游戏", games_tracks_btn: "🏁 赛道",
+        games_obstacles_title: "🚧 障碍", games_obstacles_desc: "用你的饼干躲避障碍物！每通过一行 = 10亿块饼干。碰到一次游戏结束。",
+        games_start_btn: "▶️ 开始游戏", games_over_title: "游戏结束",
+        games_over_cookies_label: "🍪 获得的饼干：", games_over_rows_label: "🏁 通过的行数：",
+        games_my_clicks_label: "你的点击数：",
+        codes_modal_title: "🎁 兑换代码", codes_modal_desc: "输入从游戏创建者或管理员那里收到的代码",
+        redeem_code_ph: "在此输入代码", redeem_code_btn: "🎁 兑换",
+        duel_subtitle: "1对1点击对决（最多4人）— 点击最多者获胜",
+        duel_create_btn: "🆚 创建对决", duel_join_btn: "🔍 加入对决",
+        duel_create_title: "🆚 创建对决", duel_duration_label: "⏱️ 对决时长",
+        duel_minutes_ph: "分钟", duel_seconds_ph: "秒", duel_players_label: "👥 玩家人数",
+        duel_bet_label: "🍪 饼干赌注（0 = 无赌注）", duel_create_confirm_btn: "🆚 创建对决",
+        duel_no_duels_msg: "目前没有等待中的对决 — 创建一个吧！",
+        duel_card_by: "⚔️ 对决发起人", duel_card_duration: "⏱️ 时长：", duel_card_players: "👥 玩家：",
+        duel_card_bet: "🍪 赌注：", duel_card_no_bet: "无赌注", duel_card_winner_gets: "（获胜者获得{amount}）",
+        duel_already_in: "你已经在这场对决中", duel_join_this_btn: "加入",
+        duel_waiting_title: "⏳ 等待玩家中", duel_waiting_for: "等待中...",
+        duel_cancel_btn: "取消对决", duel_leave_btn: "离开对决",
+        duel_results_title: "🏆 实时结果", duel_you_marker: "（你）",
+        duel_time_up: "⏱️ 时间到！正在计算结果...", duel_seconds_left: "⏱️ 剩余{num}秒",
+        duel_winner_line: "{name} 获胜了！", duel_won_cookies: "🍪 赢得了{amount}块饼干！",
+        duel_back_to_menu_btn: "返回菜单", duel_unknown_winner: "未知",
+        comp_none_active: "目前没有比赛", comp_refresh_leaderboard_btn: "🔄 刷新排行榜",
+        comp_type_clicks: "🖱 最多点击", comp_type_cookies: "🍪 最多饼干", comp_type_prestige: "⭐ 最多声望重置",
+        comp_scope_players: "个人玩家", comp_scope_clubs: "俱乐部", comp_scope_both: "玩家和俱乐部",
+        comp_table_players: "👤 个人玩家", comp_table_clubs: "🏆 俱乐部",
+        comp_participants_suffix: "参与者", comp_no_participants: "暂无参与者",
+        err_enter_user_pass: "请输入用户名和密码",
+        err_already_in_club: "你已经在一个俱乐部中", err_club_not_found: "找不到俱乐部", err_invalid_club_code: "代码无效", success_left_club: "你已成功离开俱乐部！", success_joined_club: "加入成功！", success_club_created_prefix: "已创建！代码：", info_searching_club: "正在搜索俱乐部...", err_login_first: "请先登录", err_not_enough_cookies: "你的饼干不够", err_invalid_amount: "数量无效", err_corrupted_recipient: "接收者的数据已损坏 — 目前无法捐赠", info_transferring: "转账中...", success_donated: "捐赠成功！", err_invalid_name: "名称无效", err_enter_password_verify: "输入密码以验证", err_already_your_name: "这已经是你的名字了", info_updating: "更新中...", success_changed: "更改成功！", err_fill_all_fields: "填写所有字段", err_passwords_mismatch: "密码不匹配", success_password_changed: "密码已更改！", err_wrong_current_password: "当前密码不正确", err_select_gender: "选择性别", success_updated: "已更新！", err_enter_password_confirm: "输入密码以确认", info_deleting_account: "正在删除账户...", err_wrong_password: "密码错误", err_not_enough_for_bet: "你的饼干不足以进行这次赌注", info_creating_duel: "正在创建对决...", err_invalid_duration: "输入有效的时长", err_invalid_bet: "赌注金额无效", err_enter_code: "输入代码", info_checking_code: "正在检查代码...", err_code_not_found: "代码不存在", err_already_redeemed: "你之前已经兑换过此代码", err_unknown_reward_type: "此代码的奖励类型未知", success_redeemed_cookies: "你获得了{amount}块饼干！🎁", success_redeemed_title: "你获得了称号「{title}」！🏅", info_loading: "加载中...", err_enter_message_content: "输入消息内容", success_broadcast_sent: "消息已发送给所有人！", success_broadcast_cleared: "消息已为所有人清除！", err_enter_player_name: "输入玩家名称", err_player_not_found: "未找到玩家「{name}」", err_no_players_found: "未找到玩家", info_deleting_player: "正在删除玩家...", info_searching_player: "正在搜索玩家...", err_enter_bonus: "输入有效的奖励", err_choose_duration: "选择时长", err_invalid_discount: "输入有效的折扣百分比（1-99）", success_event_started: "活动已开始！", success_event_stopped: "活动已停止！", success_all_events_stopped: "所有活动已停止！", err_enter_competition_name: "输入比赛名称", err_invalid_prize_amount: "奖金金额无效", success_competition_started: "比赛已开始！", err_competition_not_found: "未找到比赛（已经结束？）", success_competition_ending: "比赛结束，正在颁发奖品...", err_enter_title_text2: "输入称号文本", success_title_given: "称号「{title}」已授予{name}！", success_title_removed: "{name}的称号已被移除！", success_code_created: "代码「{code}」创建成功！", err_code_already_exists: "名为「{code}」的代码已存在", success_player_data_deleted: "「{name}」的数据已成功删除！", err_firebase_down: "Firebase 未连接", err_wrong_credentials: "用户名或密码错误", err_no_server_response: "服务器无响应 - 请重试", err_prefix: "错误：", err_username_short: "用户名太短", err_password_short: "密码至少需要6个字符", err_username_taken: "用户名已被使用", err_weak_password: "密码太弱", login_connecting: "登录中...", register_registering: "注册中...", register_success: "注册成功！"
     },
     hi: {
         settings_title: "⚙️ खाता सेटिंग्स", settings_language_header: "🌐 भाषा", settings_username_header: "👤 उपयोगकर्ता नाम",
@@ -898,7 +1267,48 @@ var translations = {
         shop_title: "🛒 दुकान 🛒", shop_buildings: "🏭 इमारतें", shop_click_upgrades: "👆 क्लिक अपग्रेड",
         shop_upgrades: "⚡ अपग्रेड", shop_achievements: "🎯 उपलब्धियां", prestige_btn: "🌟 प्रतिष्ठा रीसेट 🌟",
         cps_line: "{num} कुकीज़ प्रति सेकंड", cpc_line: "+{num} प्रति क्लिक",
-        prestige_line: "प्रतिष्ठा स्तर: {level} | गुणक: x{mult} | अगला लक्ष्य: {next} कुकीज़"
+        prestige_line: "प्रतिष्ठा स्तर: {level} | गुणक: x{mult} | अगला लक्ष्य: {next} कुकीज़",
+close_btn: "बंद करें", back_btn: "⬅ वापस", cancel_btn: "रद्द करें",
+        ach_first_click_name: "पहला क्लिक", ach_first_click_desc: "आपने कुकी पर क्लिक किया!",
+        ach_hundred_name: "सौ कुकीज़", ach_hundred_desc: "100 कुकीज़!",
+        ach_first_building_name: "पहली इमारत", ach_first_building_desc: "आपने एक इमारत खरीदी!",
+        ach_thousand_name: "हज़ार कुकीज़", ach_thousand_desc: "1,000 कुकीज़!",
+        ach_ten_thousand_name: "दस हज़ार", ach_ten_thousand_desc: "10,000 कुकीज़!",
+        ach_hundred_thousand_name: "एक लाख", ach_hundred_thousand_desc: "100,000 कुकीज़!",
+        ach_million_name: "दस लाख कुकीज़", ach_million_desc: "दस लाख कुकीज़!",
+        ach_first_golden_name: "सुनहरी कुकी", ach_first_golden_desc: "आपने एक सुनहरी कुकी पर क्लिक किया!",
+        ach_golden_master_name: "गोल्डन मास्टर", ach_golden_master_desc: "10 सुनहरी कुकीज़!",
+        ach_hundred_buildings_name: "सौ इमारतें", ach_hundred_buildings_desc: "100 इमारतें!",
+        ach_first_prestige_name: "पहली प्रतिष्ठा", ach_first_prestige_desc: "प्रतिष्ठा रीसेट!",
+        games_modal_title: "🎮 खेल", games_tracks_btn: "🏁 ट्रैक",
+        games_obstacles_title: "🚧 बाधाएं", games_obstacles_desc: "अपनी कुकी के साथ बाधाओं से बचें! हर पंक्ति पार करने पर = 1B कुकीज़। एक टक्कर से खेल समाप्त।",
+        games_start_btn: "▶️ खेल शुरू करें", games_over_title: "खेल समाप्त",
+        games_over_cookies_label: "🍪 अर्जित कुकीज़:", games_over_rows_label: "🏁 पार की गई पंक्तियां:",
+        games_my_clicks_label: "आपके क्लिक:",
+        codes_modal_title: "🎁 कोड रिडीम करें", codes_modal_desc: "गेम क्रिएटर या एडमिन से प्राप्त कोड दर्ज करें",
+        redeem_code_ph: "यहां कोड दर्ज करें", redeem_code_btn: "🎁 रिडीम करें",
+        duel_subtitle: "1 बनाम 1 क्लिक द्वंद्व (4 तक) — जो सबसे ज़्यादा क्लिक करे वह जीतता है",
+        duel_create_btn: "🆚 द्वंद्व बनाएं", duel_join_btn: "🔍 द्वंद्व से जुड़ें",
+        duel_create_title: "🆚 द्वंद्व बनाएं", duel_duration_label: "⏱️ द्वंद्व अवधि",
+        duel_minutes_ph: "मिनट", duel_seconds_ph: "सेकंड", duel_players_label: "👥 खिलाड़ियों की संख्या",
+        duel_bet_label: "🍪 कुकी दांव (0 = कोई दांव नहीं)", duel_create_confirm_btn: "🆚 द्वंद्व बनाएं",
+        duel_no_duels_msg: "अभी कोई द्वंद्व प्रतीक्षारत नहीं है — एक बनाएं!",
+        duel_card_by: "⚔️ द्वंद्व द्वारा", duel_card_duration: "⏱️ अवधि:", duel_card_players: "👥 खिलाड़ी:",
+        duel_card_bet: "🍪 दांव:", duel_card_no_bet: "कोई दांव नहीं", duel_card_winner_gets: "(विजेता को {amount} मिलेगा)",
+        duel_already_in: "आप पहले से ही इस द्वंद्व में हैं", duel_join_this_btn: "जुड़ें",
+        duel_waiting_title: "⏳ खिलाड़ियों की प्रतीक्षा", duel_waiting_for: "प्रतीक्षारत...",
+        duel_cancel_btn: "द्वंद्व रद्द करें", duel_leave_btn: "द्वंद्व छोड़ें",
+        duel_results_title: "🏆 लाइव परिणाम", duel_you_marker: "(आप)",
+        duel_time_up: "⏱️ समय समाप्त! परिणाम गणना हो रही है...", duel_seconds_left: "⏱️ {num} सेकंड शेष",
+        duel_winner_line: "{name} जीत गए!", duel_won_cookies: "🍪 {amount} कुकीज़ जीतीं!",
+        duel_back_to_menu_btn: "मेनू पर वापस जाएं", duel_unknown_winner: "अज्ञात",
+        comp_none_active: "अभी कोई प्रतियोगिता नहीं", comp_refresh_leaderboard_btn: "🔄 लीडरबोर्ड रीफ्रेश करें",
+        comp_type_clicks: "🖱 सबसे ज़्यादा क्लिक", comp_type_cookies: "🍪 सबसे ज़्यादा कुकीज़", comp_type_prestige: "⭐ सबसे ज़्यादा प्रतिष्ठा रीसेट",
+        comp_scope_players: "व्यक्तिगत खिलाड़ी", comp_scope_clubs: "क्लब", comp_scope_both: "खिलाड़ी और क्लब",
+        comp_table_players: "👤 व्यक्तिगत खिलाड़ी", comp_table_clubs: "🏆 क्लब",
+        comp_participants_suffix: "प्रतिभागी", comp_no_participants: "अभी तक कोई प्रतिभागी नहीं",
+        err_enter_user_pass: "उपयोगकर्ता नाम और पासवर्ड दर्ज करें",
+        err_already_in_club: "आप पहले से ही एक क्लब में हैं", err_club_not_found: "क्लब नहीं मिला", err_invalid_club_code: "अमान्य कोड", success_left_club: "आपने क्लब सफलतापूर्वक छोड़ दिया!", success_joined_club: "सफलतापूर्वक जुड़ गए!", success_club_created_prefix: "बनाया गया! कोड:", info_searching_club: "क्लब खोजा जा रहा है...", err_login_first: "पहले लॉग इन करें", err_not_enough_cookies: "आपके पास पर्याप्त कुकीज़ नहीं हैं", err_invalid_amount: "अमान्य मात्रा", err_corrupted_recipient: "प्राप्तकर्ता का डेटा क्षतिग्रस्त है — अभी दान नहीं किया जा सकता", info_transferring: "स्थानांतरित हो रहा है...", success_donated: "सफलतापूर्वक दान किया गया!", err_invalid_name: "अमान्य नाम", err_enter_password_verify: "सत्यापन के लिए अपना पासवर्ड दर्ज करें", err_already_your_name: "यह पहले से ही आपका नाम है", info_updating: "अपडेट हो रहा है...", success_changed: "सफलतापूर्वक बदला गया!", err_fill_all_fields: "सभी फ़ील्ड भरें", err_passwords_mismatch: "पासवर्ड मेल नहीं खाते", success_password_changed: "पासवर्ड बदल दिया गया!", err_wrong_current_password: "वर्तमान पासवर्ड गलत है", err_select_gender: "लिंग चुनें", success_updated: "अपडेट किया गया!", err_enter_password_confirm: "पुष्टि के लिए पासवर्ड दर्ज करें", info_deleting_account: "खाता हटाया जा रहा है...", err_wrong_password: "गलत पासवर्ड", err_not_enough_for_bet: "इस दांव के लिए आपके पास पर्याप्त कुकीज़ नहीं हैं", info_creating_duel: "द्वंद्व बनाया जा रहा है...", err_invalid_duration: "वैध अवधि दर्ज करें", err_invalid_bet: "अमान्य दांव राशि", err_enter_code: "एक कोड दर्ज करें", info_checking_code: "कोड जांचा जा रहा है...", err_code_not_found: "कोड मौजूद नहीं है", err_already_redeemed: "आपने पहले ही यह कोड रिडीम कर लिया है", err_unknown_reward_type: "इस कोड पर अज्ञात इनाम प्रकार", success_redeemed_cookies: "आपको {amount} कुकीज़ मिलीं! 🎁", success_redeemed_title: "आपको '{title}' उपाधि मिली! 🏅", info_loading: "लोड हो रहा है...", err_enter_message_content: "संदेश सामग्री दर्ज करें", success_broadcast_sent: "संदेश सभी को भेजा गया!", success_broadcast_cleared: "संदेश सभी के लिए हटाया गया!", err_enter_player_name: "खिलाड़ी का नाम दर्ज करें", err_player_not_found: "खिलाड़ी '{name}' नहीं मिला", err_no_players_found: "कोई खिलाड़ी नहीं मिला", info_deleting_player: "खिलाड़ी हटाया जा रहा है...", info_searching_player: "खिलाड़ी खोजा जा रहा है...", err_enter_bonus: "वैध बोनस दर्ज करें", err_choose_duration: "अवधि चुनें", err_invalid_discount: "वैध छूट प्रतिशत दर्ज करें (1-99)", success_event_started: "इवेंट शुरू हुआ!", success_event_stopped: "इवेंट रोका गया!", success_all_events_stopped: "सभी इवेंट रोके गए!", err_enter_competition_name: "प्रतियोगिता का नाम दर्ज करें", err_invalid_prize_amount: "अमान्य पुरस्कार राशि", success_competition_started: "प्रतियोगिता शुरू हुई!", err_competition_not_found: "प्रतियोगिता नहीं मिली (क्या पहले ही समाप्त हो गई?)", success_competition_ending: "प्रतियोगिता समाप्त हो रही है और पुरस्कार दिए जा रहे हैं...", err_enter_title_text2: "उपाधि पाठ दर्ज करें", success_title_given: "'{title}' उपाधि {name} को दी गई!", success_title_removed: "{name} की उपाधि हटा दी गई!", success_code_created: "कोड '{code}' सफलतापूर्वक बनाया गया!", err_code_already_exists: "'{code}' नाम का कोड पहले से मौजूद है", success_player_data_deleted: "'{name}' का डेटा सफलतापूर्वक हटाया गया!", err_firebase_down: "Firebase कनेक्ट नहीं है", err_wrong_credentials: "गलत उपयोगकर्ता नाम या पासवर्ड", err_no_server_response: "सर्वर से कोई प्रतिक्रिया नहीं - पुनः प्रयास करें", err_prefix: "त्रुटि:", err_username_short: "नाम बहुत छोटा है", err_password_short: "पासवर्ड कम से कम 6 अक्षरों का होना चाहिए", err_username_taken: "उपयोगकर्ता नाम पहले से लिया गया है", err_weak_password: "पासवर्ड बहुत कमज़ोर है", login_connecting: "लॉग इन हो रहा है...", register_registering: "साइन अप हो रहा है...", register_success: "सफलतापूर्वक साइन अप हुआ!"
     }
 };
 
@@ -1006,17 +1416,17 @@ var upgrades = {
 };
 
 var achievements = [
-    { id:"first_click", name:"הלחיצה הראשונה", emoji:"👆", desc:"לחצת על העוגייה!", condition:function(){ return totalCookiesBaked>=1; } },
-    { id:"hundred", name:"מאה עוגיות", emoji:"💯", desc:"100 עוגיות!", condition:function(){ return totalCookiesBaked>=100; } },
-    { id:"first_building", name:"הבנייה הראשונה", emoji:"🏗", desc:"קנית בניין!", condition:function(){ for (var k in buildings) { if (buildings[k].count>0) return true; } return false; } },
-    { id:"thousand", name:"אלף עוגיות", emoji:"🎯", desc:"1,000 עוגיות!", condition:function(){ return totalCookiesBaked>=1000; } },
-    { id:"ten_thousand", name:"עשרת אלפים", emoji:"🏆", desc:"10,000 עוגיות!", condition:function(){ return totalCookiesBaked>=10000; } },
-    { id:"hundred_thousand", name:"מאה אלף", emoji:"🎖", desc:"100,000 עוגיות!", condition:function(){ return totalCookiesBaked>=100000; } },
-    { id:"million", name:"מיליון עוגיות", emoji:"💎", desc:"מיליון עוגיות!", condition:function(){ return totalCookiesBaked>=1000000; } },
-    { id:"first_golden", name:"עוגיית הזהב", emoji:"🌟", desc:"לחצת על עוגיית זהב!", condition:function(){ return goldenCookieClicks>=1; } },
-    { id:"golden_master", name:"מאסטר הזהב", emoji:"👑", desc:"10 עוגיות זהב!", condition:function(){ return goldenCookieClicks>=10; } },
-    { id:"hundred_buildings", name:"מאה בניינים", emoji:"🏙", desc:"100 בניינים!", condition:function(){ var s=0; for (var k in buildings) { s+=buildings[k].count; } return s>=100; } },
-    { id:"first_prestige", name:"יוקרה ראשונה", emoji:"⭐", desc:"איפוס יוקרה!", condition:function(){ return prestigeLevel>=1; } }
+    { id:"first_click", get name(){return t("ach_first_click_name");}, emoji:"👆", get desc(){return t("ach_first_click_desc");}, condition:function(){ return totalCookiesBaked>=1; } },
+    { id:"hundred", get name(){return t("ach_hundred_name");}, emoji:"💯", get desc(){return t("ach_hundred_desc");}, condition:function(){ return totalCookiesBaked>=100; } },
+    { id:"first_building", get name(){return t("ach_first_building_name");}, emoji:"🏗", get desc(){return t("ach_first_building_desc");}, condition:function(){ for (var k in buildings) { if (buildings[k].count>0) return true; } return false; } },
+    { id:"thousand", get name(){return t("ach_thousand_name");}, emoji:"🎯", get desc(){return t("ach_thousand_desc");}, condition:function(){ return totalCookiesBaked>=1000; } },
+    { id:"ten_thousand", get name(){return t("ach_ten_thousand_name");}, emoji:"🏆", get desc(){return t("ach_ten_thousand_desc");}, condition:function(){ return totalCookiesBaked>=10000; } },
+    { id:"hundred_thousand", get name(){return t("ach_hundred_thousand_name");}, emoji:"🎖", get desc(){return t("ach_hundred_thousand_desc");}, condition:function(){ return totalCookiesBaked>=100000; } },
+    { id:"million", get name(){return t("ach_million_name");}, emoji:"💎", get desc(){return t("ach_million_desc");}, condition:function(){ return totalCookiesBaked>=1000000; } },
+    { id:"first_golden", get name(){return t("ach_first_golden_name");}, emoji:"🌟", get desc(){return t("ach_first_golden_desc");}, condition:function(){ return goldenCookieClicks>=1; } },
+    { id:"golden_master", get name(){return t("ach_golden_master_name");}, emoji:"👑", get desc(){return t("ach_golden_master_desc");}, condition:function(){ return goldenCookieClicks>=10; } },
+    { id:"hundred_buildings", get name(){return t("ach_hundred_buildings_name");}, emoji:"🏙", get desc(){return t("ach_hundred_buildings_desc");}, condition:function(){ var s=0; for (var k in buildings) { s+=buildings[k].count; } return s>=100; } },
+    { id:"first_prestige", get name(){return t("ach_first_prestige_name");}, emoji:"⭐", get desc(){return t("ach_first_prestige_desc");}, condition:function(){ return prestigeLevel>=1; } }
 ];
 
 function formatNum(num) {
@@ -1297,7 +1707,7 @@ function openDebugModal() {
 }
 function debugForceLeaveClub() {
     var msg = document.getElementById("debugMessage");
-    if (!currentUid) { msg.innerHTML = "<div class='error-message'>התחבר קודם</div>"; return; }
+    if (!currentUid) { msg.innerHTML = "<div class='error-message'>" + t("err_login_first") + "</div>"; return; }
 
     var clubCode = currentClub || (usersCache[currentUid] && usersCache[currentUid].club);
 
@@ -1320,9 +1730,9 @@ function debugForceLeaveClub() {
     }
 
     p.then(function() {
-        msg.innerHTML = "<div class='success-message'>עזבת את המועדון בהצלחה!</div>";
+        msg.innerHTML = "<div class='success-message'>" + t("success_left_club") + "</div>";
     }).catch(function(e) {
-        msg.innerHTML = "<div class='error-message'>שגיאה: " + (e.message||e.code) + "</div>";
+        msg.innerHTML = "<div class='error-message'>" + t("err_prefix") + " " + (e.message||e.code) + "</div>";
     });
 }
 
@@ -1342,7 +1752,7 @@ function confirmDeleteMessage() {
         statusDiv.innerHTML = "<div class='success-message'>ההודעה נמחקה!</div>";
         setTimeout(function() { closeModal("deleteMessageModal"); }, 800);
     }).catch(function(e) {
-        statusDiv.innerHTML = "<div class='error-message'>שגיאה: " + (e.message||e.code) + "</div>";
+        statusDiv.innerHTML = "<div class='error-message'>" + t("err_prefix") + " " + (e.message||e.code) + "</div>";
     });
 }
 
@@ -1373,21 +1783,21 @@ function dismissAnnouncement() {
 function sendBroadcast() {
     var text = document.getElementById("broadcastTextInput").value.trim();
     var msg = document.getElementById("adminMessage");
-    if (!text) { msg.innerHTML = "<div class='error-message'>הזן תוכן הודעה</div>"; return; }
+    if (!text) { msg.innerHTML = "<div class='error-message'>" + t("err_enter_message_content") + "</div>"; return; }
     var data = { sender: currentUsername, message: text, timestamp: Date.now() };
     withTimeout(database.ref("broadcast/message").set(data), 10000).then(function() {
-        msg.innerHTML = "<div class='success-message'>ההודעה נשלחה לכולם!</div>";
+        msg.innerHTML = "<div class='success-message'>" + t("success_broadcast_sent") + "</div>";
         document.getElementById("broadcastTextInput").value = "";
     }).catch(function(e) {
-        msg.innerHTML = "<div class='error-message'>שגיאה: " + (e.message||e.code) + "</div>";
+        msg.innerHTML = "<div class='error-message'>" + t("err_prefix") + " " + (e.message||e.code) + "</div>";
     });
 }
 function clearBroadcast() {
     var msg = document.getElementById("adminMessage");
     withTimeout(database.ref("broadcast/message").remove(), 10000).then(function() {
-        msg.innerHTML = "<div class='success-message'>ההודעה הוסרה מכולם!</div>";
+        msg.innerHTML = "<div class='success-message'>" + t("success_broadcast_cleared") + "</div>";
     }).catch(function(e) {
-        msg.innerHTML = "<div class='error-message'>שגיאה: " + (e.message||e.code) + "</div>";
+        msg.innerHTML = "<div class='error-message'>" + t("err_prefix") + " " + (e.message||e.code) + "</div>";
     });
 }
 function populateMusicSelects() {
@@ -1481,7 +1891,7 @@ function updateEventBanner() {
 function startEvent(type, durationInputId, extra, message) {
     var durationMinutes = parseFloat(document.getElementById(durationInputId).value);
     var msg = document.getElementById("eventsMessage");
-    if (!durationMinutes || durationMinutes <= 0) { msg.innerHTML = "<div class='error-message'>הזן משך זמן תקין</div>"; return; }
+    if (!durationMinutes || durationMinutes <= 0) { msg.innerHTML = "<div class='error-message'>" + t("err_invalid_duration") + "</div>"; return; }
 
     var eventData = { type: type, message: message, endTime: Date.now() + durationMinutes * 60000, startedBy: currentUsername };
     for (var key in extra) { eventData[key] = extra[key]; }
@@ -1491,16 +1901,16 @@ function startEvent(type, durationInputId, extra, message) {
             senderName: "מערכת", message: message + " (" + durationMinutes + " דקות)", timestamp: Date.now(), isSystemMessage: true
         }), 10000);
     }).then(function() {
-        msg.innerHTML = "<div class='success-message'>האירוע הופעל!</div>";
+        msg.innerHTML = "<div class='success-message'>" + t("success_event_started") + "</div>";
     }).catch(function(e) {
-        msg.innerHTML = "<div class='error-message'>שגיאה: " + (e.message||e.code) + "</div>";
+        msg.innerHTML = "<div class='error-message'>" + t("err_prefix") + " " + (e.message||e.code) + "</div>";
     });
 }
 
 function startRainEvent() {
     var bonus = parseInt(document.getElementById("rainBonusInput").value);
     var msg = document.getElementById("eventsMessage");
-    if (!bonus || bonus <= 0) { msg.innerHTML = "<div class='error-message'>הזן בונוס תקין</div>"; return; }
+    if (!bonus || bonus <= 0) { msg.innerHTML = "<div class='error-message'>" + t("err_enter_bonus") + "</div>"; return; }
     var musicFile = document.getElementById("rainMusicSelect").value;
     startEvent("golden_rain", "rainDurationInput", { fixedBonus: bonus, musicFile: musicFile }, "🌟 גשם עוגיות זהב (+" + formatNum(bonus) + " לכל עוגייה)!");
 }
@@ -1519,25 +1929,25 @@ function startDiscountEvent() {
     var discount = parseInt(document.getElementById("discountPercentInput").value);
     var musicFile = document.getElementById("discountMusicSelect").value;
     var msg = document.getElementById("eventsMessage");
-    if (!discount || discount <= 0 || discount >= 100) { msg.innerHTML = "<div class='error-message'>הזן אחוז הנחה תקין (1-99)</div>"; return; }
+    if (!discount || discount <= 0 || discount >= 100) { msg.innerHTML = "<div class='error-message'>" + t("err_invalid_discount") + "</div>"; return; }
     startEvent("shop_discount", "discountDurationInput", { discount: discount, musicFile: musicFile }, "💰 הנחת חנות של " + discount + "% פעילה!");
 }
 
 function endEvent(type) {
     var msg = document.getElementById("eventsMessage");
     withTimeout(database.ref("events/active/" + type).remove(), 10000).then(function() {
-        msg.innerHTML = "<div class='success-message'>האירוע הופסק!</div>";
+        msg.innerHTML = "<div class='success-message'>" + t("success_event_stopped") + "</div>";
     }).catch(function(e) {
-        msg.innerHTML = "<div class='error-message'>שגיאה: " + (e.message||e.code) + "</div>";
+        msg.innerHTML = "<div class='error-message'>" + t("err_prefix") + " " + (e.message||e.code) + "</div>";
     });
 }
 
 function endAllEvents() {
     var msg = document.getElementById("eventsMessage");
     withTimeout(database.ref("events/active").remove(), 10000).then(function() {
-        msg.innerHTML = "<div class='success-message'>כל האירועים הופסקו!</div>";
+        msg.innerHTML = "<div class='success-message'>" + t("success_all_events_stopped") + "</div>";
     }).catch(function(e) {
-        msg.innerHTML = "<div class='error-message'>שגיאה: " + (e.message||e.code) + "</div>";
+        msg.innerHTML = "<div class='error-message'>" + t("err_prefix") + " " + (e.message||e.code) + "</div>";
     });
 }
 
@@ -1548,7 +1958,7 @@ function adjustAllPlayersCookies(direction) {
 
     msg.innerHTML = "<div class='info-message'>" + (direction > 0 ? "שולח לכולם..." : "מוריד מכולם...") + "</div>";
     withTimeout(database.ref("users").once("value"), 15000).then(function(snap) {
-        if (!snap.exists()) { msg.innerHTML = "<div class='error-message'>לא נמצאו שחקנים</div>"; return; }
+        if (!snap.exists()) { msg.innerHTML = "<div class='error-message'>" + t("err_no_players_found") + "</div>"; return; }
         var updates = {};
         var count = 0;
         var skipped = 0;
@@ -1590,7 +2000,7 @@ function adjustAllPlayersCookies(direction) {
             document.getElementById("giftAllAmountInput").value = "";
         });
     }).catch(function(e) {
-        msg.innerHTML = "<div class='error-message'>שגיאה: " + (e.message||e.code) + "</div>";
+        msg.innerHTML = "<div class='error-message'>" + t("err_prefix") + " " + (e.message||e.code) + "</div>";
     });
 }
 
@@ -1601,8 +2011,18 @@ var localCompetitionClickCounts = {}; // competition id -> number
 var selectedCompetitionId = null; // which tab is shown in the full-screen competitions view
 var legacyCompetitionMigrationAttempted = false;
 
-var competitionTypeLabels = { clicks: "🖱 הכי הרבה לחיצות", cookies: "🍪 הכי הרבה עוגיות", prestige: "⭐ הכי הרבה איפוסי יוקרה" };
-var competitionScopeLabels = { players: "שחקנים יחידים", clubs: "מועדונים", both: "שחקנים ומועדונים" };
+function getCompetitionTypeLabel(type) {
+    if (type === "clicks") return t("comp_type_clicks");
+    if (type === "cookies") return t("comp_type_cookies");
+    if (type === "prestige") return t("comp_type_prestige");
+    return type;
+}
+function getCompetitionScopeLabel(scope) {
+    if (scope === "players") return t("comp_scope_players");
+    if (scope === "clubs") return t("comp_scope_clubs");
+    if (scope === "both") return t("comp_scope_both");
+    return scope;
+}
 
 function isCompetitionActive(comp) {
     return comp && comp.endTime > Date.now();
@@ -1797,7 +2217,7 @@ function renderCompetitionsScreen() {
     var content = document.getElementById("competitionsContent");
     var list = getActiveCompetitionsList();
     if (list.length === 0) {
-        content.innerHTML = "<p style='font-size:1.3rem; padding:40px 0; text-align:center; color:white; text-shadow:0 2px 8px rgba(0,0,0,0.4); font-weight:bold;'>אין תחרויות כרגע</p>";
+        content.innerHTML = "<p style='font-size:1.3rem; padding:40px 0; text-align:center; color:white; text-shadow:0 2px 8px rgba(0,0,0,0.4); font-weight:bold;'>" + t("comp_none_active") + "</p>";
         return;
     }
     if (!selectedCompetitionId || !isCompetitionActive(activeCompetitions[selectedCompetitionId])) {
@@ -1815,11 +2235,11 @@ function renderCompetitionsScreen() {
 
     content.innerHTML = tabsHtml +
         "<div style='margin-bottom:16px; text-align:center; color:white; text-shadow:0 2px 8px rgba(0,0,0,0.4);'>" +
-        "<strong style='font-size:1.2rem;'>" + competitionTypeLabels[comp.type] + "</strong><br>" +
-        "<span style='font-size:0.9rem; opacity:0.9;'>" + competitionScopeLabels[comp.scope] + "</span><br>" +
+        "<strong style='font-size:1.2rem;'>" + getCompetitionTypeLabel(comp.type) + "</strong><br>" +
+        "<span style='font-size:0.9rem; opacity:0.9;'>" + getCompetitionScopeLabel(comp.scope) + "</span><br>" +
         "<span id='competitionCountdown' style='font-weight:bold; color:#FFD700;'></span><br>" +
-        "<button onclick='refreshCompetitionLeaderboardManually()' style='margin-top:12px; background:rgba(255,255,255,0.2); color:white; border:2px solid rgba(255,255,255,0.5); padding:8px 18px; border-radius:15px; font-weight:bold; font-size:0.9rem; cursor:pointer;'>🔄 עדכן טבלאות מובילים</button></div>" +
-        "<div id='competitionTables'><div class='info-message'>טוען...</div></div>";
+        "<button onclick='refreshCompetitionLeaderboardManually()' style='margin-top:12px; background:rgba(255,255,255,0.2); color:white; border:2px solid rgba(255,255,255,0.5); padding:8px 18px; border-radius:15px; font-weight:bold; font-size:0.9rem; cursor:pointer;'>" + t("comp_refresh_leaderboard_btn") + "</button></div>" +
+        "<div id='competitionTables'><div class='info-message'>" + t("info_loading") + "</div></div>";
     refreshCompetitionCountdown();
     loadCompetitionStandings(comp);
 }
@@ -1835,7 +2255,7 @@ function refreshCompetitionLeaderboardManually() {
     var comp = selectedCompetitionId ? activeCompetitions[selectedCompetitionId] : null;
     if (!isCompetitionActive(comp)) return;
     var tablesEl = document.getElementById("competitionTables");
-    if (tablesEl) tablesEl.innerHTML = "<div class='info-message'>מעדכן...</div>";
+    if (tablesEl) tablesEl.innerHTML = "<div class='info-message'>" + t("info_updating") + "</div>";
     loadCompetitionStandings(comp);
 }
 
@@ -1876,7 +2296,7 @@ function loadCompetitionStandings(comp) {
                 playerRows.push({ name: usersData[uid].username || "שחקן", score: score, title: usersData[uid].title || null });
             }
             playerRows.sort(function(a,b){ return b.score - a.score; });
-            tablesHtml += buildLeaderboardTable("👤 שחקנים יחידים", playerRows);
+            tablesHtml += buildLeaderboardTable(t("comp_table_players"), playerRows);
         }
 
         if (comp.scope === "clubs" || comp.scope === "both") {
@@ -1894,11 +2314,11 @@ function loadCompetitionStandings(comp) {
                 clubRows.push({ name: club.name || ("מועדון " + code), score: total });
             }
             clubRows.sort(function(a,b){ return b.score - a.score; });
-            tablesHtml += buildLeaderboardTable("🏆 מועדונים", clubRows);
+            tablesHtml += buildLeaderboardTable(t("comp_table_clubs"), clubRows);
         }
 
         var tablesEl = document.getElementById("competitionTables");
-        if (tablesEl) tablesEl.innerHTML = tablesHtml || "<p class='leaderboard-empty'>אין עדיין משתתפים</p>";
+        if (tablesEl) tablesEl.innerHTML = tablesHtml || "<p class='leaderboard-empty'>" + t("comp_no_participants") + "</p>";
     }).catch(function(e) {
         console.log(e);
         var el = document.getElementById("competitionTables");
@@ -1908,9 +2328,9 @@ function loadCompetitionStandings(comp) {
 
 function buildLeaderboardTable(title, rows) {
     var medals = ["🥇", "🥈", "🥉"];
-    var html = "<div class='leaderboard-full-table'><h3 class='leaderboard-title' style='margin-top:0;'>" + title + " (" + rows.length + " משתתפים)</h3>";
+    var html = "<div class='leaderboard-full-table'><h3 class='leaderboard-title' style='margin-top:0;'>" + title + " (" + rows.length + " " + t("comp_participants_suffix") + ")</h3>";
     if (rows.length === 0) {
-        return html + "<div class='leaderboard-empty'>אין עדיין משתתפים</div></div>";
+        return html + "<div class='leaderboard-empty'>" + t("comp_no_participants") + "</div></div>";
     }
     rows.forEach(function(r, i) {
         var rankClass = i < 3 ? " rank-" + (i+1) : "";
@@ -1937,13 +2357,13 @@ function startCompetition() {
     var type = document.getElementById("competitionTypeSelect").value;
     var durationMs = competitionDurationMs();
     var msg = document.getElementById("competitionsAdminMessage");
-    if (!name) { msg.innerHTML = "<div class='error-message'>הזן שם לתחרות</div>"; return; }
-    if (!durationMs || durationMs <= 0) { msg.innerHTML = "<div class='error-message'>הזן משך זמן תקין</div>"; return; }
+    if (!name) { msg.innerHTML = "<div class='error-message'>" + t("err_enter_competition_name") + "</div>"; return; }
+    if (!durationMs || durationMs <= 0) { msg.innerHTML = "<div class='error-message'>" + t("err_invalid_duration") + "</div>"; return; }
 
     var prizeCookiesPlayer = parseInt(document.getElementById("competitionPrizeCookiesPlayer").value) || 0;
     var prizeCookiesClub = parseInt(document.getElementById("competitionPrizeCookiesClub").value) || 0;
     if (!Number.isFinite(prizeCookiesPlayer) || !Number.isFinite(prizeCookiesClub) || prizeCookiesPlayer < 0 || prizeCookiesClub < 0) {
-        msg.innerHTML = "<div class='error-message'>סכום פרס לא תקין</div>";
+        msg.innerHTML = "<div class='error-message'>" + t("err_invalid_prize_amount") + "</div>";
         return;
     }
     var badgeEnabled = document.getElementById("competitionBadgeEnabled").checked;
@@ -1952,7 +2372,7 @@ function startCompetition() {
     var badgeText = badgeType === "champion" ? "🏆 אלוף העולם" : badgeCustomText;
 
     if (badgeEnabled && badgeType === "custom" && !badgeCustomText) {
-        msg.innerHTML = "<div class='error-message'>הזן טקסט לתואר</div>";
+        msg.innerHTML = "<div class='error-message'>" + t("err_enter_title_text2") + "</div>";
         return;
     }
 
@@ -1979,23 +2399,23 @@ function startCompetition() {
     withTimeout(database.ref().update(updates), 10000).then(function() {
         return withTimeout(database.ref("chat/" + Date.now() + "_comp").set({
             senderName: "מערכת",
-            message: "🏁 תחרות חדשה החלה: \"" + name + "\" – " + competitionTypeLabels[type] + " (" + competitionScopeLabels[scope] + ", " + formatDurationHebrew(durationMs) + ")!",
+            message: "🏁 תחרות חדשה החלה: \"" + name + "\" – " + getCompetitionTypeLabel(type) + " (" + getCompetitionScopeLabel(scope) + ", " + formatDurationHebrew(durationMs) + ")!",
             timestamp: Date.now(), isSystemMessage: true
         }), 10000);
     }).then(function() {
-        msg.innerHTML = "<div class='success-message'>התחרות הופעלה!</div>";
+        msg.innerHTML = "<div class='success-message'>" + t("success_competition_started") + "</div>";
         document.getElementById("competitionNameInput").value = "";
     }).catch(function(e) {
-        msg.innerHTML = "<div class='error-message'>שגיאה: " + (e.message||e.code) + "</div>";
+        msg.innerHTML = "<div class='error-message'>" + t("err_prefix") + " " + (e.message||e.code) + "</div>";
     });
 }
 
 function endCompetition(compId) {
     var msg = document.getElementById("competitionsAdminMessage");
     var comp = activeCompetitions[compId];
-    if (!comp) { msg.innerHTML = "<div class='error-message'>התחרות לא נמצאה (כבר הסתיימה?)</div>"; return; }
+    if (!comp) { msg.innerHTML = "<div class='error-message'>" + t("err_competition_not_found") + "</div>"; return; }
     finalizeCompetition(comp); // awards prizes and removes it from the list once done
-    msg.innerHTML = "<div class='success-message'>התחרות מסתיימת ומחלקת פרסים...</div>";
+    msg.innerHTML = "<div class='success-message'>" + t("success_competition_ending") + "</div>";
 }
 
 function toggleGiveTitleCustomText() {
@@ -2009,12 +2429,12 @@ function adminGiveTitle() {
     var customText = document.getElementById("giveTitleCustomText").value.trim();
     var titleText = type === "champion" ? "🏆 אלוף העולם" : customText;
     var msg = document.getElementById("competitionsAdminMessage");
-    if (!target) { msg.innerHTML = "<div class='error-message'>הזן שם שחקן</div>"; return; }
-    if (type === "custom" && !customText) { msg.innerHTML = "<div class='error-message'>הזן טקסט לתואר</div>"; return; }
+    if (!target) { msg.innerHTML = "<div class='error-message'>" + t("err_enter_player_name") + "</div>"; return; }
+    if (type === "custom" && !customText) { msg.innerHTML = "<div class='error-message'>" + t("err_enter_title_text2") + "</div>"; return; }
 
-    msg.innerHTML = "<div class='info-message'>מחפש שחקן...</div>";
+    msg.innerHTML = "<div class='info-message'>" + t("info_searching_player") + "</div>";
     findUserByUsername(target).then(function(found) {
-        if (!found) { msg.innerHTML = "<div class='error-message'>שחקן '" + target + "' לא נמצא</div>"; return; }
+        if (!found) { msg.innerHTML = "<div class='error-message'>" + tFormat("err_player_not_found", {name: target}) + "</div>"; return; }
         return withTimeout(database.ref("users/" + found.uid + "/title").set(titleText), 10000).then(function() {
             // BUGFIX: if you (the admin) are the target, saveUserData()'s periodic autosave
             // reuses usersCache[currentUid] as its base object — including whatever stale
@@ -2023,33 +2443,33 @@ function adminGiveTitle() {
             if (found.uid === currentUid && usersCache[currentUid]) {
                 usersCache[currentUid].title = titleText;
             }
-            msg.innerHTML = "<div class='success-message'>התואר '" + titleText + "' ניתן ל" + target + "!</div>";
+            msg.innerHTML = "<div class='success-message'>" + tFormat("success_title_given", {title: titleText, name: target}) + "</div>";
             document.getElementById("giveTitleTargetInput").value = "";
             document.getElementById("giveTitleCustomText").value = "";
         });
     }).catch(function(e) {
-        msg.innerHTML = "<div class='error-message'>שגיאה: " + (e.message||e.code) + "</div>";
+        msg.innerHTML = "<div class='error-message'>" + t("err_prefix") + " " + (e.message||e.code) + "</div>";
     });
 }
 
 function adminRemoveTitle() {
     var target = document.getElementById("removeTitleTargetInput").value.trim();
     var msg = document.getElementById("competitionsAdminMessage");
-    if (!target) { msg.innerHTML = "<div class='error-message'>הזן שם שחקן</div>"; return; }
+    if (!target) { msg.innerHTML = "<div class='error-message'>" + t("err_enter_player_name") + "</div>"; return; }
 
-    msg.innerHTML = "<div class='info-message'>מחפש שחקן...</div>";
+    msg.innerHTML = "<div class='info-message'>" + t("info_searching_player") + "</div>";
     findUserByUsername(target).then(function(found) {
-        if (!found) { msg.innerHTML = "<div class='error-message'>שחקן '" + target + "' לא נמצא</div>"; return; }
+        if (!found) { msg.innerHTML = "<div class='error-message'>" + tFormat("err_player_not_found", {name: target}) + "</div>"; return; }
         if (!found.data.title) { msg.innerHTML = "<div class='error-message'>לשחקן '" + target + "' אין תואר כרגע</div>"; return; }
         return withTimeout(database.ref("users/" + found.uid + "/title").remove(), 10000).then(function() {
             if (found.uid === currentUid && usersCache[currentUid]) {
                 delete usersCache[currentUid].title;
             }
-            msg.innerHTML = "<div class='success-message'>התואר של " + target + " הוסר!</div>";
+            msg.innerHTML = "<div class='success-message'>" + tFormat("success_title_removed", {name: target}) + "</div>";
             document.getElementById("removeTitleTargetInput").value = "";
         });
     }).catch(function(e) {
-        msg.innerHTML = "<div class='error-message'>שגיאה: " + (e.message||e.code) + "</div>";
+        msg.innerHTML = "<div class='error-message'>" + t("err_prefix") + " " + (e.message||e.code) + "</div>";
     });
 }
 
@@ -2123,7 +2543,7 @@ function awardCompetitionPrizes(comp) {
                 if (comp.prizeBadgeEnabled && comp.prizeBadgeText) {
                     updates["users/" + bestUid + "/title"] = comp.prizeBadgeText;
                 }
-                announcements.push("👤 " + winnerName + " ניצח/ה בתחרות " + competitionTypeLabels[comp.type] + "!");
+                announcements.push("👤 " + winnerName + " ניצח/ה בתחרות " + getCompetitionTypeLabel(comp.type) + "!");
             }
         }
 
@@ -2160,7 +2580,7 @@ function awardCompetitionPrizes(comp) {
                         updates["users/" + m.uid + "/title"] = comp.prizeBadgeText;
                     }
                 });
-                announcements.push("🏆 מועדון " + (bestClub.name || bestCode) + " ניצח בתחרות " + competitionTypeLabels[comp.type] + "!");
+                announcements.push("🏆 מועדון " + (bestClub.name || bestCode) + " ניצח בתחרות " + getCompetitionTypeLabel(comp.type) + "!");
             }
         }
 
@@ -2190,7 +2610,7 @@ function renderCompetitionAdminStatus() {
         if (comp.prizeBadgeEnabled && comp.prizeBadgeText) prizeParts.push("🏅 " + comp.prizeBadgeText);
         var prizeLine = prizeParts.length ? ("<div style='font-size:0.85rem; color:#8E44AD; margin-top:4px;'>פרס: " + prizeParts.join(" · ") + "</div>") : "";
         html += "<div class='player-item'><span class='event-active-tag'>פעיל</span><strong>" + (comp.name || "תחרות ללא שם") + "</strong><br>" +
-            competitionTypeLabels[comp.type] + " · " + competitionScopeLabels[comp.scope] +
+            getCompetitionTypeLabel(comp.type) + " · " + getCompetitionScopeLabel(comp.scope) +
             " · נותרו " + formatDurationHebrew(remainingMs) + prizeLine +
             "<button class='danger-button' style='margin-top:6px;' onclick='endCompetition(" + comp.id + ")'>⏹️ עצור תחרות זו</button></div>";
     });
@@ -2371,9 +2791,9 @@ function renderDuelMenu() {
     var content = document.getElementById("duelContent");
     content.innerHTML =
         "<div style='text-align:center;'>" +
-        "<p style='color:rgba(255,255,255,0.85); font-size:1.05rem; margin-bottom:6px; text-shadow:0 2px 6px rgba(0,0,0,0.4);'>קרב לחיצות 1 על 1 (עד 4) — מי שלוחץ הכי הרבה מנצח</p>" +
-        "<button class='duel-menu-btn' onclick='showDuelCreateForm()'>🆚 צור דו-קרב</button>" +
-        "<button class='duel-menu-btn' onclick='showDuelJoinList()'>🔍 הצטרף לקרב</button>" +
+        "<p style='color:rgba(255,255,255,0.85); font-size:1.05rem; margin-bottom:6px; text-shadow:0 2px 6px rgba(0,0,0,0.4);'>" + t("duel_subtitle") + "</p>" +
+        "<button class='duel-menu-btn' onclick='showDuelCreateForm()'>" + t("duel_create_btn") + "</button>" +
+        "<button class='duel-menu-btn' onclick='showDuelJoinList()'>" + t("duel_join_btn") + "</button>" +
         "</div>";
 }
 
@@ -2382,18 +2802,18 @@ function showDuelCreateForm() {
     var content = document.getElementById("duelContent");
     content.innerHTML =
         "<div class='duel-card'>" +
-        "<h3>🆚 יצירת דו-קרב</h3>" +
-        "<div style='margin-bottom:14px;'><span class='duel-field-label'>⏱️ משך הקרב</span>" +
+        "<h3>" + t("duel_create_title") + "</h3>" +
+        "<div style='margin-bottom:14px;'><span class='duel-field-label'>" + t("duel_duration_label") + "</span>" +
         "<div style='display:flex; gap:10px;'>" +
-        "<input type='number' id='duelDurationMinutes' placeholder='דקות' min='0' style='flex:1;'>" +
-        "<input type='number' id='duelDurationSeconds' placeholder='שניות' min='0' max='59' style='flex:1;'>" +
+        "<input type='number' id='duelDurationMinutes' placeholder='" + t("duel_minutes_ph") + "' min='0' style='flex:1;'>" +
+        "<input type='number' id='duelDurationSeconds' placeholder='" + t("duel_seconds_ph") + "' min='0' max='59' style='flex:1;'>" +
         "</div></div>" +
-        "<div style='margin-bottom:14px;'><span class='duel-field-label'>👥 מספר שחקנים</span>" +
+        "<div style='margin-bottom:14px;'><span class='duel-field-label'>" + t("duel_players_label") + "</span>" +
         "<select id='duelMaxPlayersSelect' style='width:100%;'><option value='2'>2</option><option value='3'>3</option><option value='4'>4</option></select></div>" +
-        "<div style='margin-bottom:14px;'><span class='duel-field-label'>🍪 הימור עוגיות (0 = בלי הימור)</span>" +
+        "<div style='margin-bottom:14px;'><span class='duel-field-label'>" + t("duel_bet_label") + "</span>" +
         "<input type='number' id='duelBetInput' min='0' value='0' style='width:100%;'></div>" +
-        "<button onclick='createDuel()'>🆚 צור קרב</button> " +
-        "<button class='close-button' onclick='renderDuelMenu()'>ביטול</button>" +
+        "<button onclick='createDuel()'>" + t("duel_create_confirm_btn") + "</button> " +
+        "<button class='close-button' onclick='renderDuelMenu()'>" + t("cancel_btn") + "</button>" +
         "<div id='duelCreateMessage'></div>" +
         "</div>";
 }
@@ -2406,9 +2826,9 @@ function createDuel() {
     var betAmount = parseInt(document.getElementById("duelBetInput").value) || 0;
     var msg = document.getElementById("duelCreateMessage");
 
-    if (durationMs <= 0) { msg.innerHTML = "<div class='error-message'>הזן משך זמן תקין</div>"; return; }
-    if (!Number.isFinite(betAmount) || betAmount < 0) { msg.innerHTML = "<div class='error-message'>סכום הימור לא תקין</div>"; return; }
-    if (betAmount > 0 && betAmount > cookies) { msg.innerHTML = "<div class='error-message'>אין לך מספיק עוגיות להימור הזה</div>"; return; }
+    if (durationMs <= 0) { msg.innerHTML = "<div class='error-message'>" + t("err_invalid_duration") + "</div>"; return; }
+    if (!Number.isFinite(betAmount) || betAmount < 0) { msg.innerHTML = "<div class='error-message'>" + t("err_invalid_bet") + "</div>"; return; }
+    if (betAmount > 0 && betAmount > cookies) { msg.innerHTML = "<div class='error-message'>" + t("err_not_enough_for_bet") + "</div>"; return; }
 
     var duelId = "duel_" + Date.now();
     var duelData = {
@@ -2426,13 +2846,13 @@ function createDuel() {
     updates["duels/" + duelId] = duelData;
     if (betAmount > 0) updates["users/" + currentUid + "/cookies"] = cookies - betAmount;
 
-    msg.innerHTML = "<div class='info-message'>יוצר קרב...</div>";
+    msg.innerHTML = "<div class='info-message'>" + t("info_creating_duel") + "</div>";
     withTimeout(database.ref().update(updates), 10000).then(function() {
         if (betAmount > 0) { cookies -= betAmount; updateDisplay(); hasUnsavedChanges = true; }
         myCurrentDuelId = duelId;
         renderDuelScreen();
     }).catch(function(e) {
-        msg.innerHTML = "<div class='error-message'>שגיאה: " + (e.message||e.code) + "</div>";
+        msg.innerHTML = "<div class='error-message'>" + t("err_prefix") + " " + (e.message||e.code) + "</div>";
     });
 }
 
@@ -2450,20 +2870,20 @@ function renderDuelJoinList() {
     }
     waiting.sort(function(a,b){ return (b.players?Object.keys(b.players).length:0) - (a.players?Object.keys(a.players).length:0); });
 
-    var html = "<div style='text-align:center; margin-bottom:14px;'><button class='close-button' onclick='renderDuelMenu()'>⬅ חזרה</button></div>";
+    var html = "<div style='text-align:center; margin-bottom:14px;'><button class='close-button' onclick='renderDuelMenu()'>" + t("back_btn") + "</button></div>";
     if (waiting.length === 0) {
-        html += "<p style='color:white; text-align:center; font-size:1.1rem; text-shadow:0 2px 6px rgba(0,0,0,0.4);'>אין קרבות ממתינים כרגע — תיצור אחד!</p>";
+        html += "<p style='color:white; text-align:center; font-size:1.1rem; text-shadow:0 2px 6px rgba(0,0,0,0.4);'>" + t("duel_no_duels_msg") + "</p>";
     } else {
         waiting.forEach(function(d) {
             var count = d.players ? Object.keys(d.players).length : 0;
-            var creatorName = (d.players && d.players[d.createdBy]) ? d.players[d.createdBy].username : "שחקן";
+            var creatorName = (d.players && d.players[d.createdBy]) ? d.players[d.createdBy].username : "?";
             var alreadyIn = d.players && d.players[currentUid];
             html += "<div class='duel-card'>" +
-                "<div style='font-weight:bold; margin-bottom:6px;'>⚔️ קרב מאת " + creatorName + "</div>" +
-                "<div>⏱️ משך: " + formatDurationHebrew(d.durationMs) + "</div>" +
-                "<div>👥 שחקנים: " + count + " / " + d.maxPlayers + "</div>" +
-                "<div>🍪 הימור: " + (d.betAmount > 0 ? (formatNum(d.betAmount) + " עוגיות (הזוכה מקבל " + formatNum(d.betAmount * d.maxPlayers) + ")") : "ללא הימור") + "</div>" +
-                (alreadyIn ? "<div style='color:#27AE60; font-weight:bold; margin-top:8px;'>אתה כבר בקרב הזה</div>" : "<button onclick=\"joinDuel('" + d.id + "')\" style='margin-top:8px;'>הצטרף</button>") +
+                "<div style='font-weight:bold; margin-bottom:6px;'>" + t("duel_card_by") + " " + creatorName + "</div>" +
+                "<div>" + t("duel_card_duration") + " " + formatDurationHebrew(d.durationMs) + "</div>" +
+                "<div>" + t("duel_card_players") + " " + count + " / " + d.maxPlayers + "</div>" +
+                "<div>" + t("duel_card_bet") + " " + (d.betAmount > 0 ? (formatNum(d.betAmount) + " 🍪 " + tFormat("duel_card_winner_gets", {amount: formatNum(d.betAmount * d.maxPlayers)})) : t("duel_card_no_bet")) + "</div>" +
+                (alreadyIn ? "<div style='color:#27AE60; font-weight:bold; margin-top:8px;'>" + t("duel_already_in") + "</div>" : "<button onclick=\"joinDuel('" + d.id + "')\" style='margin-top:8px;'>" + t("duel_join_this_btn") + "</button>") +
                 "</div>";
         });
     }
@@ -2510,19 +2930,19 @@ function renderDuelWaitingRoom(duel) {
             var initial = (p.username || "?").trim().charAt(0).toUpperCase();
             slotsHtml += "<div class='duel-player-slot'><div class='duel-avatar'>" + initial + "</div><div class='duel-slot-name'>" + p.username + (uids[i] === duel.createdBy ? " 👑" : "") + "</div></div>";
         } else {
-            slotsHtml += "<div class='duel-player-slot'><div class='duel-avatar empty'>?</div><div class='duel-slot-name' style='color:#999;'>מחכה...</div></div>";
+            slotsHtml += "<div class='duel-player-slot'><div class='duel-avatar empty'>?</div><div class='duel-slot-name' style='color:#999;'>" + t("duel_waiting_for") + "</div></div>";
         }
         if (i < duel.maxPlayers - 1) slotsHtml += "<div class='duel-vs-label'>VS</div>";
     }
 
     content.innerHTML =
         "<div class='duel-card' style='text-align:center;'>" +
-        "<h3>⏳ ממתין לשחקנים</h3>" +
+        "<h3>" + t("duel_waiting_title") + "</h3>" +
         "<div class='duel-waiting-pill'>👥 <bdi style='unicode-bidi:embed; direction:ltr;'>" + uids.length + " / " + duel.maxPlayers + "</bdi></div>" +
         "<div class='duel-vs-row'>" + slotsHtml + "</div>" +
-        "<div style='color:#555; margin-top:10px;'>⏱️ משך הקרב: <strong>" + formatDurationHebrew(duel.durationMs) + "</strong></div>" +
-        (duel.betAmount > 0 ? "<div style='color:#555;'>🍪 הימור: <strong>" + formatNum(duel.betAmount) + " עוגיות</strong> (הזוכה מקבל " + formatNum(duel.betAmount * duel.maxPlayers) + ")</div>" : "") +
-        "<button class='danger-button' style='margin-top:16px;' onclick=\"" + (isCreator ? ("cancelDuel('" + duel.id + "')") : ("leaveDuel('" + duel.id + "')")) + "\">" + (isCreator ? "בטל קרב" : "עזוב קרב") + "</button>" +
+        "<div style='color:#555; margin-top:10px;'>" + t("duel_card_duration") + " <strong>" + formatDurationHebrew(duel.durationMs) + "</strong></div>" +
+        (duel.betAmount > 0 ? "<div style='color:#555;'>" + t("duel_card_bet") + " <strong>" + formatNum(duel.betAmount) + " 🍪</strong> " + tFormat("duel_card_winner_gets", {amount: formatNum(duel.betAmount * duel.maxPlayers)}) + "</div>" : "") +
+        "<button class='danger-button' style='margin-top:16px;' onclick=\"" + (isCreator ? ("cancelDuel('" + duel.id + "')") : ("leaveDuel('" + duel.id + "')")) + "\">" + (isCreator ? t("duel_cancel_btn") : t("duel_leave_btn")) + "</button>" +
         "</div>";
 
     startDuelWatchdog();
@@ -2605,9 +3025,9 @@ function renderDuelArena(duel) {
         "<div style='text-align:center;'>" +
         "<div class='duel-countdown-pill' id='duelCountdown'></div>" +
         "<div class='duel-arena-target' id='duelArenaTarget'></div>" +
-        "<div class='duel-my-clicks'>הלחיצות שלך: <span id='duelMyClicks'>" + localDuelClickCount + "</span></div>" +
+        "<div class='duel-my-clicks'>" + t("games_my_clicks_label") + " <span id='duelMyClicks'>" + localDuelClickCount + "</span></div>" +
         "</div>" +
-        "<div class='duel-card' id='duelScoreboardCard'><h3 style='margin-top:0;'>🏆 תוצאות חיות</h3><div id='duelScoreboardRows'></div></div>";
+        "<div class='duel-card' id='duelScoreboardCard'><h3 style='margin-top:0;'>" + t("duel_results_title") + "</h3><div id='duelScoreboardRows'></div></div>";
 
     document.getElementById("duelArenaTarget").onclick = function() {
         if (Date.now() >= duel.endTime) return;
@@ -2636,7 +3056,7 @@ function updateDuelScoreboard(duel) {
         var c = players[uid].clicks || 0;
         var pct = Math.max(4, Math.round((c / maxClicks) * 100));
         html += "<div class='duel-score-row" + (isMe ? " is-me" : "") + "'>" +
-            "<div class='duel-score-header'><span>👤 " + players[uid].username + (isMe ? " (אתה)" : "") + "</span><span>" + c + "</span></div>" +
+            "<div class='duel-score-header'><span>👤 " + players[uid].username + (isMe ? " " + t("duel_you_marker") : "") + "</span><span>" + c + "</span></div>" +
             "<div class='duel-score-track'><div class='duel-score-fill' style='width:" + pct + "%;'></div></div>" +
             "</div>";
     });
@@ -2650,11 +3070,11 @@ function startDuelCountdown(duel) {
         if (!el) { clearInterval(duelCountdownInterval); duelCountdownInterval = null; return; }
         var remaining = duel.endTime - Date.now();
         if (remaining <= 0) {
-            el.textContent = "⏱️ הזמן נגמר! מחשב תוצאות...";
+            el.textContent = t("duel_time_up");
             clearInterval(duelCountdownInterval); duelCountdownInterval = null;
             return;
         }
-        el.textContent = "⏱️ " + Math.ceil(remaining / 1000) + " שניות נותרו";
+        el.textContent = tFormat("duel_seconds_left", { num: Math.ceil(remaining / 1000) });
     }
     tick(); // fill in the text immediately, don't wait for the first interval delay
     duelCountdownInterval = setInterval(tick, 250);
@@ -2684,15 +3104,15 @@ function renderDuelFinished(duel) {
     sortedUids.forEach(function(uid, i) {
         var rank = i < 3 ? medals[i] : (i+1) + ".";
         var rankClass = i < 3 ? " rank-" + (i+1) : "";
-        scoresHtml += "<div class='duel-result-row" + rankClass + "'><span>" + rank + " " + players[uid].username + "</span><span>" + (players[uid].clicks||0) + " לחיצות</span></div>";
+        scoresHtml += "<div class='duel-result-row" + rankClass + "'><span>" + rank + " " + players[uid].username + "</span><span>🖱 " + (players[uid].clicks||0) + "</span></div>";
     });
     content.innerHTML =
         "<div class='duel-card' style='text-align:center;'>" +
         "<div class='duel-trophy'>🏆</div>" +
-        "<div class='duel-winner-name'>" + (winner ? winner.username : "לא ידוע") + " ניצח/ה!</div>" +
-        (pool > 0 ? "<div style='font-size:1.15rem; color:#27AE60; font-weight:bold; margin:6px 0 16px 0;'>🍪 זכה ב-" + formatNum(pool) + " עוגיות!</div>" : "<div style='margin-bottom:10px;'></div>") +
+        "<div class='duel-winner-name'>" + tFormat("duel_winner_line", { name: (winner ? winner.username : t("duel_unknown_winner")) }) + "</div>" +
+        (pool > 0 ? "<div style='font-size:1.15rem; color:#27AE60; font-weight:bold; margin:6px 0 16px 0;'>" + tFormat("duel_won_cookies", { amount: formatNum(pool) }) + "</div>" : "<div style='margin-bottom:10px;'></div>") +
         "<div style='text-align:right;'>" + scoresHtml + "</div>" +
-        "<button onclick='leaveDuelResultsScreen()' style='margin-top:16px;'>חזרה לתפריט</button>" +
+        "<button onclick='leaveDuelResultsScreen()' style='margin-top:16px;'>" + t("duel_back_to_menu_btn") + "</button>" +
         "</div>";
     localDuelClickCount = 0;
 }
@@ -2711,7 +3131,7 @@ function normalizeCode(code) {
 }
 
 function openCodesModal() {
-    if (!currentUid) { alert("התחבר קודם"); return; }
+    if (!currentUid) { alert(t("err_login_first")); return; }
     document.getElementById("redeemCodeInput").value = "";
     document.getElementById("redeemCodeMessage").innerHTML = "";
     document.getElementById("codesModal").style.display = "flex";
@@ -2721,14 +3141,14 @@ function redeemCode() {
     var raw = document.getElementById("redeemCodeInput").value;
     var code = normalizeCode(raw);
     var msg = document.getElementById("redeemCodeMessage");
-    if (!code) { msg.innerHTML = "<div class='error-message'>הזן קוד</div>"; return; }
+    if (!code) { msg.innerHTML = "<div class='error-message'>" + t("err_enter_code") + "</div>"; return; }
 
-    msg.innerHTML = "<div class='info-message'>בודק קוד...</div>";
+    msg.innerHTML = "<div class='info-message'>" + t("info_checking_code") + "</div>";
     withTimeout(database.ref("redeemCodes/" + code).once("value"), 10000).then(function(snap) {
-        if (!snap.exists()) { msg.innerHTML = "<div class='error-message'>הקוד לא קיים</div>"; return; }
+        if (!snap.exists()) { msg.innerHTML = "<div class='error-message'>" + t("err_code_not_found") + "</div>"; return; }
         var data = snap.val();
         if (data.redeemedBy && data.redeemedBy[currentUid]) {
-            msg.innerHTML = "<div class='error-message'>כבר מימשת את הקוד הזה בעבר</div>";
+            msg.innerHTML = "<div class='error-message'>" + t("err_already_redeemed") + "</div>";
             return;
         }
 
@@ -2742,21 +3162,21 @@ function redeemCode() {
                 var newTotal = totalCookiesBaked + amount;
                 return withTimeout(database.ref("users/" + currentUid).update({ cookies: newCookies, totalCookiesBaked: newTotal }), 10000).then(function() {
                     cookies = newCookies; totalCookiesBaked = newTotal; updateDisplay();
-                    msg.innerHTML = "<div class='success-message'>קיבלת " + formatNum(amount) + " עוגיות! 🎁</div>";
+                    msg.innerHTML = "<div class='success-message'>" + tFormat("success_redeemed_cookies", {amount: formatNum(amount)}) + "</div>";
                 });
             } else if (data.rewardType === "title") {
                 var titleText = data.titleText || "";
                 return withTimeout(database.ref("users/" + currentUid + "/title").set(titleText), 10000).then(function() {
                     if (usersCache[currentUid]) usersCache[currentUid].title = titleText;
-                    msg.innerHTML = "<div class='success-message'>קיבלת את התואר '" + titleText + "'! 🏅</div>";
+                    msg.innerHTML = "<div class='success-message'>" + tFormat("success_redeemed_title", {title: titleText}) + "</div>";
                 });
             } else {
-                msg.innerHTML = "<div class='error-message'>סוג מתנה לא מוכר בקוד הזה</div>";
+                msg.innerHTML = "<div class='error-message'>" + t("err_unknown_reward_type") + "</div>";
             }
         });
     }).catch(function(e) {
         console.log(e);
-        msg.innerHTML = "<div class='error-message'>שגיאה: " + (e.message||e.code) + "</div>";
+        msg.innerHTML = "<div class='error-message'>" + t("err_prefix") + " " + (e.message||e.code) + "</div>";
     });
 }
 
@@ -2793,7 +3213,7 @@ function createRedeemCode() {
         var titleType = document.getElementById("codeTitleTypeSelect").value;
         var customText = document.getElementById("codeTitleCustomTextInput").value.trim();
         var titleText = titleType === "champion" ? "🏆 אלוף העולם" : customText;
-        if (titleType === "custom" && !customText) { msg.innerHTML = "<div class='error-message'>הזן טקסט לתואר</div>"; return; }
+        if (titleType === "custom" && !customText) { msg.innerHTML = "<div class='error-message'>" + t("err_enter_title_text2") + "</div>"; return; }
         codeData.titleText = titleText;
     }
 
@@ -2802,22 +3222,22 @@ function createRedeemCode() {
         if (existingSnap.exists()) { throw { code: "code-exists" }; }
         return withTimeout(database.ref("redeemCodes/" + code).set(codeData), 10000);
     }).then(function() {
-        msg.innerHTML = "<div class='success-message'>הקוד '" + code + "' נוצר בהצלחה!</div>";
+        msg.innerHTML = "<div class='success-message'>" + tFormat("success_code_created", {code: code}) + "</div>";
         document.getElementById("createCodeTextInput").value = "";
         document.getElementById("codeCookieAmountInput").value = "";
         document.getElementById("codeTitleCustomTextInput").value = "";
         loadAdminCodesList();
     }).catch(function(e) {
-        if (e.code === "code-exists") { msg.innerHTML = "<div class='error-message'>קוד בשם '" + code + "' כבר קיים</div>"; return; }
+        if (e.code === "code-exists") { msg.innerHTML = "<div class='error-message'>" + tFormat("err_code_already_exists", {code: code}) + "</div>"; return; }
         console.log(e);
-        msg.innerHTML = "<div class='error-message'>שגיאה: " + (e.message||e.code) + "</div>";
+        msg.innerHTML = "<div class='error-message'>" + t("err_prefix") + " " + (e.message||e.code) + "</div>";
     });
 }
 
 function loadAdminCodesList() {
     var listDiv = document.getElementById("adminCodesListDiv");
     if (!listDiv) return;
-    listDiv.innerHTML = "<div class='info-message'>טוען...</div>";
+    listDiv.innerHTML = "<div class='info-message'>" + t("info_loading") + "</div>";
     withTimeout(database.ref("redeemCodes").once("value"), 10000).then(function(snap) {
         if (!snap.exists()) { listDiv.innerHTML = "<div style='color:#888;'>אין קודים עדיין</div>"; return; }
         var html = "";
@@ -2833,7 +3253,7 @@ function loadAdminCodesList() {
         });
         listDiv.innerHTML = html;
     }).catch(function(e) {
-        listDiv.innerHTML = "<div class='error-message'>שגיאה: " + (e.message||e.code) + "</div>";
+        listDiv.innerHTML = "<div class='error-message'>" + t("err_prefix") + " " + (e.message||e.code) + "</div>";
     });
 }
 
@@ -2868,7 +3288,7 @@ function renderGamesMenu() {
     var content = document.getElementById("gamesContent");
     content.innerHTML =
         "<div style='text-align:center;'>" +
-        "<button class='games-menu-btn' onclick='showTracksScreen()'>🏁 מסלולים</button>" +
+        "<button class='games-menu-btn' onclick='showTracksScreen()'>" + t("games_tracks_btn") + "</button>" +
         "</div>";
 }
 
@@ -2877,10 +3297,10 @@ function showTracksScreen() {
     var content = document.getElementById("gamesContent");
     content.innerHTML =
         "<div class='games-card'>" +
-        "<h3>🚧 מכשולים</h3>" +
-        "<p style='color:#555; margin-bottom:16px;'>תזוז עם העוגייה שלך בין המכשולים! כל שורה שעוברים = 1B עוגיות. פגיעה אחת והמשחק נגמר.</p>" +
-        "<button onclick='startObstacleGame()'>▶️ התחל משחק</button>" +
-        "<button class='close-button' onclick='renderGamesMenu()'>⬅ חזרה</button>" +
+        "<h3>" + t("games_obstacles_title") + "</h3>" +
+        "<p style='color:#555; margin-bottom:16px;'>" + t("games_obstacles_desc") + "</p>" +
+        "<button onclick='startObstacleGame()'>" + t("games_start_btn") + "</button>" +
+        "<button class='close-button' onclick='renderGamesMenu()'>" + t("back_btn") + "</button>" +
         "</div>";
 }
 
@@ -3096,10 +3516,10 @@ function renderObstacleGameOver(earned, rowsPassed) {
     content.innerHTML =
         "<div class='games-card'>" +
         "<div class='games-over-trophy'>💥</div>" +
-        "<h3>המשחק נגמר</h3>" +
-        "<div class='games-over-stat'>🍪 עוגיות שהרווחת: " + formatNum(earned) + "</div>" +
-        "<div class='games-over-stat'>🏁 שורות שעברת: " + rowsPassed + "</div>" +
-        "<button class='close-button' onclick='renderGamesMenu()'>סגור</button>" +
+        "<h3>" + t("games_over_title") + "</h3>" +
+        "<div class='games-over-stat'>" + t("games_over_cookies_label") + " " + formatNum(earned) + "</div>" +
+        "<div class='games-over-stat'>" + t("games_over_rows_label") + " " + rowsPassed + "</div>" +
+        "<button class='close-button' onclick='renderGamesMenu()'>" + t("close_btn") + "</button>" +
         "</div>";
 }
 
@@ -3164,13 +3584,13 @@ function msFromDuration(prefix) {
 function applyBan(permanent) {
     var msg = document.getElementById("moderationMessage");
     var durationMs = permanent ? 0 : msFromDuration("ban");
-    if (!permanent && durationMs <= 0) { msg.innerHTML = "<div class='error-message'>בחר משך זמן</div>"; return; }
+    if (!permanent && durationMs <= 0) { msg.innerHTML = "<div class='error-message'>" + t("err_choose_duration") + "</div>"; return; }
     var until = permanent ? -1 : (Date.now() + durationMs);
     var data = { username: moderationTargetName, until: until, bannedAt: Date.now(), bannedBy: currentUsername };
     withTimeout(database.ref("moderation/bans/" + moderationTargetUid).set(data), 10000).then(function() {
         msg.innerHTML = "<div class='success-message'>השחקן נחסם" + (permanent ? " לצמיתות" : "") + "!</div>";
         loadModerationLists();
-    }).catch(function(e) { msg.innerHTML = "<div class='error-message'>שגיאה: " + (e.message||e.code) + "</div>"; });
+    }).catch(function(e) { msg.innerHTML = "<div class='error-message'>" + t("err_prefix") + " " + (e.message||e.code) + "</div>"; });
 }
 
 function removeBan() {
@@ -3178,19 +3598,19 @@ function removeBan() {
     withTimeout(database.ref("moderation/bans/" + moderationTargetUid).remove(), 10000).then(function() {
         msg.innerHTML = "<div class='success-message'>החסימה הוסרה!</div>";
         loadModerationLists();
-    }).catch(function(e) { msg.innerHTML = "<div class='error-message'>שגיאה: " + (e.message||e.code) + "</div>"; });
+    }).catch(function(e) { msg.innerHTML = "<div class='error-message'>" + t("err_prefix") + " " + (e.message||e.code) + "</div>"; });
 }
 
 function applyMute(permanent) {
     var msg = document.getElementById("moderationMessage");
     var durationMs = permanent ? 0 : msFromDuration("mute");
-    if (!permanent && durationMs <= 0) { msg.innerHTML = "<div class='error-message'>בחר משך זמן</div>"; return; }
+    if (!permanent && durationMs <= 0) { msg.innerHTML = "<div class='error-message'>" + t("err_choose_duration") + "</div>"; return; }
     var until = permanent ? -1 : (Date.now() + durationMs);
     var data = { username: moderationTargetName, until: until, mutedAt: Date.now(), mutedBy: currentUsername };
     withTimeout(database.ref("moderation/mutes/" + moderationTargetUid).set(data), 10000).then(function() {
         msg.innerHTML = "<div class='success-message'>הצ'אט נחסם" + (permanent ? " לצמיתות" : "") + "!</div>";
         loadModerationLists();
-    }).catch(function(e) { msg.innerHTML = "<div class='error-message'>שגיאה: " + (e.message||e.code) + "</div>"; });
+    }).catch(function(e) { msg.innerHTML = "<div class='error-message'>" + t("err_prefix") + " " + (e.message||e.code) + "</div>"; });
 }
 
 function removeMute() {
@@ -3198,7 +3618,7 @@ function removeMute() {
     withTimeout(database.ref("moderation/mutes/" + moderationTargetUid).remove(), 10000).then(function() {
         msg.innerHTML = "<div class='success-message'>חסימת הצ'אט הוסרה!</div>";
         loadModerationLists();
-    }).catch(function(e) { msg.innerHTML = "<div class='error-message'>שגיאה: " + (e.message||e.code) + "</div>"; });
+    }).catch(function(e) { msg.innerHTML = "<div class='error-message'>" + t("err_prefix") + " " + (e.message||e.code) + "</div>"; });
 }
 
 function sendWarning() {
@@ -3213,14 +3633,14 @@ function sendWarning() {
         msg.innerHTML = "<div class='success-message'>האזהרה נשלחה!</div>";
         document.getElementById("warnTextInput").value = "";
         loadModerationLists();
-    }).catch(function(e) { msg.innerHTML = "<div class='error-message'>שגיאה: " + (e.message||e.code) + "</div>"; });
+    }).catch(function(e) { msg.innerHTML = "<div class='error-message'>" + t("err_prefix") + " " + (e.message||e.code) + "</div>"; });
 }
 
 var adminPlayersListCache = [];
 
 function loadAdminPlayersList() {
     var listDiv = document.getElementById("adminPlayersListDiv");
-    listDiv.innerHTML = "<div class='info-message'>טוען...</div>";
+    listDiv.innerHTML = "<div class='info-message'>" + t("info_loading") + "</div>";
     withTimeout(database.ref("users").once("value"), 15000).then(function(snap) {
         adminPlayersListCache = [];
         if (snap.exists()) {
@@ -3240,7 +3660,7 @@ function loadAdminPlayersList() {
         adminPlayersListCache.sort(function(a,b) { return a.username.localeCompare(b.username, "he"); });
         renderAdminPlayersList(document.getElementById("adminPlayerSearchInput").value.trim());
     }).catch(function(e) {
-        listDiv.innerHTML = "<div class='error-message'>שגיאה: " + (e.message||e.code) + "</div>";
+        listDiv.innerHTML = "<div class='error-message'>" + t("err_prefix") + " " + (e.message||e.code) + "</div>";
     });
 }
 
@@ -3346,11 +3766,11 @@ function login() {
     var loginBtn = document.getElementById("loginBtn");
     var registerBtn = document.getElementById("registerBtn");
 
-    if (!username || !pass) { msg.innerHTML = "<div class='error-message'>הזן שם וסיסמה</div>"; return; }
-    if (!firebaseInit) { msg.innerHTML = "<div class='error-message'>Firebase לא מחובר</div>"; return; }
+    if (!username || !pass) { msg.innerHTML = "<div class='error-message'>" + t("err_enter_user_pass") + "</div>"; return; }
+    if (!firebaseInit) { msg.innerHTML = "<div class='error-message'>" + t("err_firebase_down") + "</div>"; return; }
 
     loginBtn.disabled = true; registerBtn.disabled = true;
-    msg.innerHTML = "<div class='info-message'>מתחבר...</div>";
+    msg.innerHTML = "<div class='info-message'>" + t("login_connecting") + "</div>";
 
     var persistence = remember ? firebase.auth.Auth.Persistence.LOCAL : firebase.auth.Auth.Persistence.SESSION;
 
@@ -3378,11 +3798,11 @@ function login() {
         var code = e.code || e.message;
         if (code === "banned") {
         } else if (code === "auth/user-not-found" || code === "auth/wrong-password" || code === "auth/invalid-credential" || code === "auth/invalid-login-credentials") {
-            msg.innerHTML = "<div class='error-message'>שם משתמש או סיסמה שגויים</div>";
+            msg.innerHTML = "<div class='error-message'>" + t("err_wrong_credentials") + "</div>";
         } else if (code === "timeout") {
-            msg.innerHTML = "<div class='error-message'>אין תגובה מהשרת - נסה שוב</div>";
+            msg.innerHTML = "<div class='error-message'>" + t("err_no_server_response") + "</div>";
         } else {
-            msg.innerHTML = "<div class='error-message'>שגיאה: " + code + "</div>";
+            msg.innerHTML = "<div class='error-message'>" + t("err_prefix") + " " + code + "</div>";
         }
     }).finally(function() {
         loginBtn.disabled = false; registerBtn.disabled = false;
@@ -3397,13 +3817,13 @@ function register() {
     var loginBtn = document.getElementById("loginBtn");
     var registerBtn = document.getElementById("registerBtn");
 
-    if (!username || !pass) { msg.innerHTML = "<div class='error-message'>הזן שם וסיסמה</div>"; return; }
-    if (username.length < 3) { msg.innerHTML = "<div class='error-message'>שם קצר מדי</div>"; return; }
-    if (pass.length < 6) { msg.innerHTML = "<div class='error-message'>סיסמה חייבת 6 תווים לפחות</div>"; return; }
-    if (!firebaseInit) { msg.innerHTML = "<div class='error-message'>Firebase לא מחובר</div>"; return; }
+    if (!username || !pass) { msg.innerHTML = "<div class='error-message'>" + t("err_enter_user_pass") + "</div>"; return; }
+    if (username.length < 3) { msg.innerHTML = "<div class='error-message'>" + t("err_username_short") + "</div>"; return; }
+    if (pass.length < 6) { msg.innerHTML = "<div class='error-message'>" + t("err_password_short") + "</div>"; return; }
+    if (!firebaseInit) { msg.innerHTML = "<div class='error-message'>" + t("err_firebase_down") + "</div>"; return; }
 
     loginBtn.disabled = true; registerBtn.disabled = true;
-    msg.innerHTML = "<div class='info-message'>נרשם...</div>";
+    msg.innerHTML = "<div class='info-message'>" + t("register_registering") + "</div>";
 
     var persistence = remember ? firebase.auth.Auth.Persistence.LOCAL : firebase.auth.Auth.Persistence.SESSION;
     var createdUid = null;
@@ -3425,19 +3845,19 @@ function register() {
         updates["usernames/" + normalizeUsername(username)] = createdUid;
         return withTimeout(database.ref().update(updates), 10000).then(function() { return newUser; });
     }).then(function(newUser) {
-        msg.innerHTML = "<div class='success-message'>נרשמת בהצלחה!</div>";
+        msg.innerHTML = "<div class='success-message'>" + t("register_success") + "</div>";
         finishLogin(createdUid, newUser);
     }).catch(function(e) {
         console.log("Register error:", e);
         var code = e.code || e.message;
         if (code === "auth/email-already-in-use") {
-            msg.innerHTML = "<div class='error-message'>שם המשתמש כבר תפוס</div>";
+            msg.innerHTML = "<div class='error-message'>" + t("err_username_taken") + "</div>";
         } else if (code === "auth/weak-password") {
-            msg.innerHTML = "<div class='error-message'>סיסמה חלשה מדי</div>";
+            msg.innerHTML = "<div class='error-message'>" + t("err_weak_password") + "</div>";
         } else if (code === "timeout") {
-            msg.innerHTML = "<div class='error-message'>אין תגובה מהשרת - נסה שוב</div>";
+            msg.innerHTML = "<div class='error-message'>" + t("err_no_server_response") + "</div>";
         } else {
-            msg.innerHTML = "<div class='error-message'>שגיאה: " + code + "</div>";
+            msg.innerHTML = "<div class='error-message'>" + t("err_prefix") + " " + code + "</div>";
         }
     }).finally(function() {
         loginBtn.disabled = false; registerBtn.disabled = false;
@@ -3560,10 +3980,10 @@ function reauth(currentPassword) {
 function deleteMyAccount() {
     var pass = document.getElementById("deleteAccountPasswordInput").value;
     var msg = document.getElementById("settingsMessage");
-    if (!pass) { msg.innerHTML = "<div class='error-message'>הזן סיסמה לאישור</div>"; return; }
+    if (!pass) { msg.innerHTML = "<div class='error-message'>" + t("err_enter_password_confirm") + "</div>"; return; }
     if (!confirm("בטוח לגמרי? זה ימחק את החשבון וההתקדמות שלך לצמיתות ולא ניתן לבטל!")) return;
 
-    msg.innerHTML = "<div class='info-message'>מוחק חשבון...</div>";
+    msg.innerHTML = "<div class='info-message'>" + t("info_deleting_account") + "</div>";
     var uidToDelete = currentUid;
 
     reauth(pass).then(function() {
@@ -3589,13 +4009,13 @@ function deleteMyAccount() {
     }).catch(function(e) {
         console.log(e);
         var code = e.code || e.message;
-        if (code === "auth/wrong-password" || code === "auth/invalid-credential") msg.innerHTML = "<div class='error-message'>סיסמה שגויה</div>";
-        else msg.innerHTML = "<div class='error-message'>שגיאה: " + code + "</div>";
+        if (code === "auth/wrong-password" || code === "auth/invalid-credential") msg.innerHTML = "<div class='error-message'>" + t("err_wrong_password") + "</div>";
+        else msg.innerHTML = "<div class='error-message'>" + t("err_prefix") + " " + code + "</div>";
     });
 }
 
 function openSettingsModal() {
-    if (!currentUid) { alert("התחבר קודם"); return; }
+    if (!currentUid) { alert(t("err_login_first")); return; }
     document.getElementById("currentUsername").textContent = currentUsername;
     var data = usersCache[currentUid] || {};
     if (data.title) {
@@ -3629,15 +4049,15 @@ function changeUsername() {
     var newName = document.getElementById("newUsernameInput").value.trim();
     var pass = document.getElementById("usernameChangePasswordInput").value;
     var msg = document.getElementById("settingsMessage");
-    if (!newName || newName.length < 3) { msg.innerHTML = "<div class='error-message'>שם לא תקין</div>"; return; }
-    if (!pass) { msg.innerHTML = "<div class='error-message'>הזן את הסיסמה שלך לאימות</div>"; return; }
-    if (newName === currentUsername) { msg.innerHTML = "<div class='error-message'>זה כבר השם שלך</div>"; return; }
+    if (!newName || newName.length < 3) { msg.innerHTML = "<div class='error-message'>" + t("err_invalid_name") + "</div>"; return; }
+    if (!pass) { msg.innerHTML = "<div class='error-message'>" + t("err_enter_password_verify") + "</div>"; return; }
+    if (newName === currentUsername) { msg.innerHTML = "<div class='error-message'>" + t("err_already_your_name") + "</div>"; return; }
 
     var newNorm = normalizeUsername(newName);
     var oldNorm = normalizeUsername(currentUsername);
-    if (!newNorm) { msg.innerHTML = "<div class='error-message'>שם לא תקין</div>"; return; }
+    if (!newNorm) { msg.innerHTML = "<div class='error-message'>" + t("err_invalid_name") + "</div>"; return; }
 
-    msg.innerHTML = "<div class='info-message'>מעדכן...</div>";
+    msg.innerHTML = "<div class='info-message'>" + t("info_updating") + "</div>";
 
     // NOTE: this no longer calls auth.currentUser.updateEmail(). Firebase now requires the new
     // email to be verified before it can be changed (auth/operation-not-allowed), which can
@@ -3667,13 +4087,13 @@ function changeUsername() {
         }
     }).then(function() {
         document.getElementById("currentUsername").textContent = currentUsername;
-        msg.innerHTML = "<div class='success-message'>שונה בהצלחה!</div>";
+        msg.innerHTML = "<div class='success-message'>" + t("success_changed") + "</div>";
     }).catch(function(e) {
         console.log(e);
         var code = e.code || e.message;
-        if (code === "auth/wrong-password" || code === "auth/invalid-credential") msg.innerHTML = "<div class='error-message'>סיסמה שגויה</div>";
-        else if (code === "username-taken") msg.innerHTML = "<div class='error-message'>שם תפוס</div>";
-        else msg.innerHTML = "<div class='error-message'>שגיאה: " + code + "</div>";
+        if (code === "auth/wrong-password" || code === "auth/invalid-credential") msg.innerHTML = "<div class='error-message'>" + t("err_wrong_password") + "</div>";
+        else if (code === "username-taken") msg.innerHTML = "<div class='error-message'>" + t("err_username_taken") + "</div>";
+        else msg.innerHTML = "<div class='error-message'>" + t("err_prefix") + " " + code + "</div>";
     });
 }
 
@@ -3682,36 +4102,36 @@ function changePassword() {
     var np = document.getElementById("newPasswordInput").value;
     var cp = document.getElementById("confirmPasswordInput").value;
     var msg = document.getElementById("settingsMessage");
-    if (!cur || !np || !cp) { msg.innerHTML = "<div class='error-message'>מלא את כל השדות</div>"; return; }
+    if (!cur || !np || !cp) { msg.innerHTML = "<div class='error-message'>" + t("err_fill_all_fields") + "</div>"; return; }
     if (np.length < 6) { msg.innerHTML = "<div class='error-message'>סיסמה חייבת 6 תווים לפחות</div>"; return; }
-    if (np !== cp) { msg.innerHTML = "<div class='error-message'>הסיסמאות לא תואמות</div>"; return; }
+    if (np !== cp) { msg.innerHTML = "<div class='error-message'>" + t("err_passwords_mismatch") + "</div>"; return; }
 
-    msg.innerHTML = "<div class='info-message'>מעדכן...</div>";
+    msg.innerHTML = "<div class='info-message'>" + t("info_updating") + "</div>";
     reauth(cur).then(function() {
         return withTimeout(auth.currentUser.updatePassword(np), 10000);
     }).then(function() {
-        msg.innerHTML = "<div class='success-message'>הסיסמה שונתה!</div>";
+        msg.innerHTML = "<div class='success-message'>" + t("success_password_changed") + "</div>";
         document.getElementById("currentPasswordInput").value = "";
         document.getElementById("newPasswordInput").value = "";
         document.getElementById("confirmPasswordInput").value = "";
     }).catch(function(e) {
         console.log(e);
         var code = e.code || e.message;
-        if (code === "auth/wrong-password" || code === "auth/invalid-credential") msg.innerHTML = "<div class='error-message'>סיסמה נוכחית שגויה</div>";
-        else msg.innerHTML = "<div class='error-message'>שגיאה: " + code + "</div>";
+        if (code === "auth/wrong-password" || code === "auth/invalid-credential") msg.innerHTML = "<div class='error-message'>" + t("err_wrong_current_password") + "</div>";
+        else msg.innerHTML = "<div class='error-message'>" + t("err_prefix") + " " + code + "</div>";
     });
 }
 
 function changeGender() {
     var sel = document.querySelector("input[name='gender']:checked");
     var msg = document.getElementById("settingsMessage");
-    if (!sel) { msg.innerHTML = "<div class='error-message'>בחר מגדר</div>"; return; }
+    if (!sel) { msg.innerHTML = "<div class='error-message'>" + t("err_select_gender") + "</div>"; return; }
     usersCache[currentUid].gender = sel.value;
     withTimeout(database.ref("users/" + currentUid + "/gender").set(sel.value), 10000).then(function() {
         document.getElementById("currentGender").textContent = sel.value === "male" ? "בן" : "בת";
-        msg.innerHTML = "<div class='success-message'>עודכן!</div>";
+        msg.innerHTML = "<div class='success-message'>" + t("success_updated") + "</div>";
     }).catch(function(e) {
-        msg.innerHTML = "<div class='error-message'>שגיאה: " + (e.message||e.code) + "</div>";
+        msg.innerHTML = "<div class='error-message'>" + t("err_prefix") + " " + (e.message||e.code) + "</div>";
     });
 }
 
@@ -3792,7 +4212,7 @@ function verifyAdmin() {
 
     sha256Hex(pass).then(function(hash) {
         if (hash !== ADMIN_PASSWORD_HASH) {
-            msg.innerHTML = "<div class='error-message'>סיסמה שגויה</div>";
+            msg.innerHTML = "<div class='error-message'>" + t("err_wrong_password") + "</div>";
             return;
         }
         if (!isAdminUid) {
@@ -3828,16 +4248,16 @@ function adminAdjustCookies(direction) {
     var rawAmount = document.getElementById("cookieAmountInput").value.replace(/[^0-9]/g, "");
     var amount = Number(rawAmount);
     var msg = document.getElementById("adminMessage");
-    if (!target) { msg.innerHTML = "<div class='error-message'>הזן שם שחקן</div>"; return; }
+    if (!target) { msg.innerHTML = "<div class='error-message'>" + t("err_enter_player_name") + "</div>"; return; }
     // Number.isFinite catches both an empty/garbage amount AND a value so large (e.g. an
     // accidentally-pasted string of dozens of digits) that it overflows to Infinity — Firebase
     // rejects Infinity outright with an opaque console error, so we catch it here first.
-    if (!rawAmount || !Number.isFinite(amount) || amount <= 0) { msg.innerHTML = "<div class='error-message'>כמות לא תקינה</div>"; return; }
+    if (!rawAmount || !Number.isFinite(amount) || amount <= 0) { msg.innerHTML = "<div class='error-message'>" + t("err_invalid_amount") + "</div>"; return; }
 
-    msg.innerHTML = "<div class='info-message'>מחפש שחקן...</div>";
+    msg.innerHTML = "<div class='info-message'>" + t("info_searching_player") + "</div>";
 
     findUserByUsername(target).then(function(found) {
-        if (!found) { msg.innerHTML = "<div class='error-message'>שחקן '" + target + "' לא נמצא</div>"; return; }
+        if (!found) { msg.innerHTML = "<div class='error-message'>" + tFormat("err_player_not_found", {name: target}) + "</div>"; return; }
         var data = found.data;
         var updates = {};
         var newCookies, newTotal;
@@ -3895,7 +4315,7 @@ function adminAdjustCookies(direction) {
         });
     }).catch(function(e) {
         console.log(e);
-        msg.innerHTML = "<div class='error-message'>שגיאה: " + (e.message||e.code) + "</div>";
+        msg.innerHTML = "<div class='error-message'>" + t("err_prefix") + " " + (e.message||e.code) + "</div>";
     });
 }
 
@@ -3904,13 +4324,13 @@ function adminAdjustPrestige(direction) {
     var rawAmount = document.getElementById("prestigeAmountInput").value.replace(/[^0-9]/g, "");
     var amount = Number(rawAmount);
     var msg = document.getElementById("adminPrestigeMessage");
-    if (!target) { msg.innerHTML = "<div class='error-message'>הזן שם שחקן</div>"; return; }
-    if (!rawAmount || !Number.isFinite(amount) || amount <= 0) { msg.innerHTML = "<div class='error-message'>כמות לא תקינה</div>"; return; }
+    if (!target) { msg.innerHTML = "<div class='error-message'>" + t("err_enter_player_name") + "</div>"; return; }
+    if (!rawAmount || !Number.isFinite(amount) || amount <= 0) { msg.innerHTML = "<div class='error-message'>" + t("err_invalid_amount") + "</div>"; return; }
 
-    msg.innerHTML = "<div class='info-message'>מחפש שחקן...</div>";
+    msg.innerHTML = "<div class='info-message'>" + t("info_searching_player") + "</div>";
 
     findUserByUsername(target).then(function(found) {
-        if (!found) { msg.innerHTML = "<div class='error-message'>שחקן '" + target + "' לא נמצא</div>"; return; }
+        if (!found) { msg.innerHTML = "<div class='error-message'>" + tFormat("err_player_not_found", {name: target}) + "</div>"; return; }
         var data = found.data;
         var currentLevel = data.prestigeLevel || 0;
         var newLevel = direction > 0 ? (currentLevel + amount) : Math.max(0, currentLevel - amount);
@@ -3943,20 +4363,20 @@ function adminAdjustPrestige(direction) {
         });
     }).catch(function(e) {
         console.log(e);
-        msg.innerHTML = "<div class='error-message'>שגיאה: " + (e.message||e.code) + "</div>";
+        msg.innerHTML = "<div class='error-message'>" + t("err_prefix") + " " + (e.message||e.code) + "</div>";
     });
 }
 
 function adminDeleteUser() {
     var target = document.getElementById("deleteTargetPlayerInput").value.trim();
     var msg = document.getElementById("adminMessage");
-    if (!target) { msg.innerHTML = "<div class='error-message'>הזן שם שחקן</div>"; return; }
+    if (!target) { msg.innerHTML = "<div class='error-message'>" + t("err_enter_player_name") + "</div>"; return; }
     if (!confirm("בטוח שברצונך למחוק את נתוני המשחק של '" + target + "'? לא ניתן לבטל!")) return;
 
-    msg.innerHTML = "<div class='info-message'>מוחק שחקן...</div>";
+    msg.innerHTML = "<div class='info-message'>" + t("info_deleting_player") + "</div>";
 
     findUserByUsername(target).then(function(found) {
-        if (!found) { msg.innerHTML = "<div class='error-message'>שחקן '" + target + "' לא נמצא</div>"; return; }
+        if (!found) { msg.innerHTML = "<div class='error-message'>" + tFormat("err_player_not_found", {name: target}) + "</div>"; return; }
         var uid = found.uid;
         var data = found.data;
 
@@ -3979,12 +4399,12 @@ function adminDeleteUser() {
         }).then(function() {
             return withTimeout(database.ref("notifications/" + uid).remove(), 10000).catch(function(){});
         }).then(function() {
-            msg.innerHTML = "<div class='success-message'>נתוני '" + target + "' נמחקו בהצלחה!</div>";
+            msg.innerHTML = "<div class='success-message'>" + tFormat("success_player_data_deleted", {name: target}) + "</div>";
             document.getElementById("deleteTargetPlayerInput").value = "";
         });
     }).catch(function(e) {
         console.log(e);
-        msg.innerHTML = "<div class='error-message'>שגיאה: " + (e.message||e.code) + "</div>";
+        msg.innerHTML = "<div class='error-message'>" + t("err_prefix") + " " + (e.message||e.code) + "</div>";
     });
 }
 
@@ -4007,12 +4427,12 @@ function generateClubCode() {
 function joinClub() {
     var code = document.getElementById("clubCodeInput").value.trim();
     var msg = document.getElementById("joinClubMessage");
-    if (!/^\d{4}$/.test(code)) { msg.innerHTML = "<div class='error-message'>קוד לא תקין</div>"; return; }
-    if (currentClub) { msg.innerHTML = "<div class='error-message'>אתה כבר במועדון</div>"; return; }
+    if (!/^\d{4}$/.test(code)) { msg.innerHTML = "<div class='error-message'>" + t("err_invalid_club_code") + "</div>"; return; }
+    if (currentClub) { msg.innerHTML = "<div class='error-message'>" + t("err_already_in_club") + "</div>"; return; }
 
-    msg.innerHTML = "<div class='info-message'>מחפש מועדון...</div>";
+    msg.innerHTML = "<div class='info-message'>" + t("info_searching_club") + "</div>";
     withTimeout(database.ref("clubs/" + code).once("value"), 10000).then(function(snap) {
-        if (!snap.exists()) { msg.innerHTML = "<div class='error-message'>מועדון לא נמצא</div>"; return; }
+        if (!snap.exists()) { msg.innerHTML = "<div class='error-message'>" + t("err_club_not_found") + "</div>"; return; }
         var club = snap.val();
         if (!club.members) club.members = [];
         club.members.push({ uid: currentUid, username: currentUsername, role:"חבר רגיל", joinDate:Date.now() });
@@ -4031,7 +4451,7 @@ function joinClub() {
         return withTimeout(database.ref("clubs/" + code).set(club), 10000).then(function() {
             return withTimeout(database.ref("users/" + currentUid + "/club").set(code), 10000);
         }).then(function() {
-            msg.innerHTML = "<div class='success-message'>הצטרפת בהצלחה!</div>";
+            msg.innerHTML = "<div class='success-message'>" + t("success_joined_club") + "</div>";
             hasUnsavedChanges = true; // force one more fully-current authoritative save right after
             setTimeout(function() { closeModal("joinClubModal"); showClubInfo(); }, 800);
         }).catch(function(e) {
@@ -4043,15 +4463,15 @@ function joinClub() {
         });
     }).catch(function(e) {
         console.log(e);
-        msg.innerHTML = "<div class='error-message'>שגיאה: " + (e.message||e.code) + "</div>";
+        msg.innerHTML = "<div class='error-message'>" + t("err_prefix") + " " + (e.message||e.code) + "</div>";
     });
 }
 
 function createClub() {
     var name = document.getElementById("clubNameInput").value.trim();
     var msg = document.getElementById("createClubMessage");
-    if (!name || name.length < 3) { msg.innerHTML = "<div class='error-message'>שם קצר מדי</div>"; return; }
-    if (currentClub) { msg.innerHTML = "<div class='error-message'>אתה כבר במועדון</div>"; return; }
+    if (!name || name.length < 3) { msg.innerHTML = "<div class='error-message'>" + t("err_username_short") + "</div>"; return; }
+    if (currentClub) { msg.innerHTML = "<div class='error-message'>" + t("err_already_in_club") + "</div>"; return; }
 
     msg.innerHTML = "<div class='info-message'>יוצר...</div>";
     generateClubCode().then(function(code) {
@@ -4069,7 +4489,7 @@ function createClub() {
         return withTimeout(database.ref("clubs/" + code).set(club), 10000).then(function() {
             return withTimeout(database.ref("users/" + currentUid + "/club").set(code), 10000);
         }).then(function() {
-            msg.innerHTML = "<div class='success-message'>נוצר! קוד: " + code + "</div>";
+            msg.innerHTML = "<div class='success-message'>" + t("success_club_created_prefix") + " " + code + "</div>";
             hasUnsavedChanges = true; // force one more fully-current authoritative save right after
             setTimeout(function() { closeModal("createClubModal"); showClubInfo(); }, 1200);
         }).catch(function(e) {
@@ -4081,7 +4501,7 @@ function createClub() {
         });
     }).catch(function(e) {
         console.log(e);
-        msg.innerHTML = "<div class='error-message'>שגיאה: " + (e.message||e.code) + "</div>";
+        msg.innerHTML = "<div class='error-message'>" + t("err_prefix") + " " + (e.message||e.code) + "</div>";
     });
 }
 
@@ -4252,13 +4672,13 @@ document.getElementById("chatInput").addEventListener("keypress", function(e) { 
 
 // ---------- DONATIONS ----------
 function openDonateModal() {
-    if (!currentUid) { alert("התחבר קודם"); return; }
+    if (!currentUid) { alert(t("err_login_first")); return; }
     loadPlayerList();
     document.getElementById("donateModal").style.display = "flex";
 }
 function loadPlayerList() {
     var list = document.getElementById("playerList");
-    list.innerHTML = "<div class='info-message'>טוען...</div>";
+    list.innerHTML = "<div class='info-message'>" + t("info_loading") + "</div>";
     withTimeout(database.ref("users").once("value"), 10000).then(function(snap) {
         list.innerHTML = "";
         if (!snap.exists()) return;
@@ -4275,7 +4695,7 @@ function loadPlayerList() {
             list.appendChild(d);
         });
     }).catch(function(e) {
-        list.innerHTML = "<div class='error-message'>שגיאה: " + (e.message||e.code) + "</div>";
+        list.innerHTML = "<div class='error-message'>" + t("err_prefix") + " " + (e.message||e.code) + "</div>";
     });
 }
 function selectPlayer(uid, uname) {
@@ -4290,11 +4710,11 @@ function confirmDonation() {
     var amount = parseInt(document.getElementById("donationAmountInput").value);
     var msg = document.getElementById("donationMessage");
     var btn = document.getElementById("confirmDonationBtn");
-    if (!amount || !Number.isFinite(amount) || amount <= 0) { msg.innerHTML = "<div class='error-message'>כמות לא תקינה</div>"; return; }
-    if (amount > cookies) { msg.innerHTML = "<div class='error-message'>אין לך מספיק עוגיות</div>"; return; }
+    if (!amount || !Number.isFinite(amount) || amount <= 0) { msg.innerHTML = "<div class='error-message'>" + t("err_invalid_amount") + "</div>"; return; }
+    if (amount > cookies) { msg.innerHTML = "<div class='error-message'>" + t("err_not_enough_cookies") + "</div>"; return; }
 
     btn.disabled = true;
-    msg.innerHTML = "<div class='info-message'>מעביר...</div>";
+    msg.innerHTML = "<div class='info-message'>" + t("info_transferring") + "</div>";
 
     withTimeout(database.ref("users/" + selectedDonationTarget.uid).once("value"), 10000).then(function(snap) {
         if (!snap.exists()) throw new Error("no-target");
@@ -4321,15 +4741,15 @@ function confirmDonation() {
         }), 10000);
     }).then(function() {
         updateDisplay();
-        msg.innerHTML = "<div class='success-message'>נתרם בהצלחה!</div>";
+        msg.innerHTML = "<div class='success-message'>" + t("success_donated") + "</div>";
         setTimeout(function() { closeModal("donationAmountModal"); }, 1200);
     }).catch(function(e) {
         console.log(e);
         var code = e.code || e.message;
         if (code === "corrupted-target") {
-            msg.innerHTML = "<div class='error-message'>נתוני השחקן המקבל פגומים (Infinity/NaN) — אי אפשר לתרום לו כרגע</div>";
+            msg.innerHTML = "<div class='error-message'>" + t("err_corrupted_recipient") + "</div>";
         } else {
-            msg.innerHTML = "<div class='error-message'>שגיאה: " + code + "</div>";
+            msg.innerHTML = "<div class='error-message'>" + t("err_prefix") + " " + code + "</div>";
         }
     }).finally(function() { btn.disabled = false; });
 }
