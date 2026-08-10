@@ -82,7 +82,9 @@ body { font-family:Arial, sans-serif; background:linear-gradient(45deg,#FF6B6B,#
 .duel-result-row.rank-3 { background:linear-gradient(45deg,#CD7F32,#B8732E); color:white; }
 .codes-button { background:linear-gradient(45deg,#8E44AD,#F1C40F); color:white; padding:10px 18px; border:none; border-radius:15px; font-size:0.95rem; font-weight:bold; cursor:pointer; box-shadow:0 5px 15px rgba(142,68,173,0.4); }
 .codes-button:hover { transform:translateY(-2px); }
-.code-item { background:rgba(0,0,0,0.05); padding:10px 14px; margin:6px 0; border-radius:10px; text-align:right; }
+.code-item { background:rgba(0,0,0,0.05); padding:10px 14px; margin:6px 0; border-radius:10px; text-align:right; position:relative; }
+.code-item-menu-btn { position:absolute; top:8px; left:10px; background:none; border:none; font-size:1.2rem; color:#888; cursor:pointer; padding:2px 8px; border-radius:6px; line-height:1; }
+.code-item-menu-btn:hover { background:rgba(0,0,0,0.08); color:#333; }
 .code-item-text { font-weight:bold; color:#2C3E50; font-family:monospace; font-size:1rem; }
 .ai-help-btn { position:fixed; bottom:24px; left:24px; width:60px; height:60px; border-radius:50%; background:linear-gradient(135deg,#8E44AD,#3498DB); color:white; border:none; font-size:1.6rem; cursor:pointer; box-shadow:0 6px 20px rgba(0,0,0,0.4); z-index:4800; display:flex; align-items:center; justify-content:center; transition:transform 0.2s ease; }
 .ai-help-btn:hover { transform:scale(1.08); }
@@ -844,8 +846,11 @@ body { font-family:Arial, sans-serif; background:linear-gradient(45deg,#FF6B6B,#
 
 <div class="modal" id="aiChatViewerModal">
     <div class="modal-content" style="max-width:600px; width:92vw;">
-        <h3 id="aiChatViewerTitle">🤖 צ'אט</h3>
-        <div id="aiChatViewerMessages" class="ai-chat-messages" style="height:60vh; max-height:520px; border-radius:12px; margin-bottom:10px;"></div>
+        <div style="display:flex; justify-content:space-between; align-items:center;">
+            <h3 id="aiChatViewerTitle" style="margin:0;">🤖 צ'אט</h3>
+            <button id="aiChatViewerModBtn" onclick="openModerationModal(aiChatViewerUid, aiChatViewerUsername);" title="אזהרה / חסימה" style="background:none; border:1px solid #ccc; border-radius:8px; padding:4px 10px; font-size:1.1rem; cursor:pointer; color:#555;">⋮</button>
+        </div>
+        <div id="aiChatViewerMessages" class="ai-chat-messages" style="height:60vh; max-height:520px; border-radius:12px; margin-bottom:10px; margin-top:10px;"></div>
         <button class="close-button" onclick="closeModal('aiChatViewerModal')">סגור</button>
     </div>
 </div>
@@ -5934,6 +5939,7 @@ function searchAiChats() {
         var html = "";
         matches.forEach(function(r) {
             html += "<div class='code-item' style='cursor:pointer;' onclick=\"viewFullAiChat('" + r.uid + "')\">" +
+                "<button class='code-item-menu-btn' onclick=\"event.stopPropagation(); openModerationModal('" + r.uid + "', '" + escapeHtml(r.username).replace(/'/g, "\\'") + "');\" title='אזהרה / חסימה'>⋮</button>" +
                 "<div class='code-item-text'>👤 " + r.username + "</div>" +
                 "<div style='font-size:0.85rem; color:#555; margin-top:3px;'>" + r.messageCount + " הודעות" +
                 (r.snippet ? " · \"" + r.snippet.slice(0, 60) + (r.snippet.length > 60 ? "..." : "") + "\"" : "") + "</div>" +
@@ -5945,7 +5951,11 @@ function searchAiChats() {
     });
 }
 
+var aiChatViewerUid = null, aiChatViewerUsername = null;
+
 function viewFullAiChat(uid) {
+    aiChatViewerUid = uid;
+    aiChatViewerUsername = null;
     var titleEl = document.getElementById("aiChatViewerTitle");
     var msgsEl = document.getElementById("aiChatViewerMessages");
     titleEl.textContent = "🤖 טוען...";
@@ -5955,7 +5965,8 @@ function viewFullAiChat(uid) {
     withTimeout(database.ref("aiChats/" + uid).once("value"), 15000).then(function(snap) {
         if (!snap.exists()) { titleEl.textContent = "🤖 צ'אט"; msgsEl.innerHTML = "<div style='color:#888;'>לא נמצא צ'אט</div>"; return; }
         var data = snap.val();
-        titleEl.textContent = "🤖 הצ'אט של " + (data.username || "שחקן");
+        aiChatViewerUsername = data.username || "שחקן";
+        titleEl.textContent = "🤖 הצ'אט של " + aiChatViewerUsername;
         var messagesObj = data.messages || {};
         var entries = Object.keys(messagesObj).map(function(k) { return messagesObj[k]; });
         entries.sort(function(a, b) { return (a.ts || 0) - (b.ts || 0); });
