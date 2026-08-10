@@ -580,6 +580,12 @@ body { font-family:Arial, sans-serif; background:linear-gradient(45deg,#FF6B6B,#
             <button onclick="adminAdjustPrestige(1)">➕ הוסף יוקרה</button>
             <button class="danger-button" onclick="adminAdjustPrestige(-1)">➖ הורד יוקרה</button>
             <div id="adminPrestigeMessage"></div>
+            <h4 style="margin-top:16px;">🎮 מצב צ'יטים במשחקים</h4>
+            <p style="font-size:0.85rem; color:#555; margin-bottom:8px;">חסינות מפגיעה במשחק המסלולים, ומעבר בדלתות בבריחה מהקייטנה בלי קוד. פעיל רק עבורך, כל עוד אתה מחובר כאדמין.</p>
+            <label style="display:flex; align-items:center; gap:8px; cursor:pointer;">
+                <input type="checkbox" id="cheatModeToggle" onchange="toggleCheatMode(this.checked)" style="width:auto; margin:0;">
+                <span>הפעל מצב צ'יטים</span>
+            </label>
         </div>
         <div class="admin-section danger-section" id="adminDeleteSection" style="display:none;">
             <h4>🗑️ מחיקת שחקן</h4>
@@ -1993,7 +1999,10 @@ function stepMovement(dt){
   player.x += moveX*dt;
   player.z += moveZ*dt;
 
-  player.x = Math.min(player.x, maxReachX);
+  var cheatActive = (typeof isCheatModeActive==='function' && isCheatModeActive());
+  if(!cheatActive){
+    player.x = Math.min(player.x, maxReachX);
+  }
   player.x = Math.max(player.x, -1.8);
 
   const room = currentRoom(player.x);
@@ -2780,6 +2789,23 @@ var selectedDonationTarget = null;
 var unlockedAchievements = [];
 var isAdminSession = false;
 var isAdminUid = false;
+var cheatModeEnabled = false;
+(function() {
+    try { cheatModeEnabled = localStorage.getItem("cookieGameCheatMode") === "1"; } catch (e) {}
+})();
+
+// Only benefits an authenticated admin session — flipping the localStorage flag by hand
+// (or it going stale after logging out of the admin panel) does nothing on its own.
+function isCheatModeActive() {
+    return cheatModeEnabled && isAdminSession && isAdminUid;
+}
+
+function toggleCheatMode(enabled) {
+    if (!isAdminSession || !isAdminUid) return;
+    cheatModeEnabled = !!enabled;
+    try { localStorage.setItem("cookieGameCheatMode", cheatModeEnabled ? "1" : "0"); } catch (e) {}
+}
+
 var moderationTargetUid = null, moderationTargetName = null;
 var moderationTargetMsgId = null, moderationTargetMsgText = "";
 var activeEvents = {};
@@ -5062,6 +5088,7 @@ function startDash(){
 
 function takeDamage(){
   if(invuln>0 || player.dashing) return;
+  if(typeof isCheatModeActive==='function' && isCheatModeActive()) return;
   health--;
   invuln = 1.2;
   screenShake = Math.max(screenShake, 20);
@@ -6383,6 +6410,8 @@ function showAdminSections() {
     document.getElementById("competitionsAdminSection").style.display = "block";
     document.getElementById("playersListSection").style.display = "block";
     document.getElementById("codesAdminSection").style.display = "block";
+    var cheatToggle = document.getElementById("cheatModeToggle");
+    if (cheatToggle) cheatToggle.checked = !!cheatModeEnabled;
     loadModerationLists();
     populateMusicSelects();
     renderCompetitionAdminStatus();
