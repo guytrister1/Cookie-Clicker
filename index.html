@@ -84,6 +84,19 @@ body { font-family:Arial, sans-serif; background:linear-gradient(45deg,#FF6B6B,#
 .codes-button:hover { transform:translateY(-2px); }
 .code-item { background:rgba(0,0,0,0.05); padding:10px 14px; margin:6px 0; border-radius:10px; text-align:right; }
 .code-item-text { font-weight:bold; color:#2C3E50; font-family:monospace; font-size:1rem; }
+.ai-help-btn { position:fixed; bottom:24px; left:24px; width:60px; height:60px; border-radius:50%; background:linear-gradient(135deg,#8E44AD,#3498DB); color:white; border:none; font-size:1.6rem; cursor:pointer; box-shadow:0 6px 20px rgba(0,0,0,0.4); z-index:4800; display:flex; align-items:center; justify-content:center; transition:transform 0.2s ease; }
+.ai-help-btn:hover { transform:scale(1.08); }
+.ai-chat-window { position:fixed; bottom:96px; left:24px; width:360px; max-width:90vw; height:480px; max-height:70vh; background:white; border-radius:18px; box-shadow:0 15px 45px rgba(0,0,0,0.4); z-index:4801; display:none; flex-direction:column; overflow:hidden; }
+.ai-chat-header { background:linear-gradient(135deg,#8E44AD,#3498DB); color:white; padding:14px 16px; display:flex; justify-content:space-between; align-items:center; font-weight:bold; }
+.ai-chat-header button { background:rgba(255,255,255,0.2); border:none; color:white; border-radius:8px; width:28px; height:28px; cursor:pointer; font-size:1rem; }
+.ai-chat-messages { flex:1; overflow-y:auto; padding:14px; display:flex; flex-direction:column; gap:10px; background:#f7f7fb; }
+.ai-chat-msg { max-width:82%; padding:9px 13px; border-radius:14px; font-size:0.92rem; line-height:1.4; white-space:pre-wrap; }
+.ai-chat-msg.user { align-self:flex-end; background:#8E44AD; color:white; border-bottom-left-radius:4px; }
+.ai-chat-msg.bot { align-self:flex-start; background:white; color:#2C3E50; border:1px solid #e0e0e6; border-bottom-right-radius:4px; }
+.ai-chat-msg.typing { align-self:flex-start; color:#888; font-style:italic; }
+.ai-chat-input-row { display:flex; gap:8px; padding:12px; border-top:1px solid #eee; background:white; }
+.ai-chat-input-row input { flex:1; border:1px solid #ddd; border-radius:20px; padding:9px 14px; font-size:0.9rem; }
+.ai-chat-input-row button { background:#8E44AD; color:white; border:none; border-radius:20px; padding:9px 16px; cursor:pointer; font-weight:bold; }
 /* ===== Escape Camp game CSS ===== */
 #ekRoot{position:fixed;top:0;left:0;width:100vw;height:100vh;overflow:hidden;background:#000;z-index:6600;
   font-family:'Segoe UI','Arial Hebrew',sans-serif; -webkit-user-select:none; user-select:none;}
@@ -955,6 +968,21 @@ body { font-family:Arial, sans-serif; background:linear-gradient(45deg,#FF6B6B,#
 </div>
 
 <div class="achievement-popup" id="achievementPopup"><div id="achievementText"></div></div>
+
+<button class="ai-help-btn" id="aiHelpBtn" onclick="toggleAiChat()" title="עוזר AI">🤖</button>
+<div class="ai-chat-window" id="aiChatWindow">
+    <div class="ai-chat-header">
+        <span>🤖 עוזר העוגיות</span>
+        <button onclick="toggleAiChat()">✕</button>
+    </div>
+    <div class="ai-chat-messages" id="aiChatMessages">
+        <div class="ai-chat-msg bot">היי! אני כאן לעזור לך עם כל שאלה על המשחק - יוקרה, קרבות, תחרויות, מועדונים, המשחקים הנוספים ועוד. במה אפשר לעזור?</div>
+    </div>
+    <div class="ai-chat-input-row">
+        <input type="text" id="aiChatInput" placeholder="שאל אותי משהו..." onkeydown="if(event.key==='Enter') sendAiChatMessage();">
+        <button onclick="sendAiChatMessage()">שלח</button>
+    </div>
+</div>
 
 <!-- ===== Escape Camp game (20-stage escape room) ===== -->
 <div id="ekRoot" class="cg-hidden">
@@ -5757,6 +5785,71 @@ window.CyberGlitch = {
   }
 };
 })();
+
+// ---------- AI HELP CHAT ----------
+// After deploying the Cloudflare Worker (see worker.js), replace this with your actual Worker URL,
+// e.g. "https://cookie-clicker-ai-help.YOURNAME.workers.dev"
+const AI_HELPER_WORKER_URL = "REPLACE_WITH_YOUR_WORKER_URL";
+
+var aiChatHistory = []; // {role:"user"|"assistant", content:"..."} — sent with each request for context
+var aiChatOpen = false;
+
+function toggleAiChat() {
+    aiChatOpen = !aiChatOpen;
+    document.getElementById("aiChatWindow").style.display = aiChatOpen ? "flex" : "none";
+    if (aiChatOpen) {
+        var input = document.getElementById("aiChatInput");
+        setTimeout(function() { input.focus(); }, 100);
+    }
+}
+
+function appendAiChatMessage(text, cls) {
+    var msgs = document.getElementById("aiChatMessages");
+    var div = document.createElement("div");
+    div.className = "ai-chat-msg " + cls;
+    div.textContent = text;
+    msgs.appendChild(div);
+    msgs.scrollTop = msgs.scrollHeight;
+    return div;
+}
+
+function sendAiChatMessage() {
+    var input = document.getElementById("aiChatInput");
+    var text = input.value.trim();
+    if (!text) return;
+    input.value = "";
+    appendAiChatMessage(text, "user");
+
+    if (!AI_HELPER_WORKER_URL || AI_HELPER_WORKER_URL === "REPLACE_WITH_YOUR_WORKER_URL") {
+        appendAiChatMessage("⚠️ הצ'אט עדיין לא מחובר לשרת. יוצר המשחק צריך להגדיר את כתובת ה-Worker.", "bot");
+        return;
+    }
+
+    var typingEl = appendAiChatMessage("כותב...", "bot typing");
+
+    fetch(AI_HELPER_WORKER_URL, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ message: text, history: aiChatHistory })
+    }).then(function(res) {
+        return res.json();
+    }).then(function(data) {
+        typingEl.remove();
+        if (data.error) {
+            appendAiChatMessage("⚠️ משהו השתבש, נסה שוב.", "bot");
+            console.log("AI chat error:", data);
+            return;
+        }
+        appendAiChatMessage(data.reply || "...", "bot");
+        aiChatHistory.push({ role: "user", content: text });
+        aiChatHistory.push({ role: "assistant", content: data.reply || "" });
+        if (aiChatHistory.length > 20) aiChatHistory = aiChatHistory.slice(-20);
+    }).catch(function(e) {
+        typingEl.remove();
+        appendAiChatMessage("⚠️ לא הצלחתי להתחבר לשרת. נסה שוב מאוחר יותר.", "bot");
+        console.log(e);
+    });
+}
 
 // ---------- MODERATION ----------
 function checkPendingWarnings(uid) {
