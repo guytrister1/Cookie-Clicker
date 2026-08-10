@@ -361,7 +361,7 @@ body { font-family:Arial, sans-serif; background:linear-gradient(45deg,#FF6B6B,#
 .firebase-disconnected { color:#E74C3C; border:2px solid #E74C3C; }
 .achievement-popup { position:fixed; top:20px; right:20px; background:linear-gradient(135deg,#4CAF50,#45a049); color:white; padding:18px 22px; border-radius:15px; box-shadow:0 10px 30px rgba(0,0,0,0.3); transform:translateX(450px); transition:transform 0.6s ease; z-index:3000; min-width:220px; }
 .achievement-popup.show { transform:translateX(0); }
-.golden-cookie-wrap { position:fixed; z-index:9999; }
+.golden-cookie-wrap { position:fixed; z-index:2000; }
 .golden-cookie-ring { position:absolute; top:-8px; left:-8px; width:76px; height:76px; border-radius:50%; background:radial-gradient(circle, rgba(0,0,0,0.55) 0%, rgba(0,0,0,0) 70%); pointer-events:none; }
 .golden-cookie { position:relative; width:60px; height:60px; background:radial-gradient(circle,#FFD700,#FFA500); border-radius:50%; cursor:pointer; animation:goldenFloat 3s ease-in-out infinite; box-shadow:0 0 25px 8px rgba(255,215,0,0.95), 0 0 0 4px #FFFFFF, 0 0 0 7px #FF8C00; border:none; }
 @keyframes goldenFloat { 0%,100%{transform:scale(1);} 50%{transform:scale(1.1);} }
@@ -1135,20 +1135,102 @@ const FACTS = [
   {v:8,t:'רגליים יש לעכביש'},
   {v:9,t:'משבצות יש בלוח איקס-עיגול (3 על 3)'},
 ];
-function buildFactRiddle(digits){
-  return digits.map((d,i)=>'ספרה ה'+ORDINALS[i]+': כמה '+FACTS[d].t+'?').join('\n');
+// Extra known quantities (not necessarily 0-9) used to build multi-step arithmetic riddles
+// for medium/hard stages — combining two or three of these via +/- is what actually makes the
+// riddle require calculation instead of just direct recall.
+const EXTRA_QUANTITIES = [
+  {v:12,t:'חודשים יש בשנה'},
+  {v:14,t:'ימים יש בשבועיים'},
+  {v:10,t:'אצבעות יש בשתי ידיים'},
+  {v:2,t:'גלגלים יש לאופניים'},
+  {v:4,t:'גלגלים יש למכונית רגילה'},
+  {v:4,t:'כנפיים יש לפרפר'},
+  {v:4,t:'עונות יש בשנה'},
+  {v:2,t:'רגליים יש לתרנגולת'},
+  {v:6,t:'רגליים יש לחרק'},
+  {v:3,t:'צבעים ברמזור'},
+  {v:11,t:'שחקנים יש בקבוצת כדורגל אחת'},
+  {v:5,t:'כוכבים יש בדגל אחד (לרוב בציור ילדים)'},
+];
+const ALL_QUANTITIES = FACTS.concat(EXTRA_QUANTITIES);
+
+// Which generic stage indices (3..19) count as easy/medium/hard — riddles genuinely get
+// harder to solve as you progress, not just longer.
+function stageDifficultyTier(i){
+  if(i<=8) return 'easy';
+  if(i<=14) return 'medium';
+  return 'hard';
 }
-const SYMS = ['☀️','🌙','⭐','🍃','❤️'];
-const SYM_DESC = [
+
+function pickCombo(targetDigit, termCount, rng, maxTries){
+  for(let attempt=0; attempt<maxTries; attempt++){
+    const picks = [];
+    for(let k=0;k<termCount;k++) picks.push(ALL_QUANTITIES[randInt(rng, ALL_QUANTITIES.length)]);
+    // try every combination of + and - between the picked terms (first term always positive)
+    const signCount = Math.pow(2, termCount-1);
+    for(let mask=0; mask<signCount; mask++){
+      let total = picks[0].v;
+      const signs = [1];
+      for(let k=1;k<termCount;k++){
+        const sign = (mask>>(k-1))&1 ? -1 : 1;
+        signs.push(sign);
+        total += sign*picks[k].v;
+      }
+      if(total===targetDigit) return {picks, signs};
+    }
+  }
+  return null;
+}
+
+function buildDigitRiddleLine(digit, tier, rng){
+  if(tier==='medium' || tier==='hard'){
+    const termCount = tier==='medium' ? 2 : 3;
+    const combo = pickCombo(digit, termCount, rng, 40);
+    if(combo){
+      let text = 'כמה '+combo.picks[0].t;
+      for(let k=1;k<combo.picks.length;k++){
+        text += combo.signs[k]===1 ? ', ועוד כמה '+combo.picks[k].t : ', פחות כמה '+combo.picks[k].t;
+      }
+      text += '?';
+      return text;
+    }
+  }
+  // easy tier, or fallback if no valid combo was found within the try-budget
+  return 'כמה '+FACTS[digit].t+'?';
+}
+
+function buildFactRiddle(digits, tier){
+  return digits.map((d,i)=>'ספרה ה'+ORDINALS[i]+': '+buildDigitRiddleLine(d, tier||'easy', seededRand(d*104729+i))).join('\n');
+}
+const SYMS = ['☀️','🌙','⭐','🍃','❤️','🔥','💧','🗻'];
+const SYM_DESC_DIRECT = [
   'זורח ביום אחד ומחמם את כולם - בלעדיו לא היה קיץ',
   'מאיר את הלילה ומשנה צורה כל כמה שבועות',
   'נראה בשמי הלילה, מנצנץ ורחוק - אבל הוא לא הירח',
   'ירוק, גדל על עצים ונופל בסתיו',
   'מסמל אהבה, ופועם בגוף שלנו כל הזמן',
+  'חם, מאיר, ומסוכן לגעת בו בלי זהירות',
+  'שקוף, נוזלי, וחיוני לכל יצור חי',
+  'גבוה, קשה, ולפעמים יש עליו שלג בפסגה',
 ];
-function buildSymbolClue(slotIndex, symIdx){
-  return 'אני הסמל ה'+ORDINALS[slotIndex]+' במנעול. אני '+SYM_DESC[symIdx]+'.';
+// Harder tiers get an indirect/riddle-style description instead of a literal one, requiring
+// actual inference rather than simple keyword matching.
+const SYM_DESC_INDIRECT = [
+  'בלעדיי, כל הצמחים היו מתים בלי אור וחום',
+  'בכל לילה אני משנה את הצורה שלי, אבל תמיד חוזר',
+  'אני קטן מכל מה שרואים בשמיים בלילה, אבל יש הרבה כמוני',
+  'בסתיו אני עוזב את הבית שלי ונופל לרצפה',
+  'אי אפשר לראות אותי, אבל כולם מרגישים אותי כשמישהו חשוב להם',
+  'אם תיגע בי בלי זהירות, תיכווה',
+  'בלעדיי, אף אחד לא היה יכול לשתות',
+  'אני לא זז ממקומי, אבל מטפסים עליי כדי להגיע לפסגה',
+];
+function buildSymbolClue(slotIndex, symIdx, tier){
+  const desc = (tier==='hard') ? SYM_DESC_INDIRECT[symIdx] : SYM_DESC_DIRECT[symIdx];
+  return 'אני הסמל ה'+ORDINALS[slotIndex]+' במנעול. '+desc;
 }
+const LEVER_ICONS = ['🔥','💧','🌍','🌪️','⚡','🌙','⭐','🍃'];
+const LEVER_ICON_NAMES = {'🔥':'האש','💧':'המים','🌍':'האדמה','🌪️':'הרוח','⚡':'הברק','🌙':'הירח','⭐':'הכוכב','🍃':'העלה'};
 
 /* deterministic seeded RNG so every stage's riddle/code pair is fixed
    and reproducible (not truly random, but varied and consistent) */
@@ -1630,6 +1712,7 @@ function buildGenericStageFixed(i){
   const def = STAGE_DEFS[i];
   const room = rooms[i];
   const rng = seededRand(i*7919+13);
+  const tier = stageDifficultyTier(i);
   const cx = (room.x0+room.x1)/2;
   const st = {solved:false};
   genericStageState[i] = st;
@@ -1667,7 +1750,7 @@ function buildGenericStageFixed(i){
   if(def.type==='keypad'){
     const digits = Array.from({length:def.len}, ()=>randInt(rng,10));
     const code = digits.join('');
-    const riddle = buildFactRiddle(digits);
+    const riddle = buildFactRiddle(digits, tier);
     placeCratesSimple(def.crates, '📦 מצאת פתק בארגז', riddle, 'חידת הדלת ב"'+room.name+'": '+riddle);
     if(doorMesh){
       makeInteractive(doorMesh, 'gdoor'+i, def.finale?'לפתוח את השער':'לפתוח את הדלת (קוד)', ()=>{
@@ -1677,7 +1760,7 @@ function buildGenericStageFixed(i){
   }
   else if(def.type==='dial'){
     const digits = Array.from({length:def.len}, ()=>randInt(rng,10));
-    const riddle = buildFactRiddle(digits);
+    const riddle = buildFactRiddle(digits, tier);
     placeCratesSimple(def.crates, '📦 מצאת פתק בארגז', riddle, 'חידת הכספת ב"'+room.name+'": '+riddle);
     const safeM = box(cx, .9, room.zHalf-1.3, 1.6,1.8,1.2, 0x3a3a3a,{metalness:.4,roughness:.5});
     addCollider(cx, room.zHalf-1.3, 1.1);
@@ -1697,7 +1780,7 @@ function buildGenericStageFixed(i){
   }
   else if(def.type==='symbol'){
     const symIdx = Array.from({length:def.len}, ()=>randInt(rng,SYMS.length));
-    const fullClue = symIdx.map((s,slot)=>buildSymbolClue(slot,s)).join('\n');
+    const fullClue = symIdx.map((s,slot)=>buildSymbolClue(slot,s,tier)).join('\n');
     placeCratesSimple(def.crates, '📦 מצאת פתק בארגז', fullClue+'\n\n(תפצחו בעצמכם איזה סמל כל תיאור מתכוון - הפתרון לא כתוב כאן)', 'חידת הסמלים ב"'+room.name+'": '+fullClue);
     const cabM = box(cx, 1, room.zHalf-1.1, 1.6,2,.7, 0x6b4226);
     addCollider(cx, room.zHalf-1.1, 1.1);
@@ -1718,21 +1801,40 @@ function buildGenericStageFixed(i){
   }
   else if(def.type==='sequence'){
     const N = def.levers;
-    const values = shuffle(Array.from({length:N},(_,k)=>k+1), rng);
-    const correctOrder = values.map((v,idx)=>idx).sort((a,b)=>values[a]-values[b]);
+    const iconPool = shuffle(LEVER_ICONS.slice(), rng).slice(0, N); // lever k shows iconPool[k]
+    const pullOrder = shuffle(Array.from({length:N},(_,k)=>k), rng); // pullOrder[step] = lever index to pull at that step
+
+    let riddleText;
+    if(tier==='hard'){
+      // Relative clues only ("X before Y") — the player has to reconstruct the full order
+      // themselves rather than being told each position directly.
+      const lines = [];
+      for(let s=0;s<N-1;s++){
+        lines.push(LEVER_ICON_NAMES[iconPool[pullOrder[s]]]+' צריך להימשך לפני '+LEVER_ICON_NAMES[iconPool[pullOrder[s+1]]]);
+      }
+      riddleText = lines.join('\n');
+    } else {
+      const lines = [];
+      for(let s=0;s<N;s++){
+        lines.push('במקום ה'+ORDINALS[s]+': הידית עם סמל '+LEVER_ICON_NAMES[iconPool[pullOrder[s]]]);
+      }
+      riddleText = lines.join('\n');
+    }
+    placeCratesSimple(def.crates||3, '📦 מצאת פתק בארגז', riddleText, 'חידת הידיות ב"'+room.name+'": '+riddleText);
+
     let progress = 0;
     const leverMeshes = [];
     const spacing = (room.zHalf*2-1.6)/Math.max(1,N-1);
     for(let k=0;k<N;k++){
       const lz = -room.zHalf+0.8 + (N>1? k*spacing : room.zHalf);
       const post = box(cx, .6, lz, .3,1.2,.3, 0x6b4226);
-      const spr = makeNumberSprite(values[k]);
+      const spr = makeNumberSprite(iconPool[k]);
       spr.position.set(cx, 1.5, lz);
       scene.add(spr);
       leverMeshes.push(post);
       makeInteractive(post, 'glever'+i+'_'+k, 'למשוך את הידית', ()=>{
         if(st.solved){ flashMsg('כבר פתרת את החידה.'); return; }
-        const expected = correctOrder[progress];
+        const expected = pullOrder[progress];
         if(k===expected){
           progress++;
           post.material.color.set(0x3f7d4f);
@@ -1748,7 +1850,9 @@ function buildGenericStageFixed(i){
     }
     const signMesh = box(cx, 2, room.zHalf+0.29, 2.2,1.2,.1, 0x2c3e2c);
     makeInteractive(signMesh, 'gsign'+i, 'לקרוא את השלט', ()=>{
-      showNote('🪧 שלט הוראות', 'משכו את הידיות המסומנות במספרים לפי סדר עולה - מהמספר הכי נמוך למספר הכי גבוה.\n\nאם תטעו בסדר, הרצף יתאפס וצריך להתחיל מחדש.');
+      showNote('🪧 שלט הוראות', tier==='hard'
+        ? 'משכו את הידיות לפי סדר הסמלים. מצאו את הרמזים בארגזים - הם אומרים מה לפני מה, לא את הסדר המלא.'
+        : 'משכו את הידיות לפי סדר הסמלים שמופיע בפתק שמצאתם בארגז.');
     });
     if(doorMesh){
       makeInteractive(doorMesh, 'gdoor'+i, 'לפתוח את הדלת', ()=>{
@@ -6495,6 +6599,21 @@ function openJoinClubModal() { document.getElementById("joinClubModal").style.di
 function openCreateClubModal() { document.getElementById("createClubModal").style.display = "flex"; }
 function closeModal(id) { document.getElementById(id).style.display = "none"; }
 
+// Golden cookies (and the golden_rain event's spawns) should only appear on the main home
+// screen — never while the player is inside a modal like duel, competitions, games, settings,
+// etc. This checks every modal's actual shown/hidden state directly, rather than tracking a
+// separate "current screen" flag that could drift out of sync.
+function isHomeScreenActive() {
+    var modalIds = ["adminModal","clubInfoModal","codesModal","competitionsModal","createClubModal",
+        "debugModal","deleteMessageModal","donateModal","donationAmountModal","duelModal","gamesModal",
+        "joinClubModal","moderationModal","settingsModal","warningPopupModal"];
+    for (var i = 0; i < modalIds.length; i++) {
+        var el = document.getElementById(modalIds[i]);
+        if (el && el.style.display && el.style.display !== "none") return false;
+    }
+    return true;
+}
+
 function generateClubCode() {
     function tryCode(triesLeft) {
         var code = Math.floor(1000 + Math.random()*9000).toString();
@@ -6877,6 +6996,7 @@ function startGameLoops() {
     }, 100);
     setInterval(function() { makeShop(); }, 1000);
     setInterval(function() {
+        if (!isHomeScreenActive()) return;
         if (isEventActive("golden_rain")) {
             if (Math.random() < 0.7) spawnGoldenCookie();
         } else if (Math.random() < 0.02 && cookiesPerSecond > 0) {
