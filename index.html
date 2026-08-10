@@ -1157,9 +1157,10 @@ const ALL_QUANTITIES = FACTS.concat(EXTRA_QUANTITIES);
 // Which generic stage indices (3..19) count as easy/medium/hard — riddles genuinely get
 // harder to solve as you progress, not just longer.
 function stageDifficultyTier(i){
-  if(i<=8) return 'easy';
-  if(i<=14) return 'medium';
-  return 'hard';
+  if(i<=7) return 'easy';
+  if(i<=12) return 'medium';
+  if(i<=16) return 'hard';
+  return 'expert';
 }
 
 function pickCombo(targetDigit, termCount, rng, maxTries){
@@ -1183,9 +1184,9 @@ function pickCombo(targetDigit, termCount, rng, maxTries){
 }
 
 function buildDigitRiddleLine(digit, tier, rng){
-  if(tier==='medium' || tier==='hard'){
-    const termCount = tier==='medium' ? 2 : 3;
-    const combo = pickCombo(digit, termCount, rng, 40);
+  var termCount = tier==='medium' ? 2 : tier==='hard' ? 4 : tier==='expert' ? 5 : 0;
+  if(termCount>0){
+    const combo = pickCombo(digit, termCount, rng, 200);
     if(combo){
       let text = 'כמה '+combo.picks[0].t;
       for(let k=1;k<combo.picks.length;k++){
@@ -1225,8 +1226,21 @@ const SYM_DESC_INDIRECT = [
   'בלעדיי, אף אחד לא היה יכול לשתות',
   'אני לא זז ממקומי, אבל מטפסים עליי כדי להגיע לפסגה',
 ];
+const SYM_DESC_INDIRECT2 = [
+  'אני עגול, צהוב-כתום, ותמיד באותו מקום בשמיים ביום',
+  'לפעמים אני מלא, לפעמים רק חצי, ולפעמים כמעט נעלם',
+  'אני נוצץ, רחוק מאוד, ויש מיליוני כמוני בשמיים',
+  'אני ירוק ברוב השנה, אך משנה צבע כשנהיה קר',
+  'אני נמצא בתוך כל אחד, ופועם בלי הפסקה',
+  'אני יכול לבשל אוכל, אבל גם להרוס בית שלם',
+  'אני יכול להיות קר כקרח או חם כאדים',
+  'לפעמים יש עליי שלג, ולפעמים ירוק שדשא',
+];
 function buildSymbolClue(slotIndex, symIdx, tier){
-  const desc = (tier==='hard') ? SYM_DESC_INDIRECT[symIdx] : SYM_DESC_DIRECT[symIdx];
+  var desc;
+  if(tier==='expert') desc = SYM_DESC_INDIRECT[symIdx]+'. וגם: '+SYM_DESC_INDIRECT2[symIdx];
+  else if(tier==='hard') desc = SYM_DESC_INDIRECT[symIdx];
+  else desc = SYM_DESC_DIRECT[symIdx];
   return 'אני הסמל ה'+ORDINALS[slotIndex]+' במנעול. '+desc;
 }
 const LEVER_ICONS = ['🔥','💧','🌍','🌪️','⚡','🌙','⭐','🍃'];
@@ -1748,7 +1762,7 @@ function buildGenericStageFixed(i){
   }
 
   if(def.type==='keypad'){
-    const digits = Array.from({length:def.len}, ()=>randInt(rng,10));
+    const digits = shuffle(Array.from({length:10},(_,k)=>k), rng).slice(0, def.len); // distinct digits only, so no two positions ever end up with the identical riddle text
     const code = digits.join('');
     const riddle = buildFactRiddle(digits, tier);
     placeCratesSimple(def.crates, '📦 מצאת פתק בארגז', riddle, 'חידת הדלת ב"'+room.name+'": '+riddle);
@@ -1759,7 +1773,7 @@ function buildGenericStageFixed(i){
     }
   }
   else if(def.type==='dial'){
-    const digits = Array.from({length:def.len}, ()=>randInt(rng,10));
+    const digits = shuffle(Array.from({length:10},(_,k)=>k), rng).slice(0, def.len); // distinct digits only, so no two positions ever end up with the identical riddle text
     const riddle = buildFactRiddle(digits, tier);
     placeCratesSimple(def.crates, '📦 מצאת פתק בארגז', riddle, 'חידת הכספת ב"'+room.name+'": '+riddle);
     const safeM = box(cx, .9, room.zHalf-1.3, 1.6,1.8,1.2, 0x3a3a3a,{metalness:.4,roughness:.5});
@@ -1779,7 +1793,7 @@ function buildGenericStageFixed(i){
     }
   }
   else if(def.type==='symbol'){
-    const symIdx = Array.from({length:def.len}, ()=>randInt(rng,SYMS.length));
+    const symIdx = shuffle(Array.from({length:SYMS.length},(_,k)=>k), rng).slice(0, def.len); // distinct symbols only, same reasoning as the digit fix
     const fullClue = symIdx.map((s,slot)=>buildSymbolClue(slot,s,tier)).join('\n');
     placeCratesSimple(def.crates, '📦 מצאת פתק בארגז', fullClue+'\n\n(תפצחו בעצמכם איזה סמל כל תיאור מתכוון - הפתרון לא כתוב כאן)', 'חידת הסמלים ב"'+room.name+'": '+fullClue);
     const cabM = box(cx, 1, room.zHalf-1.1, 1.6,2,.7, 0x6b4226);
@@ -1805,14 +1819,17 @@ function buildGenericStageFixed(i){
     const pullOrder = shuffle(Array.from({length:N},(_,k)=>k), rng); // pullOrder[step] = lever index to pull at that step
 
     let riddleText;
-    if(tier==='hard'){
+    if(tier==='hard' || tier==='expert'){
       // Relative clues only ("X before Y") — the player has to reconstruct the full order
-      // themselves rather than being told each position directly.
+      // themselves rather than being told each position directly. At expert tier the clues
+      // are also presented out of order, so reading top-to-bottom doesn't just hand you the
+      // chain — you have to actually piece it together.
       const lines = [];
       for(let s=0;s<N-1;s++){
         lines.push(LEVER_ICON_NAMES[iconPool[pullOrder[s]]]+' צריך להימשך לפני '+LEVER_ICON_NAMES[iconPool[pullOrder[s+1]]]);
       }
-      riddleText = lines.join('\n');
+      const finalLines = tier==='expert' ? shuffle(lines, rng) : lines;
+      riddleText = finalLines.join('\n');
     } else {
       const lines = [];
       for(let s=0;s<N;s++){
@@ -1850,8 +1867,8 @@ function buildGenericStageFixed(i){
     }
     const signMesh = box(cx, 2, room.zHalf+0.29, 2.2,1.2,.1, 0x2c3e2c);
     makeInteractive(signMesh, 'gsign'+i, 'לקרוא את השלט', ()=>{
-      showNote('🪧 שלט הוראות', tier==='hard'
-        ? 'משכו את הידיות לפי סדר הסמלים. מצאו את הרמזים בארגזים - הם אומרים מה לפני מה, לא את הסדר המלא.'
+      showNote('🪧 שלט הוראות', (tier==='hard' || tier==='expert')
+        ? 'משכו את הידיות לפי סדר הסמלים. מצאו את הרמזים בארגזים - הם אומרים מה לפני מה, לא את הסדר המלא. שימו לב: הרמזים לא בהכרח מסודרים לפי הסדר שבו הם צריכים לשמש אתכם.'
         : 'משכו את הידיות לפי סדר הסמלים שמופיע בפתק שמצאתם בארגז.');
     });
     if(doorMesh){
