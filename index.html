@@ -89,6 +89,12 @@ body { font-family:Arial, sans-serif; background:linear-gradient(45deg,#FF6B6B,#
 .ai-help-btn { position:fixed; bottom:24px; left:24px; width:60px; height:60px; border-radius:50%; background:linear-gradient(135deg,#8E44AD,#3498DB); color:white; border:none; font-size:1.6rem; cursor:pointer; box-shadow:0 6px 20px rgba(0,0,0,0.4); z-index:4800; display:flex; align-items:center; justify-content:center; transition:transform 0.2s ease; }
 .titles-btn { position:fixed; bottom:96px; left:24px; width:60px; height:60px; border-radius:50%; background:linear-gradient(135deg,#F1C40F,#E67E22); color:white; border:none; font-size:1.6rem; cursor:pointer; box-shadow:0 6px 20px rgba(0,0,0,0.4); z-index:4800; display:flex; align-items:center; justify-content:center; transition:transform 0.2s ease; }
 .titles-btn:hover { transform:scale(1.08); }
+.store-btn { background:linear-gradient(45deg,#27AE60,#16A085); color:white; padding:10px 18px; border:none; border-radius:15px; font-size:0.95rem; font-weight:bold; cursor:pointer; box-shadow:0 5px 15px rgba(39,174,96,0.4); }
+.store-btn:hover { transform:translateY(-2px); }
+.store-package-card { background:linear-gradient(135deg,#fffdf5,#fff3d6); border:2px solid #F1C40F; border-radius:16px; padding:16px; margin:10px 0; cursor:pointer; text-align:center; transition:all 0.2s ease; }
+.store-package-card:hover { transform:translateY(-3px); box-shadow:0 8px 20px rgba(241,196,15,0.4); }
+.store-package-amount { font-size:1.3rem; font-weight:bold; color:#8E5B00; }
+.store-package-price { font-size:1.6rem; font-weight:bold; color:#27AE60; margin-top:4px; }
 .title-option { background:rgba(0,0,0,0.05); padding:11px 16px; margin:6px 0; border-radius:10px; text-align:right; cursor:pointer; font-weight:bold; color:#2C3E50; transition:background 0.15s ease; }
 .title-option:hover { background:rgba(0,0,0,0.1); }
 .title-option.selected { background:linear-gradient(45deg,#F1C40F,#E67E22); color:white; }
@@ -423,6 +429,7 @@ body { font-family:Arial, sans-serif; background:linear-gradient(45deg,#FF6B6B,#
     <button class="competition-button" onclick="openCompetitionsModal()" data-i18n="competitions_btn">🏁 תחרויות</button>
     <button class="duel-button" onclick="openDuelModal()" data-i18n="duel_btn">⚔️ קרב</button>
     <button class="codes-button" onclick="openCodesModal()" data-i18n="codes_btn">🎁 קודים</button>
+    <button class="store-btn" onclick="openStoreModal()">🛒 חנות</button>
     <button class="games-button" onclick="openGamesModal()" data-i18n="games_btn">🎮 משחקים</button>
 </div>
 
@@ -780,6 +787,12 @@ body { font-family:Arial, sans-serif; background:linear-gradient(45deg,#FF6B6B,#
             <div id="aiChatSearchMessage"></div>
             <div id="aiChatSearchResults" style="max-height:300px; overflow-y:auto; margin-top:10px;"></div>
         </div>
+        <div class="admin-section" id="storeOrdersAdminSection" style="display:none;">
+            <h4>🛒 הזמנות חנות</h4>
+            <button onclick="loadStoreOrders()">🔄 רענן</button>
+            <div id="storeOrdersMessage"></div>
+            <div id="storeOrdersListDiv" style="max-height:340px; overflow-y:auto; margin-top:10px;"></div>
+        </div>
         <button class="close-button" onclick="closeModal('adminModal')">סגור</button>
         <div id="adminMessage"></div>
     </div>
@@ -1004,6 +1017,25 @@ body { font-family:Arial, sans-serif; background:linear-gradient(45deg,#FF6B6B,#
         <p style="color:#555; margin-bottom:12px;">בחר איזה תואר יוצג לצדך בצ'אט ובכל מקום אחר שמציג את התואר שלך.</p>
         <div id="titlesListDiv" style="max-height:320px; overflow-y:auto;"></div>
         <button class="close-button" onclick="closeModal('titlesModal')">סגור</button>
+    </div>
+</div>
+
+<div class="modal" id="storeModal">
+    <div class="modal-content" style="max-width:420px;">
+        <div id="storePackagesView">
+            <h3>🛒 חנות עוגיות</h3>
+            <p style="color:#555; margin-bottom:12px;">רוצה בונוס עוגיות גדול? בחר חבילה:</p>
+            <div id="storePackagesListDiv"></div>
+            <button class="close-button" onclick="closeModal('storeModal')">סגור</button>
+        </div>
+        <div id="storeOrderFormView" style="display:none;">
+            <h3 id="storeOrderTitle">🛒 הזמנה</h3>
+            <input type="text" id="storeOrderName" placeholder="השם שלך">
+            <input type="tel" id="storeOrderPhone" placeholder="מספר טלפון">
+            <button onclick="submitStoreOrder()">📤 שלח</button>
+            <button class="close-button" onclick="backToStorePackages()">⬅ חזרה</button>
+            <div id="storeOrderMessage"></div>
+        </div>
     </div>
 </div>
 
@@ -5954,6 +5986,106 @@ function escapeHtml(s) {
     return String(s).replace(/[&<>"']/g, function(c) { return {"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]; });
 }
 
+// ---------- STORE ----------
+var STORE_PACKAGES = [
+    { key: "million", label: "מיליון עוגיות", amount: 1000000, price: 2 },
+    { key: "billion", label: "ביליון עוגיות", amount: 1000000000, price: 5 },
+    { key: "trillion", label: "טריליון עוגיות", amount: 1000000000000, price: 10 },
+    { key: "ten_trillion", label: "עשר טריליון עוגיות", amount: 10000000000000, price: 22 }
+];
+var selectedStorePackage = null;
+
+function openStoreModal() {
+    if (!currentUid) { alert(t("err_login_first")); return; }
+    document.getElementById("storeModal").style.display = "flex";
+    document.getElementById("storePackagesView").style.display = "block";
+    document.getElementById("storeOrderFormView").style.display = "none";
+    renderStorePackages();
+}
+
+function renderStorePackages() {
+    var html = "";
+    STORE_PACKAGES.forEach(function(p) {
+        html += "<div class='store-package-card' onclick=\"selectStorePackage('" + p.key + "')\">" +
+            "<div class='store-package-amount'>🍪 " + p.label + "</div>" +
+            "<div class='store-package-price'>" + p.price + " ₪</div>" +
+            "</div>";
+    });
+    document.getElementById("storePackagesListDiv").innerHTML = html;
+}
+
+function selectStorePackage(key) {
+    selectedStorePackage = STORE_PACKAGES.filter(function(p) { return p.key === key; })[0];
+    if (!selectedStorePackage) return;
+    document.getElementById("storeOrderTitle").textContent = "🛒 " + selectedStorePackage.label + " — " + selectedStorePackage.price + " ₪";
+    document.getElementById("storeOrderName").value = currentUsername || "";
+    document.getElementById("storeOrderPhone").value = "";
+    document.getElementById("storeOrderMessage").innerHTML = "";
+    document.getElementById("storePackagesView").style.display = "none";
+    document.getElementById("storeOrderFormView").style.display = "block";
+}
+
+function backToStorePackages() {
+    document.getElementById("storePackagesView").style.display = "block";
+    document.getElementById("storeOrderFormView").style.display = "none";
+}
+
+function submitStoreOrder() {
+    if (!currentUid || !selectedStorePackage) return;
+    var name = document.getElementById("storeOrderName").value.trim();
+    var phone = document.getElementById("storeOrderPhone").value.trim();
+    var msg = document.getElementById("storeOrderMessage");
+    if (!name || !phone) { msg.innerHTML = "<div class='error-message'>מלא שם ומספר טלפון</div>"; return; }
+
+    msg.innerHTML = "<div class='info-message'>שולח...</div>";
+    withTimeout(database.ref("storeOrders").push({
+        packageLabel: selectedStorePackage.label,
+        amount: selectedStorePackage.amount,
+        price: selectedStorePackage.price,
+        buyerName: name,
+        buyerPhone: phone,
+        buyerUsername: currentUsername,
+        buyerUid: currentUid,
+        ts: Date.now()
+    }), 10000).then(function() {
+        msg.innerHTML = "<div class='success-message'>ניסיון 123</div>";
+    }).catch(function(e) {
+        msg.innerHTML = "<div class='error-message'>" + t("err_prefix") + " " + (e.message || e.code) + "</div>";
+    });
+}
+
+// Admin-only: lists every order, newest first. Buyer name/phone stay collapsed until the
+// admin clicks the order (keeps the list scannable, and matches how the AI-chat search
+// results already behave elsewhere in this panel).
+function loadStoreOrders() {
+    var listDiv = document.getElementById("storeOrdersListDiv");
+    if (!listDiv) return;
+    listDiv.innerHTML = "<div class='info-message'>" + t("info_loading") + "</div>";
+    withTimeout(database.ref("storeOrders").once("value"), 15000).then(function(snap) {
+        if (!snap.exists()) { listDiv.innerHTML = "<div style='color:#888;'>אין עדיין הזמנות</div>"; return; }
+        var orders = [];
+        snap.forEach(function(c) { var v = c.val(); v.id = c.key; orders.push(v); });
+        orders.sort(function(a, b) { return (b.ts || 0) - (a.ts || 0); });
+
+        var html = "";
+        orders.forEach(function(o) {
+            var dateStr = new Date(o.ts || 0).toLocaleString("he-IL");
+            html += "<div class='code-item' style='cursor:pointer;' onclick=\"var d=this.querySelector('.order-details'); d.style.display = d.style.display==='none' ? 'block' : 'none';\">" +
+                "<div class='code-item-text'>🍪 " + escapeHtml(o.packageLabel || "") + " — " + (o.price || 0) + " ₪</div>" +
+                "<div style='font-size:0.8rem; color:#888; margin-top:2px;'>" + dateStr + "</div>" +
+                "<div class='order-details' style='display:none; margin-top:8px; padding-top:8px; border-top:1px solid rgba(0,0,0,0.15);'>" +
+                "<div><strong>שם:</strong> " + escapeHtml(o.buyerName || "") + "</div>" +
+                "<div><strong>טלפון:</strong> " + escapeHtml(o.buyerPhone || "") + "</div>" +
+                "<div><strong>שם משתמש באתר:</strong> " + escapeHtml(o.buyerUsername || "") + "</div>" +
+                "</div>" +
+                "</div>";
+        });
+        listDiv.innerHTML = html;
+    }).catch(function(e) {
+        listDiv.innerHTML = "<div class='error-message'>" + t("err_prefix") + " " + (e.message || e.code) + "</div>";
+    });
+}
+
 // Fetches every player's AI chat data once and filters client-side (Realtime Database has no
 // full-text search) — fine at this scale, and keeps the rules simple (admin-only read already
 // enforced server-side regardless of what this function does).
@@ -6708,6 +6840,7 @@ function showAdminSections() {
     document.getElementById("playersListSection").style.display = "block";
     document.getElementById("codesAdminSection").style.display = "block";
     document.getElementById("aiChatsAdminSection").style.display = "block";
+    document.getElementById("storeOrdersAdminSection").style.display = "block";
     var cheatToggle = document.getElementById("cheatModeToggle");
     if (cheatToggle) cheatToggle.checked = !!cheatModeEnabled;
     loadModerationLists();
@@ -6715,6 +6848,7 @@ function showAdminSections() {
     renderCompetitionAdminStatus();
     loadAdminPlayersList();
     loadAdminCodesList();
+    loadStoreOrders();
 }
 
 function openAdminModal() {
@@ -6733,6 +6867,7 @@ function openAdminModal() {
         document.getElementById("playersListSection").style.display = "none";
         document.getElementById("codesAdminSection").style.display = "none";
         document.getElementById("aiChatsAdminSection").style.display = "none";
+        document.getElementById("storeOrdersAdminSection").style.display = "none";
         document.getElementById("adminPasswordInput").value = "";
     }
 }
