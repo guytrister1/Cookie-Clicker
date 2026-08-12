@@ -87,6 +87,11 @@ body { font-family:Arial, sans-serif; background:linear-gradient(45deg,#FF6B6B,#
 .code-item-menu-btn:hover { background:rgba(0,0,0,0.08); color:#333; }
 .code-item-text { font-weight:bold; color:#2C3E50; font-family:monospace; font-size:1rem; }
 .ai-help-btn { position:fixed; bottom:24px; left:24px; width:60px; height:60px; border-radius:50%; background:linear-gradient(135deg,#8E44AD,#3498DB); color:white; border:none; font-size:1.6rem; cursor:pointer; box-shadow:0 6px 20px rgba(0,0,0,0.4); z-index:4800; display:flex; align-items:center; justify-content:center; transition:transform 0.2s ease; }
+.titles-btn { position:fixed; bottom:96px; left:24px; width:60px; height:60px; border-radius:50%; background:linear-gradient(135deg,#F1C40F,#E67E22); color:white; border:none; font-size:1.6rem; cursor:pointer; box-shadow:0 6px 20px rgba(0,0,0,0.4); z-index:4800; display:flex; align-items:center; justify-content:center; transition:transform 0.2s ease; }
+.titles-btn:hover { transform:scale(1.08); }
+.title-option { background:rgba(0,0,0,0.05); padding:11px 16px; margin:6px 0; border-radius:10px; text-align:right; cursor:pointer; font-weight:bold; color:#2C3E50; transition:background 0.15s ease; }
+.title-option:hover { background:rgba(0,0,0,0.1); }
+.title-option.selected { background:linear-gradient(45deg,#F1C40F,#E67E22); color:white; }
 .ai-help-btn:hover { transform:scale(1.08); }
 .ai-chat-window { position:fixed; bottom:96px; left:24px; width:360px; max-width:90vw; height:480px; max-height:70vh; background:white; border-radius:18px; box-shadow:0 15px 45px rgba(0,0,0,0.4); z-index:4801; display:none; flex-direction:column; overflow:hidden; }
 .ai-chat-header { background:linear-gradient(135deg,#8E44AD,#3498DB); color:white; padding:14px 16px; display:flex; justify-content:space-between; align-items:center; font-weight:bold; }
@@ -991,6 +996,17 @@ body { font-family:Arial, sans-serif; background:linear-gradient(45deg,#FF6B6B,#
 <div class="achievement-popup" id="achievementPopup"><div id="achievementText"></div></div>
 
 <button class="ai-help-btn" id="aiHelpBtn" onclick="toggleAiChat()" title="עוזר AI">🤖</button>
+<button class="titles-btn" id="titlesBtn" onclick="openTitlesModal()" title="תארים">🏅</button>
+
+<div class="modal" id="titlesModal">
+    <div class="modal-content">
+        <h3>🏅 בחירת תואר</h3>
+        <p style="color:#555; margin-bottom:12px;">בחר איזה תואר יוצג לצדך בצ'אט ובכל מקום אחר שמציג את התואר שלך.</p>
+        <div id="titlesListDiv" style="max-height:320px; overflow-y:auto;"></div>
+        <button class="close-button" onclick="closeModal('titlesModal')">סגור</button>
+    </div>
+</div>
+
 <div class="ai-chat-window" id="aiChatWindow">
     <div class="ai-chat-header">
         <span>🤖 עוזר העוגיות</span>
@@ -3932,6 +3948,8 @@ function adminGiveTitle() {
             if (found.uid === currentUid && usersCache[currentUid]) {
                 usersCache[currentUid].title = titleText;
             }
+            return withTimeout(database.ref("users/" + found.uid + "/titlesEarned").push(titleText), 10000);
+        }).then(function() {
             msg.innerHTML = "<div class='success-message'>" + tFormat("success_title_given", {title: titleText, name: target}) + "</div>";
             document.getElementById("giveTitleTargetInput").value = "";
             document.getElementById("giveTitleCustomText").value = "";
@@ -4659,6 +4677,8 @@ function redeemCode() {
                 var titleText = data.titleText || "";
                 return withTimeout(database.ref("users/" + currentUid + "/title").set(titleText), 10000).then(function() {
                     if (usersCache[currentUid]) usersCache[currentUid].title = titleText;
+                    return withTimeout(database.ref("users/" + currentUid + "/titlesEarned").push(titleText), 10000);
+                }).then(function() {
                     msg.innerHTML = "<div class='success-message'>" + tFormat("success_redeemed_title", {title: titleText}) + "</div>";
                 });
             } else {
@@ -5881,6 +5901,53 @@ function saveAiChatExchange(userText, botText) {
     withTimeout(database.ref("aiChats/" + currentUid + "/messages").push({
         userText: userText, botText: botText, ts: Date.now()
     }), 10000).catch(function(e) { console.log(e); });
+}
+
+// ---------- TITLES PICKER ----------
+function openTitlesModal() {
+    if (!currentUid) { alert(t("err_login_first")); return; }
+    document.getElementById("titlesModal").style.display = "flex";
+    loadMyTitles();
+}
+
+function loadMyTitles() {
+    var listDiv = document.getElementById("titlesListDiv");
+    listDiv.innerHTML = "<div class='info-message'>" + t("info_loading") + "</div>";
+    withTimeout(database.ref("users/" + currentUid + "/titlesEarned").once("value"), 10000).then(function(snap) {
+        var titles = [];
+        var seen = {};
+        if (snap.exists()) {
+            snap.forEach(function(c) {
+                var val = c.val();
+                if (val && !seen[val]) { seen[val] = true; titles.push(val); }
+            });
+        }
+        // Merge in the currently-active title too, in case it was set before this feature
+        // existed (directly via the old single-title system) and was never pushed into the
+        // earned-titles list — otherwise the player would lose the ability to pick it again.
+        var currentTitle = usersCache[currentUid] && usersCache[currentUid].title;
+        if (currentTitle && !seen[currentTitle]) { seen[currentTitle] = true; titles.push(currentTitle); }
+
+        if (titles.length === 0) {
+            listDiv.innerHTML = "<div style='color:#888; text-align:center; padding:20px;'>עדיין אין לך תארים. אפשר לקבל אותם דרך קודים או מיוצר המשחק.</div>";
+            return;
+        }
+        var html = "<div class='title-option" + (!currentTitle ? " selected" : "") + "' onclick=\"selectMyTitle('')\">— בלי תואר —" + (!currentTitle ? " ✓" : "") + "</div>";
+        titles.forEach(function(tt) {
+            var isSelected = tt === currentTitle;
+            html += "<div class='title-option" + (isSelected ? " selected" : "") + "' onclick=\"selectMyTitle('" + tt.replace(/'/g, "\\'") + "')\">" + escapeHtml(tt) + (isSelected ? " ✓" : "") + "</div>";
+        });
+        listDiv.innerHTML = html;
+    }).catch(function(e) {
+        listDiv.innerHTML = "<div class='error-message'>" + t("err_prefix") + " " + (e.message || e.code) + "</div>";
+    });
+}
+
+function selectMyTitle(titleText) {
+    withTimeout(database.ref("users/" + currentUid + "/title").set(titleText || null), 10000).then(function() {
+        if (usersCache[currentUid]) usersCache[currentUid].title = titleText || undefined;
+        loadMyTitles();
+    }).catch(function(e) { console.log(e); });
 }
 
 function escapeHtml(s) {
