@@ -429,7 +429,7 @@ body { font-family:Arial, sans-serif; background:linear-gradient(45deg,#FF6B6B,#
     <button class="competition-button" onclick="openCompetitionsModal()" data-i18n="competitions_btn">🏁 תחרויות</button>
     <button class="duel-button" onclick="openDuelModal()" data-i18n="duel_btn">⚔️ קרב</button>
     <button class="codes-button" onclick="openCodesModal()" data-i18n="codes_btn">🎁 קודים</button>
-    <button class="store-btn" onclick="openStoreModal()">🛒 חנות</button>
+    <button class="store-btn" onclick="openStoreModal()" data-i18n="store_btn">🛒 חנות</button>
     <button class="games-button" onclick="openGamesModal()" data-i18n="games_btn">🎮 משחקים</button>
 </div>
 
@@ -439,72 +439,72 @@ body { font-family:Arial, sans-serif; background:linear-gradient(45deg,#FF6B6B,#
 
 <div class="modal" id="debugModal">
     <div class="modal-content">
-        <h3>🐛 מצב באגים</h3>
-        <button class="danger-button" onclick="debugForceLeaveClub()">עזוב מועדון</button>
-        <button class="close-button" onclick="closeModal('debugModal')">סגור</button>
+        <h3 data-i18n="debug_mode_title">🐛 מצב באגים</h3>
+        <button class="danger-button" onclick="debugForceLeaveClub()" data-i18n="leave_club_btn">עזוב מועדון</button>
+        <button class="close-button" onclick="closeModal('debugModal')" data-i18n="close_btn">סגור</button>
         <div id="debugMessage"></div>
     </div>
 </div>
 
 <div class="modal" id="deleteMessageModal">
     <div class="modal-content">
-        <h3>🗑️ מחיקת הודעה</h3>
+        <h3 data-i18n="delete_message_title">🗑️ מחיקת הודעה</h3>
         <p style="margin:15px 0;">בטוח שברצונך למחוק את ההודעה הזו?</p>
         <p id="deleteMessagePreview" style="font-size:0.9rem; color:#555; background:rgba(0,0,0,0.05); padding:10px; border-radius:10px; margin-bottom:15px;"></p>
-        <button class="danger-button" onclick="confirmDeleteMessage()">מחק לצמיתות</button>
-        <button class="close-button" onclick="closeModal('deleteMessageModal')">ביטול</button>
+        <button class="danger-button" onclick="confirmDeleteMessage()" data-i18n="delete_permanent_btn">מחק לצמיתות</button>
+        <button class="close-button" onclick="closeModal('deleteMessageModal')" data-i18n="cancel_btn">ביטול</button>
         <div id="deleteMessageStatus"></div>
     </div>
 </div>
 
 <div class="modal" id="joinClubModal">
     <div class="modal-content">
-        <h3>🏆 הצטרפות למועדון</h3>
-        <input type="text" id="clubCodeInput" placeholder="קוד מועדון (4 ספרות)" maxlength="4">
-        <button id="joinClubBtn" onclick="joinClub()">אישור</button>
-        <button class="close-button" onclick="closeModal('joinClubModal')">ביטול</button>
+        <h3 data-i18n="join_club_title">🏆 הצטרפות למועדון</h3>
+        <input type="text" id="clubCodeInput" data-i18n-ph="club_code_ph" data-i18n-ph="club_code_ph" placeholder="קוד מועדון (4 ספרות)" maxlength="4">
+        <button id="joinClubBtn" onclick="joinClub()" data-i18n="confirm_btn">אישור</button>
+        <button class="close-button" onclick="closeModal('joinClubModal')" data-i18n="cancel_btn">ביטול</button>
         <div id="joinClubMessage"></div>
     </div>
 </div>
 
 <div class="modal" id="createClubModal">
     <div class="modal-content">
-        <h3>⭐ יצירת מועדון</h3>
-        <input type="text" id="clubNameInput" placeholder="שם המועדון" maxlength="30">
-        <button id="createClubBtn" onclick="createClub()">צור</button>
-        <button class="close-button" onclick="closeModal('createClubModal')">ביטול</button>
+        <h3 data-i18n="create_club_title">⭐ יצירת מועדון</h3>
+        <input type="text" id="clubNameInput" data-i18n-ph="club_name_ph" data-i18n-ph="club_name_ph" placeholder="שם המועדון" maxlength="30">
+        <button id="createClubBtn" onclick="createClub()" data-i18n="create_btn">צור</button>
+        <button class="close-button" onclick="closeModal('createClubModal')" data-i18n="cancel_btn">ביטול</button>
         <div id="createClubMessage"></div>
     </div>
 </div>
 
 <div class="modal" id="clubInfoModal">
     <div class="modal-content">
-        <h3 id="clubInfoName">🏆 המועדון שלי</h3>
+        <h3 id="clubInfoName" data-i18n="my_club_title">🏆 המועדון שלי</h3>
         <div id="clubInfoCode"></div>
         <div id="clubInfoStats"></div>
-        <div class="member-list"><h4>חברים:</h4><div id="memberList"></div></div>
-        <button onclick="leaveClub()">עזוב מועדון</button>
-        <button class="close-button" onclick="closeModal('clubInfoModal')">סגור</button>
+        <div class="member-list"><h4 data-i18n="members_label">חברים:</h4><div id="memberList"></div></div>
+        <button onclick="leaveClub()" data-i18n="leave_club_btn">עזוב מועדון</button>
+        <button class="close-button" onclick="closeModal('clubInfoModal')" data-i18n="close_btn">סגור</button>
     </div>
 </div>
 
 <div class="modal" id="donateModal">
     <div class="modal-content">
-        <h3>🎁 בחר שחקן לתרומה</h3>
+        <h3 data-i18n="donate_pick_player_title">🎁 בחר שחקן לתרומה</h3>
         <div class="player-list" id="playerList"></div>
-        <button class="close-button" onclick="closeModal('donateModal')">ביטול</button>
+        <button class="close-button" onclick="closeModal('donateModal')" data-i18n="cancel_btn">ביטול</button>
         <div id="donateMessage"></div>
     </div>
 </div>
 
 <div class="modal" id="donationAmountModal">
     <div class="modal-content">
-        <h3>🎁 תרום עוגיות</h3>
+        <h3 data-i18n="donate_title">🎁 תרום עוגיות</h3>
         <p>לשחקן: <strong id="donationTargetPlayer"></strong></p>
         <p>יש לך: <strong id="currentCookiesDisplay"></strong> עוגיות</p>
-        <input type="number" id="donationAmountInput" placeholder="כמות עוגיות" min="1">
-        <button id="confirmDonationBtn" onclick="confirmDonation()">אשר תרומה</button>
-        <button class="close-button" onclick="closeModal('donationAmountModal')">ביטול</button>
+        <input type="number" id="donationAmountInput" data-i18n-ph="cookie_amount_ph" data-i18n-ph="cookie_amount_ph" placeholder="כמות עוגיות" min="1">
+        <button id="confirmDonationBtn" onclick="confirmDonation()" data-i18n="confirm_donation_btn">אשר תרומה</button>
+        <button class="close-button" onclick="closeModal('donationAmountModal')" data-i18n="cancel_btn">ביטול</button>
         <div id="donationMessage"></div>
     </div>
 </div>
@@ -553,61 +553,61 @@ body { font-family:Arial, sans-serif; background:linear-gradient(45deg,#FF6B6B,#
         </div>
         <div class="settings-section">
             <h4 data-i18n="settings_password_header">🔒 סיסמה</h4>
-            <input type="password" id="currentPasswordInput" placeholder="סיסמה נוכחית">
-            <input type="password" id="newPasswordInput" placeholder="סיסמה חדשה">
-            <input type="password" id="confirmPasswordInput" placeholder="אשר סיסמה חדשה">
-            <button id="changePasswordBtn" onclick="changePassword()">שנה סיסמה</button>
+            <input type="password" id="currentPasswordInput" data-i18n-ph="current_password_ph" data-i18n-ph="current_password_ph" placeholder="סיסמה נוכחית">
+            <input type="password" id="newPasswordInput" data-i18n-ph="new_password_ph" data-i18n-ph="new_password_ph" placeholder="סיסמה חדשה">
+            <input type="password" id="confirmPasswordInput" data-i18n-ph="confirm_new_password_ph" data-i18n-ph="confirm_new_password_ph" placeholder="אשר סיסמה חדשה">
+            <button id="changePasswordBtn" onclick="changePassword()" data-i18n="change_password_btn">שנה סיסמה</button>
         </div>
         <div class="settings-section">
-            <h4>👫 מגדר</h4>
+            <h4 data-i18n="gender_section_title">👫 מגדר</h4>
             <div class="current-info">נוכחי: <span id="currentGender">לא נבחר</span></div>
             <div class="gender-selector">
                 <label class="gender-option" id="maleOption"><input type="radio" name="gender" value="male"> 👦 בן</label>
                 <label class="gender-option" id="femaleOption"><input type="radio" name="gender" value="female"> 👧 בת</label>
             </div>
-            <button id="changeGenderBtn" onclick="changeGender()">עדכן מגדר</button>
+            <button id="changeGenderBtn" onclick="changeGender()" data-i18n="update_gender_btn">עדכן מגדר</button>
         </div>
         <div class="settings-section danger-section">
-            <h4>🗑️ מחיקת חשבון</h4>
+            <h4 data-i18n="delete_account_title">🗑️ מחיקת חשבון</h4>
             <p style="font-size:0.85rem; color:#922B21; margin-bottom:10px;">פעולה זו תמחק לצמיתות את החשבון וההתקדמות שלך. לא ניתן לבטל!</p>
-            <input type="password" id="deleteAccountPasswordInput" placeholder="הזן סיסמה לאישור">
-            <button class="danger-button" id="deleteAccountBtn" onclick="deleteMyAccount()">מחק את החשבון שלי לצמיתות</button>
+            <input type="password" id="deleteAccountPasswordInput" data-i18n-ph="confirm_password_field_ph" data-i18n-ph="confirm_password_field_ph" placeholder="הזן סיסמה לאישור">
+            <button class="danger-button" id="deleteAccountBtn" onclick="deleteMyAccount()" data-i18n="delete_my_account_btn">מחק את החשבון שלי לצמיתות</button>
         </div>
-        <button class="close-button" onclick="doLogout()">🚪 התנתק</button>
-        <button class="close-button" onclick="closeModal('settingsModal')">סגור</button>
+        <button class="close-button" onclick="doLogout()" data-i18n="logout_btn">🚪 התנתק</button>
+        <button class="close-button" onclick="closeModal('settingsModal')" data-i18n="close_btn">סגור</button>
         <div id="settingsMessage"></div>
     </div>
 </div>
 
 <div class="modal" id="adminModal">
     <div class="modal-content">
-        <button class="sticky-close-btn" onclick="closeModal('adminModal')">✕ סגור</button>
-        <h3 style="clear:both;">👑 מסך יוצר המשחק</h3>
+        <button class="sticky-close-btn" onclick="closeModal('adminModal')">✕ <span data-i18n="close_btn">סגור</span></button>
+        <h3 style="clear:both;" data-i18n="creator_screen_title">👑 מסך יוצר המשחק</h3>
         <div class="admin-warning">⚠️ אזור מוגבל ליוצרים בלבד ⚠️</div>
         <div class="admin-section" id="adminAuthSection">
-            <h4>🔐 אימות</h4>
-            <input type="password" id="adminPasswordInput" placeholder="סיסמת יוצר">
-            <button id="verifyAdminBtn" onclick="verifyAdmin()">אמת גישה</button>
+            <h4 data-i18n="auth_section_title">🔐 אימות</h4>
+            <input type="password" id="adminPasswordInput" data-i18n-ph="creator_password_ph" data-i18n-ph="creator_password_ph" placeholder="סיסמת יוצר">
+            <button id="verifyAdminBtn" onclick="verifyAdmin()" data-i18n="verify_access_btn">אמת גישה</button>
         </div>
         <div class="admin-section" id="adminBroadcastSection" style="display:none;">
-            <h4>📢 הודעה לכל השחקנים</h4>
+            <h4 data-i18n="broadcast_section_title">📢 הודעה לכל השחקנים</h4>
             <textarea id="broadcastTextInput" placeholder="תוכן ההודעה שתופיע לכולם למעלה במסך" maxlength="200"></textarea>
-            <button onclick="sendBroadcast()">שלח לכולם</button>
-            <button class="danger-button" onclick="clearBroadcast()">נקה הודעה מכולם</button>
+            <button onclick="sendBroadcast()" data-i18n="send_to_all_btn">שלח לכולם</button>
+            <button class="danger-button" onclick="clearBroadcast()" data-i18n="clear_message_all_btn">נקה הודעה מכולם</button>
         </div>
         <div class="admin-section" id="adminActionsSection" style="display:none;">
-            <h4>💰 העברת עוגיות</h4>
-            <input type="text" id="targetPlayerInput" placeholder="שם השחקן">
-           <input type="text" inputmode="numeric" pattern="[0-9]*" id="cookieAmountInput" placeholder="כמות עוגיות">
-            <button id="adminTransferBtn" onclick="adminAdjustCookies(1)">➕ הוסף עוגיות</button>
-            <button class="danger-button" id="adminRemoveCookiesBtn" onclick="adminAdjustCookies(-1)">➖ הורד עוגיות</button>
-            <h4 style="margin-top:16px;">⭐ מתן/הורדת יוקרה</h4>
-            <input type="text" id="prestigeTargetPlayerInput" placeholder="שם השחקן">
-            <input type="text" inputmode="numeric" pattern="[0-9]*" id="prestigeAmountInput" placeholder="כמות רמות יוקרה">
-            <button onclick="adminAdjustPrestige(1)">➕ הוסף יוקרה</button>
-            <button class="danger-button" onclick="adminAdjustPrestige(-1)">➖ הורד יוקרה</button>
+            <h4 data-i18n="transfer_cookies_title">💰 העברת עוגיות</h4>
+            <input type="text" id="targetPlayerInput" data-i18n-ph="player_name_ph" data-i18n-ph="player_name_ph" placeholder="שם השחקן">
+           <input type="text" inputmode="numeric" pattern="[0-9]*" id="cookieAmountInput" data-i18n-ph="cookie_amount_ph" data-i18n-ph="cookie_amount_ph" placeholder="כמות עוגיות">
+            <button id="adminTransferBtn" onclick="adminAdjustCookies(1)" data-i18n="add_cookies_btn">➕ הוסף עוגיות</button>
+            <button class="danger-button" id="adminRemoveCookiesBtn" onclick="adminAdjustCookies(-1)" data-i18n="remove_cookies_btn">➖ הורד עוגיות</button>
+            <h4 style="margin-top:16px;" data-i18n="give_remove_prestige_title">⭐ מתן/הורדת יוקרה</h4>
+            <input type="text" id="prestigeTargetPlayerInput" data-i18n-ph="player_name_ph" data-i18n-ph="player_name_ph" placeholder="שם השחקן">
+            <input type="text" inputmode="numeric" pattern="[0-9]*" id="prestigeAmountInput" data-i18n-ph="prestige_amount_ph" data-i18n-ph="prestige_amount_ph" placeholder="כמות רמות יוקרה">
+            <button onclick="adminAdjustPrestige(1)" data-i18n="add_prestige_btn">➕ הוסף יוקרה</button>
+            <button class="danger-button" onclick="adminAdjustPrestige(-1)" data-i18n="remove_prestige_btn">➖ הורד יוקרה</button>
             <div id="adminPrestigeMessage"></div>
-            <h4 style="margin-top:16px;">🎮 מצב צ'יטים במשחקים</h4>
+            <h4 style="margin-top:16px;" data-i18n="cheat_mode_title">🎮 מצב צ'יטים במשחקים</h4>
             <p style="font-size:0.85rem; color:#555; margin-bottom:8px;">חסינות מפגיעה במשחק המסלולים, ומעבר בדלתות בבריחה מהקייטנה בלי קוד. פעיל רק עבורך, כל עוד אתה מחובר כאדמין.</p>
             <label style="display:flex; align-items:center; gap:8px; cursor:pointer;">
                 <input type="checkbox" id="cheatModeToggle" onchange="toggleCheatMode(this.checked)" style="width:auto; margin:0;">
@@ -615,82 +615,82 @@ body { font-family:Arial, sans-serif; background:linear-gradient(45deg,#FF6B6B,#
             </label>
         </div>
         <div class="admin-section danger-section" id="adminDeleteSection" style="display:none;">
-            <h4>🗑️ מחיקת שחקן</h4>
+            <h4 data-i18n="delete_player_title">🗑️ מחיקת שחקן</h4>
             <p style="font-size:0.85rem; color:#922B21; margin-bottom:10px;">מוחק את נתוני המשחק של השחקן. לא ניתן לבטל!</p>
-            <input type="text" id="deleteTargetPlayerInput" placeholder="שם השחקן למחיקה">
-            <button class="danger-button" id="adminDeleteBtn" onclick="adminDeleteUser()">מחק שחקן</button>
+            <input type="text" id="deleteTargetPlayerInput" data-i18n-ph="player_name_delete_ph" data-i18n-ph="player_name_delete_ph" placeholder="שם השחקן למחיקה">
+            <button class="danger-button" id="adminDeleteBtn" onclick="adminDeleteUser()" data-i18n="delete_player_btn">מחק שחקן</button>
         </div>
         <div class="admin-section" id="playersListSection" style="display:none;">
-            <h4>📋 רשימת שחקנים</h4>
-            <input type="text" id="adminPlayerSearchInput" placeholder="חפש שחקן לפי שם..." oninput="filterAdminPlayersList()">
-            <button onclick="loadAdminPlayersList()">🔄 רענן רשימה</button>
+            <h4 data-i18n="players_list_title">📋 רשימת שחקנים</h4>
+            <input type="text" id="adminPlayerSearchInput" data-i18n-ph="search_player_ph" data-i18n-ph="search_player_ph" placeholder="חפש שחקן לפי שם..." oninput="filterAdminPlayersList()">
+            <button onclick="loadAdminPlayersList()" data-i18n="refresh_list_btn">🔄 רענן רשימה</button>
             <div id="adminPlayersListDiv" style="max-height:320px; overflow-y:auto; margin-top:10px;"></div>
         </div>
         <div class="admin-section" id="moderationListsSection" style="display:none;">
-            <h4>📋 ניהול קהילה</h4>
-            <button onclick="loadModerationLists()">🔄 רענן רשימות</button>
+            <h4 data-i18n="community_mgmt_title">📋 ניהול קהילה</h4>
+            <button onclick="loadModerationLists()" data-i18n="refresh_lists_btn">🔄 רענן רשימות</button>
             <div style="text-align:right; margin-top:12px;"><strong>🚫 באנים פעילים:</strong><div id="bansListDiv" style="margin-top:6px;"></div></div>
             <div style="text-align:right; margin-top:12px;"><strong>🔇 חסימות צ'אט פעילות:</strong><div id="mutesListDiv" style="margin-top:6px;"></div></div>
             <div style="text-align:right; margin-top:12px;"><strong>⚠️ שחקנים עם אזהרות:</strong><div id="warningsListDiv" style="margin-top:6px;"></div></div>
         </div>
         <div class="admin-section" id="eventsSection" style="display:none;">
-            <h4>🎉 ניהול אירועים (ניתן להפעיל כמה ביחד)</h4>
+            <h4 data-i18n="events_mgmt_title">🎉 ניהול אירועים (ניתן להפעיל כמה ביחד)</h4>
             <div style="text-align:right; margin-bottom:10px;"><strong>אירועים פעילים כרגע:</strong></div>
             <div id="currentEventsStatus" style="margin-bottom:15px;"></div>
 
             <div style="margin-bottom:15px; text-align:right;">
     <strong>🌟 גשם עוגיות זהב</strong>
-    <input type="number" id="rainDurationInput" placeholder="משך בדקות" min="1" value="10">
-    <input type="number" id="rainBonusInput" placeholder="בונוס קבוע לכל עוגיית זהב" min="1" value="1000000000">
+    <input type="number" id="rainDurationInput" data-i18n-ph="duration_minutes_ph" data-i18n-ph="duration_minutes_ph" placeholder="משך בדקות" min="1" value="10">
+    <input type="number" id="rainBonusInput" data-i18n-ph="golden_bonus_ph" data-i18n-ph="golden_bonus_ph" placeholder="בונוס קבוע לכל עוגיית זהב" min="1" value="1000000000">
     <select id="rainMusicSelect"></select>
-    <button onclick="startRainEvent()">הפעל</button>
-    <button class="danger-button" onclick="endEvent('golden_rain')">עצור</button>
+    <button onclick="startRainEvent()" data-i18n="start_btn2">הפעל</button>
+    <button class="danger-button" onclick="endEvent('golden_rain')" data-i18n="stop_btn2">עצור</button>
 </div>
 
             <div style="margin-bottom:15px; text-align:right;">
                 <strong>⚡ כפל ייצור (בונוס קבוע לבניינים שנקנים בזמן האירוע)</strong>
-                <input type="number" id="cpsDurationInput" placeholder="משך בדקות" min="1" value="10">
+                <input type="number" id="cpsDurationInput" data-i18n-ph="duration_minutes_ph" data-i18n-ph="duration_minutes_ph" placeholder="משך בדקות" min="1" value="10">
                 <select id="cpsMultiplierSelect"><option value="2">x2</option><option value="3">x3</option></select>
                 <select id="cpsMusicSelect"></select>
-                <button onclick="startCpsEvent()">הפעל</button>
-                <button class="danger-button" onclick="endEvent('double_cps')">עצור</button>
+                <button onclick="startCpsEvent()" data-i18n="start_btn2">הפעל</button>
+                <button class="danger-button" onclick="endEvent('double_cps')" data-i18n="stop_btn2">עצור</button>
             </div>
 
             <div style="margin-bottom:15px; text-align:right;">
                 <strong>💰 הנחת חנות</strong>
-                <input type="number" id="discountDurationInput" placeholder="משך בדקות" min="1" value="10">
-                <input type="number" id="discountPercentInput" placeholder="אחוז הנחה" min="1" max="90" value="30">
+                <input type="number" id="discountDurationInput" data-i18n-ph="duration_minutes_ph" data-i18n-ph="duration_minutes_ph" placeholder="משך בדקות" min="1" value="10">
+                <input type="number" id="discountPercentInput" data-i18n-ph="discount_percent_ph" data-i18n-ph="discount_percent_ph" placeholder="אחוז הנחה" min="1" max="90" value="30">
                 <select id="discountMusicSelect"></select>
-                <button onclick="startDiscountEvent()">הפעל</button>
-                <button class="danger-button" onclick="endEvent('shop_discount')">עצור</button>
+                <button onclick="startDiscountEvent()" data-i18n="start_btn2">הפעל</button>
+                <button class="danger-button" onclick="endEvent('shop_discount')" data-i18n="stop_btn2">עצור</button>
             </div>
 
            <div style="margin-bottom:15px; text-align:right;">
     <strong>👆 כפל כוח לחיצה (בונוס קבוע לשדרוגים שנקנים בזמן האירוע)</strong>
-    <input type="number" id="clickDurationInput" placeholder="משך בדקות" min="1" value="10">
+    <input type="number" id="clickDurationInput" data-i18n-ph="duration_minutes_ph" data-i18n-ph="duration_minutes_ph" placeholder="משך בדקות" min="1" value="10">
     <select id="clickMultiplierSelect"><option value="2">x2</option><option value="3">x3</option></select>
     <select id="clickMusicSelect"></select>
-    <button onclick="startClickEvent()">הפעל</button>
-    <button class="danger-button" onclick="endEvent('double_click')">עצור</button>
+    <button onclick="startClickEvent()" data-i18n="start_btn2">הפעל</button>
+    <button class="danger-button" onclick="endEvent('double_click')" data-i18n="stop_btn2">עצור</button>
 </div>
 
-            <button class="danger-button" onclick="endAllEvents()">⏹️ עצור את כל האירועים</button>
+            <button class="danger-button" onclick="endAllEvents()" data-i18n="stop_all_events_btn">⏹️ עצור את כל האירועים</button>
 
             <div class="settings-section" style="margin-top:20px;">
-                <h4>🎁 עוגיות לכל השחקנים</h4>
-                <input type="number" id="giftAllAmountInput" placeholder="כמות עוגיות לכל שחקן" min="1">
-                <button onclick="adjustAllPlayersCookies(1)">➕ הוסף לכולם</button>
-                <button class="danger-button" onclick="adjustAllPlayersCookies(-1)">➖ הורד מכולם</button>
+                <h4 data-i18n="cookies_for_all_title">🎁 עוגיות לכל השחקנים</h4>
+                <input type="number" id="giftAllAmountInput" data-i18n-ph="cookies_per_player_ph" data-i18n-ph="cookies_per_player_ph" placeholder="כמות עוגיות לכל שחקן" min="1">
+                <button onclick="adjustAllPlayersCookies(1)" data-i18n="add_to_all_btn">➕ הוסף לכולם</button>
+                <button class="danger-button" onclick="adjustAllPlayersCookies(-1)" data-i18n="remove_from_all_btn">➖ הורד מכולם</button>
             </div>
 
             <div id="eventsMessage"></div>
         </div>
         <div class="admin-section" id="competitionsAdminSection" style="display:none;">
-            <h4>🏁 ניהול תחרויות</h4>
+            <h4 data-i18n="competitions_mgmt_title">🏁 ניהול תחרויות</h4>
             <div id="currentCompetitionStatus" style="margin-bottom:12px; text-align:right;"></div>
             <div style="text-align:right; margin-bottom:10px;">
                 <strong>📛 שם התחרות</strong>
-                <input type="text" id="competitionNameInput" placeholder="למשל: תחרות אביב 2026" maxlength="40">
+                <input type="text" id="competitionNameInput" data-i18n-ph="competition_name_example_ph" data-i18n-ph="competition_name_example_ph" placeholder="למשל: תחרות אביב 2026" maxlength="40">
             </div>
             <div style="text-align:right; margin-bottom:10px;">
                 <strong>משתתפים:</strong>
@@ -720,39 +720,39 @@ body { font-family:Arial, sans-serif; background:linear-gradient(45deg,#FF6B6B,#
                         <option value="champion">🏆 אלוף העולם</option>
                         <option value="custom">✏️ תואר מותאם אישית</option>
                     </select>
-                    <input type="text" id="competitionBadgeCustomText" placeholder="הקלד את התואר" maxlength="30" style="display:none; margin-top:6px;">
+                    <input type="text" id="competitionBadgeCustomText" data-i18n-ph="enter_title_ph" data-i18n-ph="enter_title_ph" placeholder="הקלד את התואר" maxlength="30" style="display:none; margin-top:6px;">
                 </div>
             </div>
             <div style="text-align:right; margin-bottom:6px;"><strong>⏱️ משך התחרות</strong></div>
             <div style="display:flex; gap:5px;">
-                <input type="number" id="competitionDaysInput" placeholder="ימים" min="0" style="width:25%;">
-                <input type="number" id="competitionHoursInput" placeholder="שעות" min="0" style="width:25%;">
-                <input type="number" id="competitionMinutesInput" placeholder="דקות" min="0" style="width:25%;">
-                <input type="number" id="competitionSecondsInput" placeholder="שניות" min="0" style="width:25%;">
+                <input type="number" id="competitionDaysInput" data-i18n-ph="days_ph" data-i18n-ph="days_ph" placeholder="ימים" min="0" style="width:25%;">
+                <input type="number" id="competitionHoursInput" data-i18n-ph="hours_ph" data-i18n-ph="hours_ph" placeholder="שעות" min="0" style="width:25%;">
+                <input type="number" id="competitionMinutesInput" data-i18n-ph="mins_ph" data-i18n-ph="mins_ph" placeholder="דקות" min="0" style="width:25%;">
+                <input type="number" id="competitionSecondsInput" data-i18n-ph="secs_ph" data-i18n-ph="secs_ph" placeholder="שניות" min="0" style="width:25%;">
             </div>
-            <button onclick="startCompetition()">🏁 הפעל תחרות חדשה</button>
+            <button onclick="startCompetition()" data-i18n="start_new_competition_btn">🏁 הפעל תחרות חדשה</button>
             <div style="text-align:right; margin-top:14px; padding-top:12px; border-top:1px solid rgba(0,0,0,0.15);">
                 <strong>🏅 מתן תואר לשחקן (ללא קשר לתחרות)</strong>
-                <input type="text" id="giveTitleTargetInput" placeholder="שם השחקן">
+                <input type="text" id="giveTitleTargetInput" data-i18n-ph="player_name_ph" data-i18n-ph="player_name_ph" placeholder="שם השחקן">
                 <select id="giveTitleTypeSelect" onchange="toggleGiveTitleCustomText()">
                     <option value="champion">🏆 אלוף העולם</option>
                     <option value="custom">✏️ תואר מותאם אישית</option>
                 </select>
-                <input type="text" id="giveTitleCustomText" placeholder="הקלד את התואר" maxlength="30" style="display:none;">
-                <button onclick="adminGiveTitle()">תן תואר</button>
+                <input type="text" id="giveTitleCustomText" data-i18n-ph="enter_title_ph" data-i18n-ph="enter_title_ph" placeholder="הקלד את התואר" maxlength="30" style="display:none;">
+                <button onclick="adminGiveTitle()" data-i18n="give_title_btn">תן תואר</button>
             </div>
             <div style="text-align:right; margin-top:14px; padding-top:12px; border-top:1px solid rgba(0,0,0,0.15);">
                 <strong>🗑️ הסרת תואר משחקן</strong>
-                <input type="text" id="removeTitleTargetInput" placeholder="שם השחקן">
-                <button class="danger-button" onclick="adminRemoveTitle()">מחק תואר</button>
+                <input type="text" id="removeTitleTargetInput" data-i18n-ph="player_name_ph" data-i18n-ph="player_name_ph" placeholder="שם השחקן">
+                <button class="danger-button" onclick="adminRemoveTitle()" data-i18n="remove_title_btn">מחק תואר</button>
             </div>
             <div id="competitionsAdminMessage"></div>
         </div>
         <div class="admin-section" id="codesAdminSection" style="display:none;">
-            <h4>🎁 ניהול קודים</h4>
+            <h4 data-i18n="codes_mgmt_title">🎁 ניהול קודים</h4>
             <div style="text-align:right; margin-bottom:10px;">
                 <strong>📛 טקסט הקוד</strong>
-                <input type="text" id="createCodeTextInput" placeholder="למשל: WELCOME2026" maxlength="30" style="text-transform:uppercase;">
+                <input type="text" id="createCodeTextInput" data-i18n-ph="code_example_ph" data-i18n-ph="code_example_ph" placeholder="למשל: WELCOME2026" maxlength="30" style="text-transform:uppercase;">
             </div>
             <div style="text-align:right; margin-bottom:10px;">
                 <strong>🎁 סוג המתנה</strong>
@@ -762,92 +762,92 @@ body { font-family:Arial, sans-serif; background:linear-gradient(45deg,#FF6B6B,#
                 </select>
             </div>
             <div id="codeCookiesRewardSection">
-                <input type="number" id="codeCookieAmountInput" placeholder="כמות עוגיות" min="1">
+                <input type="number" id="codeCookieAmountInput" data-i18n-ph="cookie_amount_ph" data-i18n-ph="cookie_amount_ph" placeholder="כמות עוגיות" min="1">
             </div>
             <div id="codeTitleRewardSection" style="display:none;">
                 <select id="codeTitleTypeSelect" onchange="toggleCodeTitleCustomText()">
                     <option value="champion">🏆 אלוף העולם</option>
                     <option value="custom">✏️ תואר מותאם אישית</option>
                 </select>
-                <input type="text" id="codeTitleCustomTextInput" placeholder="הקלד את התואר" maxlength="30" style="display:none; margin-top:6px;">
+                <input type="text" id="codeTitleCustomTextInput" data-i18n-ph="enter_title_ph" data-i18n-ph="enter_title_ph" placeholder="הקלד את התואר" maxlength="30" style="display:none; margin-top:6px;">
             </div>
-            <button onclick="createRedeemCode()">🎁 צור קוד</button>
+            <button onclick="createRedeemCode()" data-i18n="create_code_btn">🎁 צור קוד</button>
             <div id="codesAdminMessage"></div>
             <div style="text-align:right; margin-top:14px; padding-top:12px; border-top:1px solid rgba(0,0,0,0.15);">
                 <strong>📋 קודים קיימים</strong>
-                <button onclick="loadAdminCodesList()" style="margin-right:8px;">🔄 רענן</button>
+                <button onclick="loadAdminCodesList()" style="margin-right:8px;" data-i18n="refresh_btn">🔄 רענן</button>
                 <div id="adminCodesListDiv" style="max-height:260px; overflow-y:auto; margin-top:10px;"></div>
             </div>
         </div>
         <div class="admin-section" id="aiChatsAdminSection" style="display:none;">
-            <h4>🤖 צ'אטים עם ה-AI</h4>
-            <input type="text" id="aiChatSearchUsername" placeholder="חפש לפי שם משתמש">
-            <input type="text" id="aiChatSearchText" placeholder="חפש לפי תוכן הודעה">
-            <button onclick="searchAiChats()">🔍 חפש</button>
+            <h4 data-i18n="ai_chats_admin_title">🤖 צ'אטים עם ה-AI</h4>
+            <input type="text" id="aiChatSearchUsername" data-i18n-ph="ai_search_username_ph" placeholder="חפש לפי שם משתמש">
+            <input type="text" id="aiChatSearchText" data-i18n-ph="ai_search_text_ph" placeholder="חפש לפי תוכן הודעה">
+            <button onclick="searchAiChats()" data-i18n="search_btn">🔍 חפש</button>
             <div id="aiChatSearchMessage"></div>
             <div id="aiChatSearchResults" style="max-height:300px; overflow-y:auto; margin-top:10px;"></div>
         </div>
         <div class="admin-section" id="storeOrdersAdminSection" style="display:none;">
-            <h4>🛒 הזמנות חנות</h4>
-            <button onclick="loadStoreOrders()">🔄 רענן</button>
+            <h4 data-i18n="store_orders_admin_title">🛒 הזמנות חנות</h4>
+            <button onclick="loadStoreOrders()" data-i18n="refresh_btn">🔄 רענן</button>
             <div id="storeOrdersMessage"></div>
             <div id="storeOrdersListDiv" style="max-height:340px; overflow-y:auto; margin-top:10px;"></div>
         </div>
-        <button class="close-button" onclick="closeModal('adminModal')">סגור</button>
+        <button class="close-button" onclick="closeModal('adminModal')" data-i18n="close_btn">סגור</button>
         <div id="adminMessage"></div>
     </div>
 </div>
 
 <div class="modal" id="moderationModal">
     <div class="modal-content">
-        <h3>🛡️ פעולת מנהל</h3>
+        <h3 data-i18n="mod_action_title">🛡️ פעולת מנהל</h3>
         <div class="current-info">שחקן: <span id="modTargetName"></span></div>
 
         <div class="admin-section danger-section">
-            <h4>🚫 חסימת כניסה למשחק (באן)</h4>
+            <h4 data-i18n="ban_section_title">🚫 חסימת כניסה למשחק (באן)</h4>
             <div style="display:flex; gap:5px;">
-                <input type="number" id="banDaysInput" placeholder="ימים" min="0" style="width:33%;">
-                <input type="number" id="banHoursInput" placeholder="שעות" min="0" style="width:33%;">
-                <input type="number" id="banMinutesInput" placeholder="דקות" min="0" style="width:33%;">
+                <input type="number" id="banDaysInput" data-i18n-ph="days_ph" data-i18n-ph="days_ph" placeholder="ימים" min="0" style="width:33%;">
+                <input type="number" id="banHoursInput" data-i18n-ph="hours_ph" data-i18n-ph="hours_ph" placeholder="שעות" min="0" style="width:33%;">
+                <input type="number" id="banMinutesInput" data-i18n-ph="mins_ph" data-i18n-ph="mins_ph" placeholder="דקות" min="0" style="width:33%;">
             </div>
-            <button class="danger-button" onclick="applyBan(false)">חסום לזמן שנבחר</button>
-            <button class="danger-button" onclick="applyBan(true)">חסום לצמיתות</button>
-            <button onclick="removeBan()">הסר חסימה</button>
+            <button class="danger-button" onclick="applyBan(false)" data-i18n="ban_for_duration_btn">חסום לזמן שנבחר</button>
+            <button class="danger-button" onclick="applyBan(true)" data-i18n="ban_permanent_btn">חסום לצמיתות</button>
+            <button onclick="removeBan()" data-i18n="remove_ban_btn">הסר חסימה</button>
         </div>
 
         <div class="admin-section danger-section">
-            <h4>🔇 חסימת צ'אט (Mute)</h4>
+            <h4 data-i18n="mute_section_title">🔇 חסימת צ'אט (Mute)</h4>
             <div style="display:flex; gap:5px;">
-                <input type="number" id="muteDaysInput" placeholder="ימים" min="0" style="width:33%;">
-                <input type="number" id="muteHoursInput" placeholder="שעות" min="0" style="width:33%;">
-                <input type="number" id="muteMinutesInput" placeholder="דקות" min="0" style="width:33%;">
+                <input type="number" id="muteDaysInput" data-i18n-ph="days_ph" data-i18n-ph="days_ph" placeholder="ימים" min="0" style="width:33%;">
+                <input type="number" id="muteHoursInput" data-i18n-ph="hours_ph" data-i18n-ph="hours_ph" placeholder="שעות" min="0" style="width:33%;">
+                <input type="number" id="muteMinutesInput" data-i18n-ph="mins_ph" data-i18n-ph="mins_ph" placeholder="דקות" min="0" style="width:33%;">
             </div>
-            <button class="danger-button" onclick="applyMute(false)">חסום צ'אט לזמן שנבחר</button>
-            <button class="danger-button" onclick="applyMute(true)">חסום צ'אט לצמיתות</button>
-            <button onclick="removeMute()">הסר חסימת צ'אט</button>
+            <button class="danger-button" onclick="applyMute(false)" data-i18n="mute_chat_duration_btn">חסום צ'אט לזמן שנבחר</button>
+            <button class="danger-button" onclick="applyMute(true)" data-i18n="mute_chat_permanent_btn">חסום צ'אט לצמיתות</button>
+            <button onclick="removeMute()" data-i18n="remove_mute_btn">הסר חסימת צ'אט</button>
         </div>
 
         <div class="admin-section">
-            <h4>⚠️ שליחת אזהרה</h4>
-            <input type="text" id="warnTextInput" placeholder="תוכן האזהרה">
-            <button class="danger-button" onclick="sendWarning()">שלח אזהרה</button>
+            <h4 data-i18n="warning_section_title">⚠️ שליחת אזהרה</h4>
+            <input type="text" id="warnTextInput" data-i18n-ph="warning_content_ph" data-i18n-ph="warning_content_ph" placeholder="תוכן האזהרה">
+            <button class="danger-button" onclick="sendWarning()" data-i18n="send_warning_btn">שלח אזהרה</button>
         </div>
 
         <div class="admin-section danger-section" id="moderationDeleteMsgSection" style="display:none;">
-            <h4>🗑️ מחיקת ההודעה שנבחרה</h4>
-            <button class="danger-button" onclick="deleteMessageFromModeration()">מחק את ההודעה הזו</button>
+            <h4 data-i18n="delete_selected_msg_title">🗑️ מחיקת ההודעה שנבחרה</h4>
+            <button class="danger-button" onclick="deleteMessageFromModeration()" data-i18n="delete_this_message_btn">מחק את ההודעה הזו</button>
         </div>
 
-        <button class="close-button" onclick="closeModal('moderationModal')">סגור</button>
+        <button class="close-button" onclick="closeModal('moderationModal')" data-i18n="close_btn">סגור</button>
         <div id="moderationMessage"></div>
     </div>
 </div>
 
 <div class="modal" id="warningPopupModal">
     <div class="modal-content">
-        <h3>⚠️ אזהרה!</h3>
+        <h3 data-i18n="warning_modal_title">⚠️ אזהרה!</h3>
         <div id="warningPopupText" style="font-size:1.1rem; color:#C0392B; font-weight:bold; margin:15px 0;"></div>
-        <button class="close-button" onclick="closeModal('warningPopupModal')">הבנתי</button>
+        <button class="close-button" onclick="closeModal('warningPopupModal')" data-i18n="understood_btn">הבנתי</button>
     </div>
 </div>
 
@@ -865,11 +865,11 @@ body { font-family:Arial, sans-serif; background:linear-gradient(45deg,#FF6B6B,#
 <div class="modal" id="aiChatViewerModal">
     <div class="modal-content" style="max-width:600px; width:92vw;">
         <div style="display:flex; justify-content:space-between; align-items:center;">
-            <h3 id="aiChatViewerTitle" style="margin:0;">🤖 צ'אט</h3>
+            <h3 id="aiChatViewerTitle" style="margin:0;" data-i18n="ai_chat_title_default">🤖 צ'אט</h3>
             <button id="aiChatViewerModBtn" onclick="openModerationModal(aiChatViewerUid, aiChatViewerUsername);" title="אזהרה / חסימה" style="background:none; border:1px solid #ccc; border-radius:8px; padding:4px 10px; font-size:1.1rem; cursor:pointer; color:#555;">⋮</button>
         </div>
         <div id="aiChatViewerMessages" class="ai-chat-messages" style="height:60vh; max-height:520px; border-radius:12px; margin-bottom:10px; margin-top:10px;"></div>
-        <button class="close-button" onclick="closeModal('aiChatViewerModal')">סגור</button>
+        <button class="close-button" onclick="closeModal('aiChatViewerModal')" data-i18n="close_btn">סגור</button>
     </div>
 </div>
 
@@ -981,8 +981,8 @@ body { font-family:Arial, sans-serif; background:linear-gradient(45deg,#FF6B6B,#
     </div>
     <div class="chat-messages" id="chatMessages"></div>
     <div class="chat-input-container">
-        <input type="text" class="chat-input" id="chatInput" placeholder="הקלד הודעה..." maxlength="200">
-        <button class="chat-send-btn" onclick="sendMessage()">שלח</button>
+        <input type="text" class="chat-input" id="chatInput" data-i18n-ph="global_chat_input_ph" data-i18n-ph="global_chat_input_ph" placeholder="הקלד הודעה..." maxlength="200">
+        <button class="chat-send-btn" onclick="sendMessage()" data-i18n="send_btn">שלח</button>
     </div>
 </div>
 
@@ -1013,27 +1013,27 @@ body { font-family:Arial, sans-serif; background:linear-gradient(45deg,#FF6B6B,#
 
 <div class="modal" id="titlesModal">
     <div class="modal-content">
-        <h3>🏅 בחירת תואר</h3>
+        <h3 data-i18n="titles_modal_title">🏅 בחירת תואר</h3>
         <p style="color:#555; margin-bottom:12px;">בחר איזה תואר יוצג לצדך בצ'אט ובכל מקום אחר שמציג את התואר שלך.</p>
         <div id="titlesListDiv" style="max-height:320px; overflow-y:auto;"></div>
-        <button class="close-button" onclick="closeModal('titlesModal')">סגור</button>
+        <button class="close-button" onclick="closeModal('titlesModal')" data-i18n="close_btn">סגור</button>
     </div>
 </div>
 
 <div class="modal" id="storeModal">
     <div class="modal-content" style="max-width:420px;">
         <div id="storePackagesView">
-            <h3>🛒 חנות עוגיות</h3>
+            <h3 data-i18n="store_modal_title">🛒 חנות עוגיות</h3>
             <p style="color:#555; margin-bottom:12px;">רוצה בונוס עוגיות גדול? בחר חבילה:</p>
             <div id="storePackagesListDiv"></div>
-            <button class="close-button" onclick="closeModal('storeModal')">סגור</button>
+            <button class="close-button" onclick="closeModal('storeModal')" data-i18n="close_btn">סגור</button>
         </div>
         <div id="storeOrderFormView" style="display:none;">
-            <h3 id="storeOrderTitle">🛒 הזמנה</h3>
-            <input type="text" id="storeOrderName" placeholder="השם שלך">
-            <input type="tel" id="storeOrderPhone" placeholder="מספר טלפון">
-            <button onclick="submitStoreOrder()">📤 שלח</button>
-            <button class="close-button" onclick="backToStorePackages()">⬅ חזרה</button>
+            <h3 id="storeOrderTitle" data-i18n="store_order_title_prefix">🛒 הזמנה</h3>
+            <input type="text" id="storeOrderName" data-i18n-ph="store_order_name_ph" data-i18n-ph="store_order_name_ph" placeholder="השם שלך">
+            <input type="tel" id="storeOrderPhone" data-i18n-ph="store_order_phone_ph" data-i18n-ph="store_order_phone_ph" placeholder="מספר טלפון">
+            <button onclick="submitStoreOrder()" data-i18n="store_send_btn">📤 שלח</button>
+            <button class="close-button" onclick="backToStorePackages()" data-i18n="back_btn">⬅ חזרה</button>
             <div id="storeOrderMessage"></div>
         </div>
     </div>
@@ -1048,8 +1048,8 @@ body { font-family:Arial, sans-serif; background:linear-gradient(45deg,#FF6B6B,#
         <div class="ai-chat-msg bot">היי! אני כאן לעזור לך עם כל שאלה על המשחק - יוקרה, קרבות, תחרויות, מועדונים, המשחקים הנוספים ועוד. במה אפשר לעזור?</div>
     </div>
     <div class="ai-chat-input-row">
-        <input type="text" id="aiChatInput" placeholder="שאל אותי משהו..." onkeydown="if(event.key==='Enter') sendAiChatMessage();">
-        <button onclick="sendAiChatMessage()">שלח</button>
+        <input type="text" id="aiChatInput" data-i18n-ph="ai_chat_input_ph" data-i18n-ph="ai_chat_input_ph" placeholder="שאל אותי משהו..." onkeydown="if(event.key==='Enter') sendAiChatMessage();">
+        <button onclick="sendAiChatMessage()" data-i18n="send_btn">שלח</button>
     </div>
 </div>
 
@@ -1103,7 +1103,7 @@ body { font-family:Arial, sans-serif; background:linear-gradient(45deg,#FF6B6B,#
   <div class="panel">
     <h2 id="noteTitle">📝 רמז</h2>
     <p id="noteBody" style="text-align:right;"></p>
-    <div class="row"><button class="btn small" id="noteClose">הבנתי</button></div>
+    <div class="row"><button class="btn small" id="noteClose" data-i18n="understood_btn">הבנתי</button></div>
   </div>
 </div>
 
@@ -1115,8 +1115,8 @@ body { font-family:Arial, sans-serif; background:linear-gradient(45deg,#FF6B6B,#
     <div class="keypadGrid" id="keypadGrid"></div>
     <div class="row">
       <button class="btn small" id="keypadClear">נקה</button>
-      <button class="btn small secondary" id="keypadEnter">אישור</button>
-      <button class="btn small" id="keypadCancel">ביטול</button>
+      <button class="btn small secondary" id="keypadEnter" data-i18n="confirm_btn">אישור</button>
+      <button class="btn small" id="keypadCancel" data-i18n="cancel_btn">ביטול</button>
     </div>
   </div>
 </div>
@@ -1127,8 +1127,8 @@ body { font-family:Arial, sans-serif; background:linear-gradient(45deg,#FF6B6B,#
     <div class="hint">כוונו כל חוגה עם החצים לקוד הנכון</div>
     <div class="dialRow" id="dialRow"></div>
     <div class="row">
-      <button class="btn small secondary" id="dialEnter">אישור</button>
-      <button class="btn small" id="dialCancel">ביטול</button>
+      <button class="btn small secondary" id="dialEnter" data-i18n="confirm_btn">אישור</button>
+      <button class="btn small" id="dialCancel" data-i18n="cancel_btn">ביטול</button>
     </div>
   </div>
 </div>
@@ -1139,8 +1139,8 @@ body { font-family:Arial, sans-serif; background:linear-gradient(45deg,#FF6B6B,#
     <div class="hint">סדרו את הסמלים לפי הרמזים שמצאתם</div>
     <div class="symRow" id="symRow"></div>
     <div class="row">
-      <button class="btn small secondary" id="symEnter">אישור</button>
-      <button class="btn small" id="symCancel">ביטול</button>
+      <button class="btn small secondary" id="symEnter" data-i18n="confirm_btn">אישור</button>
+      <button class="btn small" id="symCancel" data-i18n="cancel_btn">ביטול</button>
     </div>
   </div>
 </div>
@@ -1149,7 +1149,7 @@ body { font-family:Arial, sans-serif; background:linear-gradient(45deg,#FF6B6B,#
   <div class="panel" id="journalPanel">
     <h2>📓 הפתקים שאספתי</h2>
     <div id="journalList"></div>
-    <div class="row"><button class="btn small" id="journalClose">סגור</button></div>
+    <div class="row"><button class="btn small" id="journalClose" data-i18n="close_btn">סגור</button></div>
   </div>
 </div>
 
@@ -2331,6 +2331,8 @@ close_btn: "סגור", back_btn: "⬅ חזרה", cancel_btn: "ביטול",
         comp_table_players: "👤 שחקנים יחידים", comp_table_clubs: "🏆 מועדונים",
         comp_participants_suffix: "משתתפים", comp_no_participants: "אין עדיין משתתפים",
         err_enter_user_pass: "הזן שם וסיסמה",
+        ai_search_username_ph: "חפש לפי שם משתמש", ai_search_text_ph: "חפש לפי תוכן הודעה",
+        store_btn: "🛒 חנות", store_modal_title: "🛒 חנות עוגיות", store_order_title_prefix: "🛒 הזמנה", store_order_name_ph: "השם שלך", store_order_phone_ph: "מספר טלפון", store_send_btn: "📤 שלח", titles_modal_title: "🏅 בחירת תואר", ai_chat_input_ph: "שאל אותי משהו...", global_chat_input_ph: "הקלד הודעה...", send_btn: "שלח", escape_camp_btn: "🏕️ לברוח מהקייטנה", warning_modal_title: "⚠️ אזהרה!", ai_chat_title_default: "🤖 צ'אט", debug_mode_title: "🐛 מצב באגים", delete_message_title: "🗑️ מחיקת הודעה", join_club_title: "🏆 הצטרפות למועדון", create_club_title: "⭐ יצירת מועדון", my_club_title: "🏆 המועדון שלי", members_label: "חברים:", donate_pick_player_title: "🎁 בחר שחקן לתרומה", donate_title: "🎁 תרום עוגיות", gender_section_title: "👫 מגדר", delete_account_title: "🗑️ מחיקת חשבון", creator_screen_title: "👑 מסך יוצר המשחק", auth_section_title: "🔐 אימות", broadcast_section_title: "📢 הודעה לכל השחקנים", transfer_cookies_title: "💰 העברת עוגיות", give_remove_prestige_title: "⭐ מתן/הורדת יוקרה", cheat_mode_title: "🎮 מצב צ'יטים במשחקים", delete_player_title: "🗑️ מחיקת שחקן", players_list_title: "📋 רשימת שחקנים", community_mgmt_title: "📋 ניהול קהילה", events_mgmt_title: "🎉 ניהול אירועים (ניתן להפעיל כמה ביחד)", cookies_for_all_title: "🎁 עוגיות לכל השחקנים", competitions_mgmt_title: "🏁 ניהול תחרויות", codes_mgmt_title: "🎁 ניהול קודים", ai_chats_admin_title: "🤖 צ'אטים עם ה-AI", store_orders_admin_title: "🛒 הזמנות חנות", mod_action_title: "🛡️ פעולת מנהל", ban_section_title: "🚫 חסימת כניסה למשחק (באן)", mute_section_title: "🔇 חסימת צ'אט (Mute)", warning_section_title: "⚠️ שליחת אזהרה", delete_selected_msg_title: "🗑️ מחיקת ההודעה שנבחרה", leave_club_btn: "עזוב מועדון", delete_permanent_btn: "מחק לצמיתות", confirm_btn: "אישור", create_btn: "צור", confirm_donation_btn: "אשר תרומה", change_password_btn: "שנה סיסמה", update_gender_btn: "עדכן מגדר", delete_my_account_btn: "מחק את החשבון שלי לצמיתות", logout_btn: "🚪 התנתק", verify_access_btn: "אמת גישה", send_to_all_btn: "שלח לכולם", clear_message_all_btn: "נקה הודעה מכולם", add_cookies_btn: "➕ הוסף עוגיות", remove_cookies_btn: "➖ הורד עוגיות", add_prestige_btn: "➕ הוסף יוקרה", remove_prestige_btn: "➖ הורד יוקרה", delete_player_btn: "מחק שחקן", refresh_list_btn: "🔄 רענן רשימה", refresh_lists_btn: "🔄 רענן רשימות", start_btn2: "הפעל", stop_btn2: "עצור", stop_all_events_btn: "⏹️ עצור את כל האירועים", add_to_all_btn: "➕ הוסף לכולם", remove_from_all_btn: "➖ הורד מכולם", start_new_competition_btn: "🏁 הפעל תחרות חדשה", give_title_btn: "תן תואר", remove_title_btn: "מחק תואר", create_code_btn: "🎁 צור קוד", refresh_btn: "🔄 רענן", search_btn: "🔍 חפש", ban_for_duration_btn: "חסום לזמן שנבחר", ban_permanent_btn: "חסום לצמיתות", remove_ban_btn: "הסר חסימה", mute_chat_duration_btn: "חסום צ'אט לזמן שנבחר", mute_chat_permanent_btn: "חסום צ'אט לצמיתות", remove_mute_btn: "הסר חסימת צ'אט", send_warning_btn: "שלח אזהרה", delete_this_message_btn: "מחק את ההודעה הזו", understood_btn: "הבנתי", stop_this_competition_btn: "⏹️ עצור תחרות זו", delete_code_btn: "מחק קוד", no_name_competition_fallback: "תחרות ללא שם", club_code_ph: "קוד מועדון (4 ספרות)", club_name_ph: "שם המועדון", cookie_amount_ph: "כמות עוגיות", current_password_ph: "סיסמה נוכחית", new_password_ph: "סיסמה חדשה", confirm_new_password_ph: "אשר סיסמה חדשה", confirm_password_field_ph: "הזן סיסמה לאישור", creator_password_ph: "סיסמת יוצר", player_name_ph: "שם השחקן", prestige_amount_ph: "כמות רמות יוקרה", player_name_delete_ph: "שם השחקן למחיקה", search_player_ph: "חפש שחקן לפי שם...", duration_minutes_ph: "משך בדקות", golden_bonus_ph: "בונוס קבוע לכל עוגיית זהב", discount_percent_ph: "אחוז הנחה", cookies_per_player_ph: "כמות עוגיות לכל שחקן", competition_name_example_ph: "למשל: תחרות אביב 2026", enter_title_ph: "הקלד את התואר", days_ph: "ימים", hours_ph: "שעות", mins_ph: "דקות", secs_ph: "שניות", code_example_ph: "למשל: WELCOME2026", warning_content_ph: "תוכן האזהרה",
         err_already_in_club: "אתה כבר במועדון", err_club_not_found: "מועדון לא נמצא", err_invalid_club_code: "קוד לא תקין", success_left_club: "עזבת את המועדון בהצלחה!", success_joined_club: "הצטרפת בהצלחה!", success_club_created_prefix: "נוצר! קוד:", info_searching_club: "מחפש מועדון...", err_login_first: "התחבר קודם", err_not_enough_cookies: "אין לך מספיק עוגיות", err_invalid_amount: "כמות לא תקינה", err_corrupted_recipient: "נתוני השחקן המקבל פגומים — אי אפשר לתרום לו כרגע", info_transferring: "מעביר...", success_donated: "נתרם בהצלחה!", err_invalid_name: "שם לא תקין", err_enter_password_verify: "הזן את הסיסמה שלך לאימות", err_already_your_name: "זה כבר השם שלך", info_updating: "מעדכן...", success_changed: "שונה בהצלחה!", err_fill_all_fields: "מלא את כל השדות", err_passwords_mismatch: "הסיסמאות לא תואמות", success_password_changed: "הסיסמה שונתה!", err_wrong_current_password: "סיסמה נוכחית שגויה", err_select_gender: "בחר מגדר", success_updated: "עודכן!", err_enter_password_confirm: "הזן סיסמה לאישור", info_deleting_account: "מוחק חשבון...", err_wrong_password: "סיסמה שגויה", err_not_enough_for_bet: "אין לך מספיק עוגיות להימור הזה", info_creating_duel: "יוצר קרב...", err_invalid_duration: "הזן משך זמן תקין", err_invalid_bet: "סכום הימור לא תקין", err_enter_code: "הזן קוד", info_checking_code: "בודק קוד...", err_code_not_found: "הקוד לא קיים", err_already_redeemed: "כבר מימשת את הקוד הזה בעבר", err_unknown_reward_type: "סוג מתנה לא מוכר בקוד הזה", success_redeemed_cookies: "קיבלת {amount} עוגיות! 🎁", success_redeemed_title: "קיבלת את התואר '{title}'! 🏅", info_loading: "טוען...", err_enter_message_content: "הזן תוכן הודעה", success_broadcast_sent: "ההודעה נשלחה לכולם!", success_broadcast_cleared: "ההודעה הוסרה מכולם!", err_enter_player_name: "הזן שם שחקן", err_player_not_found: "שחקן '{name}' לא נמצא", err_no_players_found: "לא נמצאו שחקנים", info_deleting_player: "מוחק שחקן...", info_searching_player: "מחפש שחקן...", err_enter_bonus: "הזן בונוס תקין", err_choose_duration: "בחר משך זמן", err_invalid_discount: "הזן אחוז הנחה תקין (1-99)", success_event_started: "האירוע הופעל!", success_event_stopped: "האירוע הופסק!", success_all_events_stopped: "כל האירועים הופסקו!", err_enter_competition_name: "הזן שם לתחרות", err_invalid_prize_amount: "סכום פרס לא תקין", success_competition_started: "התחרות הופעלה!", err_competition_not_found: "התחרות לא נמצאה (כבר הסתיימה?)", success_competition_ending: "התחרות מסתיימת ומחלקת פרסים...", err_enter_title_text2: "הזן טקסט לתואר", success_title_given: "התואר '{title}' ניתן ל{name}!", success_title_removed: "התואר של {name} הוסר!", success_code_created: "הקוד '{code}' נוצר בהצלחה!", err_code_already_exists: "קוד בשם '{code}' כבר קיים", success_player_data_deleted: "נתוני '{name}' נמחקו בהצלחה!", err_firebase_down: "Firebase לא מחובר", err_wrong_credentials: "שם משתמש או סיסמה שגויים", err_no_server_response: "אין תגובה מהשרת - נסה שוב", err_prefix: "שגיאה:", err_username_short: "שם קצר מדי", err_password_short: "סיסמה חייבת 6 תווים לפחות", err_username_taken: "שם המשתמש כבר תפוס", err_weak_password: "סיסמה חלשה מדי", login_connecting: "מתחבר...", register_registering: "נרשם...", register_success: "נרשמת בהצלחה!"
     },
     en: {
@@ -2386,6 +2388,8 @@ close_btn: "Close", back_btn: "⬅ Back", cancel_btn: "Cancel",
         comp_table_players: "👤 Individual players", comp_table_clubs: "🏆 Clubs",
         comp_participants_suffix: "participants", comp_no_participants: "No participants yet",
         err_enter_user_pass: "Enter username and password",
+        ai_search_username_ph: "Search by username", ai_search_text_ph: "Search by message content",
+        store_btn: "🛒 Store", store_modal_title: "🛒 Cookie Store", store_order_title_prefix: "🛒 Order", store_order_name_ph: "Your name", store_order_phone_ph: "Phone number", store_send_btn: "📤 Send", titles_modal_title: "🏅 Choose Title", ai_chat_input_ph: "Ask me something...", global_chat_input_ph: "Type a message...", send_btn: "Send", escape_camp_btn: "🏕️ Escape the Camp", warning_modal_title: "⚠️ Warning!", ai_chat_title_default: "🤖 Chat", debug_mode_title: "🐛 Debug Mode", delete_message_title: "🗑️ Delete Message", join_club_title: "🏆 Join a Club", create_club_title: "⭐ Create a Club", my_club_title: "🏆 My Club", members_label: "Members:", donate_pick_player_title: "🎁 Choose Player to Donate To", donate_title: "🎁 Donate Cookies", gender_section_title: "👫 Gender", delete_account_title: "🗑️ Delete Account", creator_screen_title: "👑 Creator Screen", auth_section_title: "🔐 Authentication", broadcast_section_title: "📢 Message to All Players", transfer_cookies_title: "💰 Transfer Cookies", give_remove_prestige_title: "⭐ Give/Remove Prestige", cheat_mode_title: "🎮 Games Cheat Mode", delete_player_title: "🗑️ Delete Player", players_list_title: "📋 Player List", community_mgmt_title: "📋 Community Management", events_mgmt_title: "🎉 Event Management (multiple can run together)", cookies_for_all_title: "🎁 Cookies for All Players", competitions_mgmt_title: "🏁 Competition Management", codes_mgmt_title: "🎁 Code Management", ai_chats_admin_title: "🤖 AI Chats", store_orders_admin_title: "🛒 Store Orders", mod_action_title: "🛡️ Moderator Action", ban_section_title: "🚫 Game Ban", mute_section_title: "🔇 Chat Mute", warning_section_title: "⚠️ Send Warning", delete_selected_msg_title: "🗑️ Delete Selected Message", leave_club_btn: "Leave Club", delete_permanent_btn: "Delete Permanently", confirm_btn: "Confirm", create_btn: "Create", confirm_donation_btn: "Confirm Donation", change_password_btn: "Change Password", update_gender_btn: "Update Gender", delete_my_account_btn: "Permanently Delete My Account", logout_btn: "🚪 Log Out", verify_access_btn: "Verify Access", send_to_all_btn: "Send to Everyone", clear_message_all_btn: "Clear Message for Everyone", add_cookies_btn: "➕ Add Cookies", remove_cookies_btn: "➖ Remove Cookies", add_prestige_btn: "➕ Add Prestige", remove_prestige_btn: "➖ Remove Prestige", delete_player_btn: "Delete Player", refresh_list_btn: "🔄 Refresh List", refresh_lists_btn: "🔄 Refresh Lists", start_btn2: "Start", stop_btn2: "Stop", stop_all_events_btn: "⏹️ Stop All Events", add_to_all_btn: "➕ Add to Everyone", remove_from_all_btn: "➖ Remove from Everyone", start_new_competition_btn: "🏁 Start New Competition", give_title_btn: "Give Title", remove_title_btn: "Remove Title", create_code_btn: "🎁 Create Code", refresh_btn: "🔄 Refresh", search_btn: "🔍 Search", ban_for_duration_btn: "Ban for Selected Duration", ban_permanent_btn: "Ban Permanently", remove_ban_btn: "Remove Ban", mute_chat_duration_btn: "Mute Chat for Selected Duration", mute_chat_permanent_btn: "Mute Chat Permanently", remove_mute_btn: "Remove Chat Mute", send_warning_btn: "Send Warning", delete_this_message_btn: "Delete This Message", understood_btn: "Got It", stop_this_competition_btn: "⏹️ Stop This Competition", delete_code_btn: "Delete Code", no_name_competition_fallback: "Unnamed Competition", club_code_ph: "Club code (4 digits)", club_name_ph: "Club name", cookie_amount_ph: "Cookie amount", current_password_ph: "Current password", new_password_ph: "New password", confirm_new_password_ph: "Confirm new password", confirm_password_field_ph: "Enter password to confirm", creator_password_ph: "Creator password", player_name_ph: "Player name", prestige_amount_ph: "Number of prestige levels", player_name_delete_ph: "Player name to delete", search_player_ph: "Search player by name...", duration_minutes_ph: "Duration in minutes", golden_bonus_ph: "Fixed bonus per golden cookie", discount_percent_ph: "Discount percentage", cookies_per_player_ph: "Cookie amount per player", competition_name_example_ph: "e.g.: Spring Competition 2026", enter_title_ph: "Type the title", days_ph: "Days", hours_ph: "Hours", mins_ph: "Minutes", secs_ph: "Seconds", code_example_ph: "e.g.: WELCOME2026", warning_content_ph: "Warning content",
         err_already_in_club: "You're already in a club", err_club_not_found: "Club not found", err_invalid_club_code: "Invalid code", success_left_club: "You left the club successfully!", success_joined_club: "Joined successfully!", success_club_created_prefix: "Created! Code:", info_searching_club: "Searching for club...", err_login_first: "Log in first", err_not_enough_cookies: "You don't have enough cookies", err_invalid_amount: "Invalid amount", err_corrupted_recipient: "Recipient's data is corrupted — can't donate to them right now", info_transferring: "Transferring...", success_donated: "Donated successfully!", err_invalid_name: "Invalid name", err_enter_password_verify: "Enter your password to verify", err_already_your_name: "That's already your name", info_updating: "Updating...", success_changed: "Changed successfully!", err_fill_all_fields: "Fill in all fields", err_passwords_mismatch: "Passwords don't match", success_password_changed: "Password changed!", err_wrong_current_password: "Current password is incorrect", err_select_gender: "Select gender", success_updated: "Updated!", err_enter_password_confirm: "Enter password to confirm", info_deleting_account: "Deleting account...", err_wrong_password: "Incorrect password", err_not_enough_for_bet: "You don't have enough cookies for this bet", info_creating_duel: "Creating duel...", err_invalid_duration: "Enter a valid duration", err_invalid_bet: "Invalid bet amount", err_enter_code: "Enter a code", info_checking_code: "Checking code...", err_code_not_found: "Code doesn't exist", err_already_redeemed: "You already redeemed this code before", err_unknown_reward_type: "Unknown reward type on this code", success_redeemed_cookies: "You got {amount} cookies! 🎁", success_redeemed_title: "You got the title '{title}'! 🏅", info_loading: "Loading...", err_enter_message_content: "Enter message content", success_broadcast_sent: "Message sent to everyone!", success_broadcast_cleared: "Message cleared for everyone!", err_enter_player_name: "Enter player name", err_player_not_found: "Player '{name}' not found", err_no_players_found: "No players found", info_deleting_player: "Deleting player...", info_searching_player: "Searching for player...", err_enter_bonus: "Enter a valid bonus", err_choose_duration: "Choose a duration", err_invalid_discount: "Enter a valid discount percentage (1-99)", success_event_started: "Event started!", success_event_stopped: "Event stopped!", success_all_events_stopped: "All events stopped!", err_enter_competition_name: "Enter a competition name", err_invalid_prize_amount: "Invalid prize amount", success_competition_started: "Competition started!", err_competition_not_found: "Competition not found (already ended?)", success_competition_ending: "Competition ending and awarding prizes...", err_enter_title_text2: "Enter title text", success_title_given: "Title '{title}' given to {name}!", success_title_removed: "{name}'s title was removed!", success_code_created: "Code '{code}' created successfully!", err_code_already_exists: "A code named '{code}' already exists", success_player_data_deleted: "'{name}''s data was deleted successfully!", err_firebase_down: "Firebase not connected", err_wrong_credentials: "Incorrect username or password", err_no_server_response: "No response from server - try again", err_prefix: "Error:", err_username_short: "Username too short", err_password_short: "Password must be at least 6 characters", err_username_taken: "Username already taken", err_weak_password: "Password too weak", login_connecting: "Logging in...", register_registering: "Signing up...", register_success: "Signed up successfully!"
     },
     ar: {
@@ -2441,6 +2445,8 @@ close_btn: "إغلاق", back_btn: "⬅ رجوع", cancel_btn: "إلغاء",
         comp_table_players: "👤 لاعبون أفراد", comp_table_clubs: "🏆 أندية",
         comp_participants_suffix: "مشاركين", comp_no_participants: "لا يوجد مشاركون بعد",
         err_enter_user_pass: "أدخل اسم المستخدم وكلمة المرور",
+        ai_search_username_ph: "البحث حسب اسم المستخدم", ai_search_text_ph: "البحث حسب محتوى الرسالة",
+        store_btn: "🛒 المتجر", store_modal_title: "🛒 متجر الكوكيز", store_order_title_prefix: "🛒 طلب", store_order_name_ph: "اسمك", store_order_phone_ph: "رقم الهاتف", store_send_btn: "📤 إرسال", titles_modal_title: "🏅 اختيار اللقب", ai_chat_input_ph: "اسألني شيئًا...", global_chat_input_ph: "اكتب رسالة...", send_btn: "إرسال", escape_camp_btn: "🏕️ الهروب من المخيم", warning_modal_title: "⚠️ تحذير!", ai_chat_title_default: "🤖 دردشة", debug_mode_title: "🐛 وضع التصحيح", delete_message_title: "🗑️ حذف الرسالة", join_club_title: "🏆 الانضمام لنادٍ", create_club_title: "⭐ إنشاء نادٍ", my_club_title: "🏆 ناديّ", members_label: "الأعضاء:", donate_pick_player_title: "🎁 اختر لاعبًا للتبرع له", donate_title: "🎁 تبرع بالكوكيز", gender_section_title: "👫 الجنس", delete_account_title: "🗑️ حذف الحساب", creator_screen_title: "👑 شاشة المنشئ", auth_section_title: "🔐 التحقق", broadcast_section_title: "📢 رسالة لجميع اللاعبين", transfer_cookies_title: "💰 تحويل الكوكيز", give_remove_prestige_title: "⭐ منح/إزالة المكانة", cheat_mode_title: "🎮 وضع الغش في الألعاب", delete_player_title: "🗑️ حذف اللاعب", players_list_title: "📋 قائمة اللاعبين", community_mgmt_title: "📋 إدارة المجتمع", events_mgmt_title: "🎉 إدارة الأحداث (يمكن تفعيل عدة أحداث معًا)", cookies_for_all_title: "🎁 كوكيز لجميع اللاعبين", competitions_mgmt_title: "🏁 إدارة المسابقات", codes_mgmt_title: "🎁 إدارة الأكواد", ai_chats_admin_title: "🤖 محادثات الذكاء الاصطناعي", store_orders_admin_title: "🛒 طلبات المتجر", mod_action_title: "🛡️ إجراء المشرف", ban_section_title: "🚫 حظر الدخول للعبة", mute_section_title: "🔇 كتم الدردشة", warning_section_title: "⚠️ إرسال تحذير", delete_selected_msg_title: "🗑️ حذف الرسالة المحددة", leave_club_btn: "مغادرة النادي", delete_permanent_btn: "حذف نهائي", confirm_btn: "تأكيد", create_btn: "إنشاء", confirm_donation_btn: "تأكيد التبرع", change_password_btn: "تغيير كلمة المرور", update_gender_btn: "تحديث الجنس", delete_my_account_btn: "حذف حسابي نهائيًا", logout_btn: "🚪 تسجيل الخروج", verify_access_btn: "تحقق من الوصول", send_to_all_btn: "إرسال للجميع", clear_message_all_btn: "مسح الرسالة للجميع", add_cookies_btn: "➕ إضافة كوكيز", remove_cookies_btn: "➖ إزالة كوكيز", add_prestige_btn: "➕ إضافة مكانة", remove_prestige_btn: "➖ إزالة مكانة", delete_player_btn: "حذف اللاعب", refresh_list_btn: "🔄 تحديث القائمة", refresh_lists_btn: "🔄 تحديث القوائم", start_btn2: "تفعيل", stop_btn2: "إيقاف", stop_all_events_btn: "⏹️ إيقاف جميع الأحداث", add_to_all_btn: "➕ إضافة للجميع", remove_from_all_btn: "➖ إزالة من الجميع", start_new_competition_btn: "🏁 بدء مسابقة جديدة", give_title_btn: "منح لقب", remove_title_btn: "إزالة اللقب", create_code_btn: "🎁 إنشاء كود", refresh_btn: "🔄 تحديث", search_btn: "🔍 بحث", ban_for_duration_btn: "حظر للمدة المحددة", ban_permanent_btn: "حظر نهائي", remove_ban_btn: "إزالة الحظر", mute_chat_duration_btn: "كتم الدردشة للمدة المحددة", mute_chat_permanent_btn: "كتم الدردشة نهائيًا", remove_mute_btn: "إزالة كتم الدردشة", send_warning_btn: "إرسال تحذير", delete_this_message_btn: "حذف هذه الرسالة", understood_btn: "فهمت", stop_this_competition_btn: "⏹️ إيقاف هذه المسابقة", delete_code_btn: "حذف الكود", no_name_competition_fallback: "مسابقة بلا اسم", club_code_ph: "كود النادي (4 أرقام)", club_name_ph: "اسم النادي", cookie_amount_ph: "كمية الكوكيز", current_password_ph: "كلمة المرور الحالية", new_password_ph: "كلمة مرور جديدة", confirm_new_password_ph: "تأكيد كلمة المرور الجديدة", confirm_password_field_ph: "أدخل كلمة المرور للتأكيد", creator_password_ph: "كلمة مرور المنشئ", player_name_ph: "اسم اللاعب", prestige_amount_ph: "عدد مستويات المكانة", player_name_delete_ph: "اسم اللاعب للحذف", search_player_ph: "البحث عن لاعب بالاسم...", duration_minutes_ph: "المدة بالدقائق", golden_bonus_ph: "مكافأة ثابتة لكل كوكيز ذهبية", discount_percent_ph: "نسبة الخصم", cookies_per_player_ph: "كمية الكوكيز لكل لاعب", competition_name_example_ph: "مثال: مسابقة الربيع 2026", enter_title_ph: "اكتب اللقب", days_ph: "أيام", hours_ph: "ساعات", mins_ph: "دقائق", secs_ph: "ثوانٍ", code_example_ph: "مثال: WELCOME2026", warning_content_ph: "محتوى التحذير",
         err_already_in_club: "أنت بالفعل في نادٍ", err_club_not_found: "النادي غير موجود", err_invalid_club_code: "كود غير صالح", success_left_club: "لقد غادرت النادي بنجاح!", success_joined_club: "تم الانضمام بنجاح!", success_club_created_prefix: "تم الإنشاء! الكود:", info_searching_club: "جارٍ البحث عن نادٍ...", err_login_first: "سجل الدخول أولاً", err_not_enough_cookies: "ليس لديك ما يكفي من الكوكيز", err_invalid_amount: "كمية غير صالحة", err_corrupted_recipient: "بيانات المستلم تالفة — لا يمكن التبرع له الآن", info_transferring: "جارٍ التحويل...", success_donated: "تم التبرع بنجاح!", err_invalid_name: "اسم غير صالح", err_enter_password_verify: "أدخل كلمة المرور للتحقق", err_already_your_name: "هذا هو اسمك بالفعل", info_updating: "جارٍ التحديث...", success_changed: "تم التغيير بنجاح!", err_fill_all_fields: "املأ جميع الحقول", err_passwords_mismatch: "كلمتا المرور غير متطابقتين", success_password_changed: "تم تغيير كلمة المرور!", err_wrong_current_password: "كلمة المرور الحالية غير صحيحة", err_select_gender: "اختر الجنس", success_updated: "تم التحديث!", err_enter_password_confirm: "أدخل كلمة المرور للتأكيد", info_deleting_account: "جارٍ حذف الحساب...", err_wrong_password: "كلمة مرور غير صحيحة", err_not_enough_for_bet: "ليس لديك ما يكفي من الكوكيز لهذا الرهان", info_creating_duel: "جارٍ إنشاء المبارزة...", err_invalid_duration: "أدخل مدة صالحة", err_invalid_bet: "مبلغ الرهان غير صالح", err_enter_code: "أدخل كودًا", info_checking_code: "جارٍ التحقق من الكود...", err_code_not_found: "الكود غير موجود", err_already_redeemed: "لقد استخدمت هذا الكود من قبل", err_unknown_reward_type: "نوع هدية غير معروف في هذا الكود", success_redeemed_cookies: "حصلت على {amount} كوكيز! 🎁", success_redeemed_title: "حصلت على اللقب '{title}'! 🏅", info_loading: "جارٍ التحميل...", err_enter_message_content: "أدخل محتوى الرسالة", success_broadcast_sent: "تم إرسال الرسالة للجميع!", success_broadcast_cleared: "تمت إزالة الرسالة للجميع!", err_enter_player_name: "أدخل اسم اللاعب", err_player_not_found: "اللاعب '{name}' غير موجود", err_no_players_found: "لم يتم العثور على لاعبين", info_deleting_player: "جارٍ حذف اللاعب...", info_searching_player: "جارٍ البحث عن اللاعب...", err_enter_bonus: "أدخل مكافأة صالحة", err_choose_duration: "اختر مدة", err_invalid_discount: "أدخل نسبة خصم صالحة (1-99)", success_event_started: "تم تفعيل الحدث!", success_event_stopped: "تم إيقاف الحدث!", success_all_events_stopped: "تم إيقاف جميع الأحداث!", err_enter_competition_name: "أدخل اسم المسابقة", err_invalid_prize_amount: "مبلغ الجائزة غير صالح", success_competition_started: "تم بدء المسابقة!", err_competition_not_found: "المسابقة غير موجودة (هل انتهت بالفعل؟)", success_competition_ending: "المسابقة تنتهي ويتم توزيع الجوائز...", err_enter_title_text2: "أدخل نص اللقب", success_title_given: "تم منح اللقب '{title}' إلى {name}!", success_title_removed: "تمت إزالة لقب {name}!", success_code_created: "تم إنشاء الكود '{code}' بنجاح!", err_code_already_exists: "يوجد بالفعل كود باسم '{code}'", success_player_data_deleted: "تم حذف بيانات '{name}' بنجاح!", err_firebase_down: "Firebase غير متصل", err_wrong_credentials: "اسم المستخدم أو كلمة المرور غير صحيحة", err_no_server_response: "لا توجد استجابة من الخادم - حاول مرة أخرى", err_prefix: "خطأ:", err_username_short: "الاسم قصير جداً", err_password_short: "يجب أن تتكون كلمة المرور من 6 أحرف على الأقل", err_username_taken: "اسم المستخدم مستخدم بالفعل", err_weak_password: "كلمة المرور ضعيفة جداً", login_connecting: "جارٍ تسجيل الدخول...", register_registering: "جارٍ التسجيل...", register_success: "تم التسجيل بنجاح!"
     },
     es: {
@@ -2496,6 +2502,8 @@ close_btn: "Cerrar", back_btn: "⬅ Volver", cancel_btn: "Cancelar",
         comp_table_players: "👤 Jugadores individuales", comp_table_clubs: "🏆 Clubes",
         comp_participants_suffix: "participantes", comp_no_participants: "Aún no hay participantes",
         err_enter_user_pass: "Introduce usuario y contraseña",
+        ai_search_username_ph: "Buscar por nombre de usuario", ai_search_text_ph: "Buscar por contenido del mensaje",
+        store_btn: "🛒 Tienda", store_modal_title: "🛒 Tienda de galletas", store_order_title_prefix: "🛒 Pedido", store_order_name_ph: "Tu nombre", store_order_phone_ph: "Número de teléfono", store_send_btn: "📤 Enviar", titles_modal_title: "🏅 Elegir título", ai_chat_input_ph: "Pregúntame algo...", global_chat_input_ph: "Escribe un mensaje...", send_btn: "Enviar", escape_camp_btn: "🏕️ Escapar del campamento", warning_modal_title: "⚠️ ¡Advertencia!", ai_chat_title_default: "🤖 Chat", debug_mode_title: "🐛 Modo depuración", delete_message_title: "🗑️ Eliminar mensaje", join_club_title: "🏆 Unirse a un club", create_club_title: "⭐ Crear un club", my_club_title: "🏆 Mi club", members_label: "Miembros:", donate_pick_player_title: "🎁 Elige un jugador para donar", donate_title: "🎁 Donar galletas", gender_section_title: "👫 Género", delete_account_title: "🗑️ Eliminar cuenta", creator_screen_title: "👑 Panel del creador", auth_section_title: "🔐 Autenticación", broadcast_section_title: "📢 Mensaje para todos los jugadores", transfer_cookies_title: "💰 Transferir galletas", give_remove_prestige_title: "⭐ Dar/quitar prestigio", cheat_mode_title: "🎮 Modo trucos en juegos", delete_player_title: "🗑️ Eliminar jugador", players_list_title: "📋 Lista de jugadores", community_mgmt_title: "📋 Gestión de la comunidad", events_mgmt_title: "🎉 Gestión de eventos (se pueden activar varios juntos)", cookies_for_all_title: "🎁 Galletas para todos los jugadores", competitions_mgmt_title: "🏁 Gestión de competencias", codes_mgmt_title: "🎁 Gestión de códigos", ai_chats_admin_title: "🤖 Chats con la IA", store_orders_admin_title: "🛒 Pedidos de la tienda", mod_action_title: "🛡️ Acción de moderador", ban_section_title: "🚫 Prohibición de entrada al juego", mute_section_title: "🔇 Silenciar chat", warning_section_title: "⚠️ Enviar advertencia", delete_selected_msg_title: "🗑️ Eliminar mensaje seleccionado", leave_club_btn: "Salir del club", delete_permanent_btn: "Eliminar permanentemente", confirm_btn: "Confirmar", create_btn: "Crear", confirm_donation_btn: "Confirmar donación", change_password_btn: "Cambiar contraseña", update_gender_btn: "Actualizar género", delete_my_account_btn: "Eliminar mi cuenta permanentemente", logout_btn: "🚪 Cerrar sesión", verify_access_btn: "Verificar acceso", send_to_all_btn: "Enviar a todos", clear_message_all_btn: "Borrar mensaje para todos", add_cookies_btn: "➕ Añadir galletas", remove_cookies_btn: "➖ Quitar galletas", add_prestige_btn: "➕ Añadir prestigio", remove_prestige_btn: "➖ Quitar prestigio", delete_player_btn: "Eliminar jugador", refresh_list_btn: "🔄 Actualizar lista", refresh_lists_btn: "🔄 Actualizar listas", start_btn2: "Activar", stop_btn2: "Detener", stop_all_events_btn: "⏹️ Detener todos los eventos", add_to_all_btn: "➕ Añadir a todos", remove_from_all_btn: "➖ Quitar a todos", start_new_competition_btn: "🏁 Iniciar nueva competencia", give_title_btn: "Dar título", remove_title_btn: "Quitar título", create_code_btn: "🎁 Crear código", refresh_btn: "🔄 Actualizar", search_btn: "🔍 Buscar", ban_for_duration_btn: "Prohibir por la duración seleccionada", ban_permanent_btn: "Prohibir permanentemente", remove_ban_btn: "Quitar prohibición", mute_chat_duration_btn: "Silenciar chat por la duración seleccionada", mute_chat_permanent_btn: "Silenciar chat permanentemente", remove_mute_btn: "Quitar silencio del chat", send_warning_btn: "Enviar advertencia", delete_this_message_btn: "Eliminar este mensaje", understood_btn: "Entendido", stop_this_competition_btn: "⏹️ Detener esta competencia", delete_code_btn: "Eliminar código", no_name_competition_fallback: "Competencia sin nombre", club_code_ph: "Código del club (4 dígitos)", club_name_ph: "Nombre del club", cookie_amount_ph: "Cantidad de galletas", current_password_ph: "Contraseña actual", new_password_ph: "Nueva contraseña", confirm_new_password_ph: "Confirmar nueva contraseña", confirm_password_field_ph: "Introduce la contraseña para confirmar", creator_password_ph: "Contraseña de creador", player_name_ph: "Nombre del jugador", prestige_amount_ph: "Cantidad de niveles de prestigio", player_name_delete_ph: "Nombre del jugador a eliminar", search_player_ph: "Buscar jugador por nombre...", duration_minutes_ph: "Duración en minutos", golden_bonus_ph: "Bonificación fija por galleta dorada", discount_percent_ph: "Porcentaje de descuento", cookies_per_player_ph: "Cantidad de galletas por jugador", competition_name_example_ph: "ej.: Competencia de primavera 2026", enter_title_ph: "Escribe el título", days_ph: "Días", hours_ph: "Horas", mins_ph: "Minutos", secs_ph: "Segundos", code_example_ph: "ej.: WELCOME2026", warning_content_ph: "Contenido de la advertencia",
         err_already_in_club: "Ya estás en un club", err_club_not_found: "Club no encontrado", err_invalid_club_code: "Código no válido", success_left_club: "¡Has salido del club con éxito!", success_joined_club: "¡Te uniste con éxito!", success_club_created_prefix: "¡Creado! Código:", info_searching_club: "Buscando club...", err_login_first: "Inicia sesión primero", err_not_enough_cookies: "No tienes suficientes galletas", err_invalid_amount: "Cantidad no válida", err_corrupted_recipient: "Los datos del destinatario están dañados — no se puede donar ahora", info_transferring: "Transfiriendo...", success_donated: "¡Donado con éxito!", err_invalid_name: "Nombre no válido", err_enter_password_verify: "Introduce tu contraseña para verificar", err_already_your_name: "Ese ya es tu nombre", info_updating: "Actualizando...", success_changed: "¡Cambiado con éxito!", err_fill_all_fields: "Completa todos los campos", err_passwords_mismatch: "Las contraseñas no coinciden", success_password_changed: "¡Contraseña cambiada!", err_wrong_current_password: "La contraseña actual es incorrecta", err_select_gender: "Selecciona género", success_updated: "¡Actualizado!", err_enter_password_confirm: "Introduce la contraseña para confirmar", info_deleting_account: "Eliminando cuenta...", err_wrong_password: "Contraseña incorrecta", err_not_enough_for_bet: "No tienes suficientes galletas para esta apuesta", info_creating_duel: "Creando duelo...", err_invalid_duration: "Introduce una duración válida", err_invalid_bet: "Importe de apuesta no válido", err_enter_code: "Introduce un código", info_checking_code: "Verificando código...", err_code_not_found: "El código no existe", err_already_redeemed: "Ya canjeaste este código antes", err_unknown_reward_type: "Tipo de recompensa desconocido en este código", success_redeemed_cookies: "¡Obtuviste {amount} galletas! 🎁", success_redeemed_title: "¡Obtuviste el título '{title}'! 🏅", info_loading: "Cargando...", err_enter_message_content: "Introduce el contenido del mensaje", success_broadcast_sent: "¡Mensaje enviado a todos!", success_broadcast_cleared: "¡Mensaje eliminado para todos!", err_enter_player_name: "Introduce el nombre del jugador", err_player_not_found: "Jugador '{name}' no encontrado", err_no_players_found: "No se encontraron jugadores", info_deleting_player: "Eliminando jugador...", info_searching_player: "Buscando jugador...", err_enter_bonus: "Introduce una bonificación válida", err_choose_duration: "Elige una duración", err_invalid_discount: "Introduce un porcentaje de descuento válido (1-99)", success_event_started: "¡Evento iniciado!", success_event_stopped: "¡Evento detenido!", success_all_events_stopped: "¡Todos los eventos detenidos!", err_enter_competition_name: "Introduce un nombre para la competencia", err_invalid_prize_amount: "Importe del premio no válido", success_competition_started: "¡Competencia iniciada!", err_competition_not_found: "Competencia no encontrada (¿ya terminó?)", success_competition_ending: "La competencia está terminando y otorgando premios...", err_enter_title_text2: "Introduce el texto del título", success_title_given: "¡Título '{title}' otorgado a {name}!", success_title_removed: "¡El título de {name} fue eliminado!", success_code_created: "¡Código '{code}' creado con éxito!", err_code_already_exists: "Ya existe un código llamado '{code}'", success_player_data_deleted: "¡Los datos de '{name}' se eliminaron con éxito!", err_firebase_down: "Firebase no conectado", err_wrong_credentials: "Usuario o contraseña incorrectos", err_no_server_response: "Sin respuesta del servidor - inténtalo de nuevo", err_prefix: "Error:", err_username_short: "Nombre demasiado corto", err_password_short: "La contraseña debe tener al menos 6 caracteres", err_username_taken: "Nombre de usuario ya en uso", err_weak_password: "Contraseña demasiado débil", login_connecting: "Iniciando sesión...", register_registering: "Registrando...", register_success: "¡Registrado con éxito!"
     },
     fr: {
@@ -2551,6 +2559,8 @@ close_btn: "Fermer", back_btn: "⬅ Retour", cancel_btn: "Annuler",
         comp_table_players: "👤 Joueurs individuels", comp_table_clubs: "🏆 Clubs",
         comp_participants_suffix: "participants", comp_no_participants: "Aucun participant pour l'instant",
         err_enter_user_pass: "Entrez un nom d'utilisateur et un mot de passe",
+        ai_search_username_ph: "Rechercher par nom d'utilisateur", ai_search_text_ph: "Rechercher par contenu du message",
+        store_btn: "🛒 Boutique", store_modal_title: "🛒 Boutique de cookies", store_order_title_prefix: "🛒 Commande", store_order_name_ph: "Votre nom", store_order_phone_ph: "Numéro de téléphone", store_send_btn: "📤 Envoyer", titles_modal_title: "🏅 Choisir un titre", ai_chat_input_ph: "Demandez-moi quelque chose...", global_chat_input_ph: "Tapez un message...", send_btn: "Envoyer", escape_camp_btn: "🏕️ S'échapper du camp", warning_modal_title: "⚠️ Avertissement !", ai_chat_title_default: "🤖 Chat", debug_mode_title: "🐛 Mode débogage", delete_message_title: "🗑️ Supprimer le message", join_club_title: "🏆 Rejoindre un club", create_club_title: "⭐ Créer un club", my_club_title: "🏆 Mon club", members_label: "Membres :", donate_pick_player_title: "🎁 Choisir un joueur pour le don", donate_title: "🎁 Faire don de cookies", gender_section_title: "👫 Genre", delete_account_title: "🗑️ Supprimer le compte", creator_screen_title: "👑 Écran créateur", auth_section_title: "🔐 Authentification", broadcast_section_title: "📢 Message à tous les joueurs", transfer_cookies_title: "💰 Transférer des cookies", give_remove_prestige_title: "⭐ Donner/retirer du prestige", cheat_mode_title: "🎮 Mode triche dans les jeux", delete_player_title: "🗑️ Supprimer le joueur", players_list_title: "📋 Liste des joueurs", community_mgmt_title: "📋 Gestion de la communauté", events_mgmt_title: "🎉 Gestion des événements (plusieurs peuvent tourner ensemble)", cookies_for_all_title: "🎁 Cookies pour tous les joueurs", competitions_mgmt_title: "🏁 Gestion des compétitions", codes_mgmt_title: "🎁 Gestion des codes", ai_chats_admin_title: "🤖 Discussions avec l'IA", store_orders_admin_title: "🛒 Commandes de la boutique", mod_action_title: "🛡️ Action de modérateur", ban_section_title: "🚫 Bannissement du jeu", mute_section_title: "🔇 Rendre muet dans le chat", warning_section_title: "⚠️ Envoyer un avertissement", delete_selected_msg_title: "🗑️ Supprimer le message sélectionné", leave_club_btn: "Quitter le club", delete_permanent_btn: "Supprimer définitivement", confirm_btn: "Confirmer", create_btn: "Créer", confirm_donation_btn: "Confirmer le don", change_password_btn: "Changer le mot de passe", update_gender_btn: "Mettre à jour le genre", delete_my_account_btn: "Supprimer définitivement mon compte", logout_btn: "🚪 Se déconnecter", verify_access_btn: "Vérifier l'accès", send_to_all_btn: "Envoyer à tous", clear_message_all_btn: "Effacer le message pour tous", add_cookies_btn: "➕ Ajouter des cookies", remove_cookies_btn: "➖ Retirer des cookies", add_prestige_btn: "➕ Ajouter du prestige", remove_prestige_btn: "➖ Retirer du prestige", delete_player_btn: "Supprimer le joueur", refresh_list_btn: "🔄 Actualiser la liste", refresh_lists_btn: "🔄 Actualiser les listes", start_btn2: "Démarrer", stop_btn2: "Arrêter", stop_all_events_btn: "⏹️ Arrêter tous les événements", add_to_all_btn: "➕ Ajouter à tous", remove_from_all_btn: "➖ Retirer à tous", start_new_competition_btn: "🏁 Démarrer une nouvelle compétition", give_title_btn: "Donner un titre", remove_title_btn: "Retirer le titre", create_code_btn: "🎁 Créer un code", refresh_btn: "🔄 Actualiser", search_btn: "🔍 Rechercher", ban_for_duration_btn: "Bannir pour la durée sélectionnée", ban_permanent_btn: "Bannir définitivement", remove_ban_btn: "Retirer le bannissement", mute_chat_duration_btn: "Rendre muet pour la durée sélectionnée", mute_chat_permanent_btn: "Rendre muet définitivement", remove_mute_btn: "Retirer le mode muet", send_warning_btn: "Envoyer un avertissement", delete_this_message_btn: "Supprimer ce message", understood_btn: "Compris", stop_this_competition_btn: "⏹️ Arrêter cette compétition", delete_code_btn: "Supprimer le code", no_name_competition_fallback: "Compétition sans nom", club_code_ph: "Code du club (4 chiffres)", club_name_ph: "Nom du club", cookie_amount_ph: "Quantité de cookies", current_password_ph: "Mot de passe actuel", new_password_ph: "Nouveau mot de passe", confirm_new_password_ph: "Confirmer le nouveau mot de passe", confirm_password_field_ph: "Entrez le mot de passe pour confirmer", creator_password_ph: "Mot de passe créateur", player_name_ph: "Nom du joueur", prestige_amount_ph: "Nombre de niveaux de prestige", player_name_delete_ph: "Nom du joueur à supprimer", search_player_ph: "Rechercher un joueur par nom...", duration_minutes_ph: "Durée en minutes", golden_bonus_ph: "Bonus fixe par cookie doré", discount_percent_ph: "Pourcentage de réduction", cookies_per_player_ph: "Quantité de cookies par joueur", competition_name_example_ph: "ex. : Compétition de printemps 2026", enter_title_ph: "Tapez le titre", days_ph: "Jours", hours_ph: "Heures", mins_ph: "Minutes", secs_ph: "Secondes", code_example_ph: "ex. : WELCOME2026", warning_content_ph: "Contenu de l'avertissement",
         err_already_in_club: "Vous êtes déjà dans un club", err_club_not_found: "Club introuvable", err_invalid_club_code: "Code invalide", success_left_club: "Vous avez quitté le club avec succès !", success_joined_club: "Vous avez rejoint avec succès !", success_club_created_prefix: "Créé ! Code :", info_searching_club: "Recherche du club...", err_login_first: "Connectez-vous d'abord", err_not_enough_cookies: "Vous n'avez pas assez de cookies", err_invalid_amount: "Montant invalide", err_corrupted_recipient: "Les données du destinataire sont corrompues — impossible de faire un don pour le moment", info_transferring: "Transfert...", success_donated: "Don effectué avec succès !", err_invalid_name: "Nom invalide", err_enter_password_verify: "Entrez votre mot de passe pour vérifier", err_already_your_name: "C'est déjà votre nom", info_updating: "Mise à jour...", success_changed: "Modifié avec succès !", err_fill_all_fields: "Remplissez tous les champs", err_passwords_mismatch: "Les mots de passe ne correspondent pas", success_password_changed: "Mot de passe modifié !", err_wrong_current_password: "Le mot de passe actuel est incorrect", err_select_gender: "Sélectionnez un genre", success_updated: "Mis à jour !", err_enter_password_confirm: "Entrez le mot de passe pour confirmer", info_deleting_account: "Suppression du compte...", err_wrong_password: "Mot de passe incorrect", err_not_enough_for_bet: "Vous n'avez pas assez de cookies pour cette mise", info_creating_duel: "Création du duel...", err_invalid_duration: "Entrez une durée valide", err_invalid_bet: "Montant de mise invalide", err_enter_code: "Entrez un code", info_checking_code: "Vérification du code...", err_code_not_found: "Le code n'existe pas", err_already_redeemed: "Vous avez déjà utilisé ce code", err_unknown_reward_type: "Type de récompense inconnu pour ce code", success_redeemed_cookies: "Vous avez reçu {amount} cookies ! 🎁", success_redeemed_title: "Vous avez reçu le titre « {title} » ! 🏅", info_loading: "Chargement...", err_enter_message_content: "Entrez le contenu du message", success_broadcast_sent: "Message envoyé à tout le monde !", success_broadcast_cleared: "Message supprimé pour tout le monde !", err_enter_player_name: "Entrez le nom du joueur", err_player_not_found: "Joueur « {name} » introuvable", err_no_players_found: "Aucun joueur trouvé", info_deleting_player: "Suppression du joueur...", info_searching_player: "Recherche du joueur...", err_enter_bonus: "Entrez un bonus valide", err_choose_duration: "Choisissez une durée", err_invalid_discount: "Entrez un pourcentage de réduction valide (1-99)", success_event_started: "Événement démarré !", success_event_stopped: "Événement arrêté !", success_all_events_stopped: "Tous les événements arrêtés !", err_enter_competition_name: "Entrez un nom de compétition", err_invalid_prize_amount: "Montant du prix invalide", success_competition_started: "Compétition démarrée !", err_competition_not_found: "Compétition introuvable (déjà terminée ?)", success_competition_ending: "La compétition se termine et distribue les prix...", err_enter_title_text2: "Entrez le texte du titre", success_title_given: "Titre « {title} » attribué à {name} !", success_title_removed: "Le titre de {name} a été supprimé !", success_code_created: "Code « {code} » créé avec succès !", err_code_already_exists: "Un code nommé « {code} » existe déjà", success_player_data_deleted: "Les données de « {name} » ont été supprimées avec succès !", err_firebase_down: "Firebase non connecté", err_wrong_credentials: "Nom d'utilisateur ou mot de passe incorrect", err_no_server_response: "Aucune réponse du serveur - réessayez", err_prefix: "Erreur :", err_username_short: "Nom trop court", err_password_short: "Le mot de passe doit contenir au moins 6 caractères", err_username_taken: "Nom d'utilisateur déjà pris", err_weak_password: "Mot de passe trop faible", login_connecting: "Connexion...", register_registering: "Inscription...", register_success: "Inscription réussie !"
     },
     ru: {
@@ -2606,6 +2616,8 @@ close_btn: "Закрыть", back_btn: "⬅ Назад", cancel_btn: "Отмен
         comp_table_players: "👤 Отдельные игроки", comp_table_clubs: "🏆 Клубы",
         comp_participants_suffix: "участников", comp_no_participants: "Пока нет участников",
         err_enter_user_pass: "Введите имя пользователя и пароль",
+        ai_search_username_ph: "Поиск по имени пользователя", ai_search_text_ph: "Поиск по содержанию сообщения",
+        store_btn: "🛒 Магазин", store_modal_title: "🛒 Магазин печенек", store_order_title_prefix: "🛒 Заказ", store_order_name_ph: "Ваше имя", store_order_phone_ph: "Номер телефона", store_send_btn: "📤 Отправить", titles_modal_title: "🏅 Выбор титула", ai_chat_input_ph: "Спросите меня о чём-нибудь...", global_chat_input_ph: "Введите сообщение...", send_btn: "Отправить", escape_camp_btn: "🏕️ Побег из лагеря", warning_modal_title: "⚠️ Предупреждение!", ai_chat_title_default: "🤖 Чат", debug_mode_title: "🐛 Режим отладки", delete_message_title: "🗑️ Удалить сообщение", join_club_title: "🏆 Вступление в клуб", create_club_title: "⭐ Создание клуба", my_club_title: "🏆 Мой клуб", members_label: "Участники:", donate_pick_player_title: "🎁 Выберите игрока для пожертвования", donate_title: "🎁 Пожертвовать печеньками", gender_section_title: "👫 Пол", delete_account_title: "🗑️ Удаление аккаунта", creator_screen_title: "👑 Экран создателя", auth_section_title: "🔐 Аутентификация", broadcast_section_title: "📢 Сообщение всем игрокам", transfer_cookies_title: "💰 Перевод печенек", give_remove_prestige_title: "⭐ Дать/убрать престиж", cheat_mode_title: "🎮 Режим читов в играх", delete_player_title: "🗑️ Удалить игрока", players_list_title: "📋 Список игроков", community_mgmt_title: "📋 Управление сообществом", events_mgmt_title: "🎉 Управление событиями (можно запускать несколько вместе)", cookies_for_all_title: "🎁 Печеньки для всех игроков", competitions_mgmt_title: "🏁 Управление соревнованиями", codes_mgmt_title: "🎁 Управление кодами", ai_chats_admin_title: "🤖 Чаты с ИИ", store_orders_admin_title: "🛒 Заказы магазина", mod_action_title: "🛡️ Действие модератора", ban_section_title: "🚫 Бан в игре", mute_section_title: "🔇 Мут в чате", warning_section_title: "⚠️ Отправить предупреждение", delete_selected_msg_title: "🗑️ Удалить выбранное сообщение", leave_club_btn: "Покинуть клуб", delete_permanent_btn: "Удалить навсегда", confirm_btn: "Подтвердить", create_btn: "Создать", confirm_donation_btn: "Подтвердить пожертвование", change_password_btn: "Изменить пароль", update_gender_btn: "Обновить пол", delete_my_account_btn: "Навсегда удалить мой аккаунт", logout_btn: "🚪 Выйти", verify_access_btn: "Подтвердить доступ", send_to_all_btn: "Отправить всем", clear_message_all_btn: "Убрать сообщение у всех", add_cookies_btn: "➕ Добавить печеньки", remove_cookies_btn: "➖ Убрать печеньки", add_prestige_btn: "➕ Добавить престиж", remove_prestige_btn: "➖ Убрать престиж", delete_player_btn: "Удалить игрока", refresh_list_btn: "🔄 Обновить список", refresh_lists_btn: "🔄 Обновить списки", start_btn2: "Запустить", stop_btn2: "Остановить", stop_all_events_btn: "⏹️ Остановить все события", add_to_all_btn: "➕ Добавить всем", remove_from_all_btn: "➖ Убрать у всех", start_new_competition_btn: "🏁 Запустить новое соревнование", give_title_btn: "Дать титул", remove_title_btn: "Убрать титул", create_code_btn: "🎁 Создать код", refresh_btn: "🔄 Обновить", search_btn: "🔍 Поиск", ban_for_duration_btn: "Забанить на выбранный срок", ban_permanent_btn: "Забанить навсегда", remove_ban_btn: "Снять бан", mute_chat_duration_btn: "Замутить чат на выбранный срок", mute_chat_permanent_btn: "Замутить чат навсегда", remove_mute_btn: "Снять мут", send_warning_btn: "Отправить предупреждение", delete_this_message_btn: "Удалить это сообщение", understood_btn: "Понятно", stop_this_competition_btn: "⏹️ Остановить это соревнование", delete_code_btn: "Удалить код", no_name_competition_fallback: "Соревнование без названия", club_code_ph: "Код клуба (4 цифры)", club_name_ph: "Название клуба", cookie_amount_ph: "Количество печенек", current_password_ph: "Текущий пароль", new_password_ph: "Новый пароль", confirm_new_password_ph: "Подтвердите новый пароль", confirm_password_field_ph: "Введите пароль для подтверждения", creator_password_ph: "Пароль создателя", player_name_ph: "Имя игрока", prestige_amount_ph: "Количество уровней престижа", player_name_delete_ph: "Имя игрока для удаления", search_player_ph: "Поиск игрока по имени...", duration_minutes_ph: "Длительность в минутах", golden_bonus_ph: "Фиксированный бонус за золотую печеньку", discount_percent_ph: "Процент скидки", cookies_per_player_ph: "Количество печенек на игрока", competition_name_example_ph: "напр.: Весеннее соревнование 2026", enter_title_ph: "Введите титул", days_ph: "Дни", hours_ph: "Часы", mins_ph: "Минуты", secs_ph: "Секунды", code_example_ph: "напр.: WELCOME2026", warning_content_ph: "Текст предупреждения",
         err_already_in_club: "Вы уже в клубе", err_club_not_found: "Клуб не найден", err_invalid_club_code: "Неверный код", success_left_club: "Вы успешно покинули клуб!", success_joined_club: "Успешно присоединились!", success_club_created_prefix: "Создано! Код:", info_searching_club: "Поиск клуба...", err_login_first: "Сначала войдите", err_not_enough_cookies: "У вас недостаточно печенек", err_invalid_amount: "Неверное количество", err_corrupted_recipient: "Данные получателя повреждены — сейчас невозможно сделать пожертвование", info_transferring: "Перевод...", success_donated: "Успешно пожертвовано!", err_invalid_name: "Неверное имя", err_enter_password_verify: "Введите пароль для проверки", err_already_your_name: "Это уже ваше имя", info_updating: "Обновление...", success_changed: "Успешно изменено!", err_fill_all_fields: "Заполните все поля", err_passwords_mismatch: "Пароли не совпадают", success_password_changed: "Пароль изменён!", err_wrong_current_password: "Текущий пароль неверен", err_select_gender: "Выберите пол", success_updated: "Обновлено!", err_enter_password_confirm: "Введите пароль для подтверждения", info_deleting_account: "Удаление аккаунта...", err_wrong_password: "Неверный пароль", err_not_enough_for_bet: "У вас недостаточно печенек для этой ставки", info_creating_duel: "Создание дуэли...", err_invalid_duration: "Введите корректную длительность", err_invalid_bet: "Неверная сумма ставки", err_enter_code: "Введите код", info_checking_code: "Проверка кода...", err_code_not_found: "Код не существует", err_already_redeemed: "Вы уже использовали этот код ранее", err_unknown_reward_type: "Неизвестный тип награды в этом коде", success_redeemed_cookies: "Вы получили {amount} печенек! 🎁", success_redeemed_title: "Вы получили титул «{title}»! 🏅", info_loading: "Загрузка...", err_enter_message_content: "Введите текст сообщения", success_broadcast_sent: "Сообщение отправлено всем!", success_broadcast_cleared: "Сообщение удалено у всех!", err_enter_player_name: "Введите имя игрока", err_player_not_found: "Игрок «{name}» не найден", err_no_players_found: "Игроки не найдены", info_deleting_player: "Удаление игрока...", info_searching_player: "Поиск игрока...", err_enter_bonus: "Введите корректный бонус", err_choose_duration: "Выберите длительность", err_invalid_discount: "Введите корректный процент скидки (1-99)", success_event_started: "Событие запущено!", success_event_stopped: "Событие остановлено!", success_all_events_stopped: "Все события остановлены!", err_enter_competition_name: "Введите название соревнования", err_invalid_prize_amount: "Неверная сумма приза", success_competition_started: "Соревнование запущено!", err_competition_not_found: "Соревнование не найдено (уже завершилось?)", success_competition_ending: "Соревнование завершается и выдаёт призы...", err_enter_title_text2: "Введите текст титула", success_title_given: "Титул «{title}» присвоен {name}!", success_title_removed: "Титул {name} удалён!", success_code_created: "Код «{code}» успешно создан!", err_code_already_exists: "Код с именем «{code}» уже существует", success_player_data_deleted: "Данные «{name}» успешно удалены!", err_firebase_down: "Firebase не подключен", err_wrong_credentials: "Неверное имя пользователя или пароль", err_no_server_response: "Нет ответа от сервера - попробуйте снова", err_prefix: "Ошибка:", err_username_short: "Слишком короткое имя", err_password_short: "Пароль должен содержать не менее 6 символов", err_username_taken: "Имя пользователя уже занято", err_weak_password: "Слишком слабый пароль", login_connecting: "Вход...", register_registering: "Регистрация...", register_success: "Успешная регистрация!"
     },
     pt: {
@@ -2661,6 +2673,8 @@ close_btn: "Fechar", back_btn: "⬅ Voltar", cancel_btn: "Cancelar",
         comp_table_players: "👤 Jogadores individuais", comp_table_clubs: "🏆 Clubes",
         comp_participants_suffix: "participantes", comp_no_participants: "Ainda sem participantes",
         err_enter_user_pass: "Digite usuário e senha",
+        ai_search_username_ph: "Buscar por nome de usuário", ai_search_text_ph: "Buscar por conteúdo da mensagem",
+        store_btn: "🛒 Loja", store_modal_title: "🛒 Loja de cookies", store_order_title_prefix: "🛒 Pedido", store_order_name_ph: "Seu nome", store_order_phone_ph: "Número de telefone", store_send_btn: "📤 Enviar", titles_modal_title: "🏅 Escolher título", ai_chat_input_ph: "Pergunte-me algo...", global_chat_input_ph: "Digite uma mensagem...", send_btn: "Enviar", escape_camp_btn: "🏕️ Fugir do acampamento", warning_modal_title: "⚠️ Aviso!", ai_chat_title_default: "🤖 Chat", debug_mode_title: "🐛 Modo de depuração", delete_message_title: "🗑️ Excluir mensagem", join_club_title: "🏆 Entrar em um clube", create_club_title: "⭐ Criar um clube", my_club_title: "🏆 Meu clube", members_label: "Membros:", donate_pick_player_title: "🎁 Escolha um jogador para doar", donate_title: "🎁 Doar cookies", gender_section_title: "👫 Gênero", delete_account_title: "🗑️ Excluir conta", creator_screen_title: "👑 Painel do criador", auth_section_title: "🔐 Autenticação", broadcast_section_title: "📢 Mensagem para todos os jogadores", transfer_cookies_title: "💰 Transferir cookies", give_remove_prestige_title: "⭐ Dar/remover prestígio", cheat_mode_title: "🎮 Modo de trapaça nos jogos", delete_player_title: "🗑️ Excluir jogador", players_list_title: "📋 Lista de jogadores", community_mgmt_title: "📋 Gestão da comunidade", events_mgmt_title: "🎉 Gestão de eventos (vários podem rodar juntos)", cookies_for_all_title: "🎁 Cookies para todos os jogadores", competitions_mgmt_title: "🏁 Gestão de competições", codes_mgmt_title: "🎁 Gestão de códigos", ai_chats_admin_title: "🤖 Chats com a IA", store_orders_admin_title: "🛒 Pedidos da loja", mod_action_title: "🛡️ Ação de moderador", ban_section_title: "🚫 Banimento do jogo", mute_section_title: "🔇 Silenciar no chat", warning_section_title: "⚠️ Enviar aviso", delete_selected_msg_title: "🗑️ Excluir mensagem selecionada", leave_club_btn: "Sair do clube", delete_permanent_btn: "Excluir permanentemente", confirm_btn: "Confirmar", create_btn: "Criar", confirm_donation_btn: "Confirmar doação", change_password_btn: "Alterar senha", update_gender_btn: "Atualizar gênero", delete_my_account_btn: "Excluir minha conta permanentemente", logout_btn: "🚪 Sair", verify_access_btn: "Verificar acesso", send_to_all_btn: "Enviar a todos", clear_message_all_btn: "Limpar mensagem para todos", add_cookies_btn: "➕ Adicionar cookies", remove_cookies_btn: "➖ Remover cookies", add_prestige_btn: "➕ Adicionar prestígio", remove_prestige_btn: "➖ Remover prestígio", delete_player_btn: "Excluir jogador", refresh_list_btn: "🔄 Atualizar lista", refresh_lists_btn: "🔄 Atualizar listas", start_btn2: "Ativar", stop_btn2: "Parar", stop_all_events_btn: "⏹️ Parar todos os eventos", add_to_all_btn: "➕ Adicionar a todos", remove_from_all_btn: "➖ Remover de todos", start_new_competition_btn: "🏁 Iniciar nova competição", give_title_btn: "Dar título", remove_title_btn: "Remover título", create_code_btn: "🎁 Criar código", refresh_btn: "🔄 Atualizar", search_btn: "🔍 Buscar", ban_for_duration_btn: "Banir pela duração selecionada", ban_permanent_btn: "Banir permanentemente", remove_ban_btn: "Remover banimento", mute_chat_duration_btn: "Silenciar chat pela duração selecionada", mute_chat_permanent_btn: "Silenciar chat permanentemente", remove_mute_btn: "Remover silêncio do chat", send_warning_btn: "Enviar aviso", delete_this_message_btn: "Excluir esta mensagem", understood_btn: "Entendi", stop_this_competition_btn: "⏹️ Parar esta competição", delete_code_btn: "Excluir código", no_name_competition_fallback: "Competição sem nome", club_code_ph: "Código do clube (4 dígitos)", club_name_ph: "Nome do clube", cookie_amount_ph: "Quantidade de cookies", current_password_ph: "Senha atual", new_password_ph: "Nova senha", confirm_new_password_ph: "Confirmar nova senha", confirm_password_field_ph: "Digite a senha para confirmar", creator_password_ph: "Senha do criador", player_name_ph: "Nome do jogador", prestige_amount_ph: "Quantidade de níveis de prestígio", player_name_delete_ph: "Nome do jogador a excluir", search_player_ph: "Buscar jogador por nome...", duration_minutes_ph: "Duração em minutos", golden_bonus_ph: "Bônus fixo por cookie dourado", discount_percent_ph: "Porcentagem de desconto", cookies_per_player_ph: "Quantidade de cookies por jogador", competition_name_example_ph: "ex.: Competição de primavera 2026", enter_title_ph: "Digite o título", days_ph: "Dias", hours_ph: "Horas", mins_ph: "Minutos", secs_ph: "Segundos", code_example_ph: "ex.: WELCOME2026", warning_content_ph: "Conteúdo do aviso",
         err_already_in_club: "Você já está em um clube", err_club_not_found: "Clube não encontrado", err_invalid_club_code: "Código inválido", success_left_club: "Você saiu do clube com sucesso!", success_joined_club: "Entrou com sucesso!", success_club_created_prefix: "Criado! Código:", info_searching_club: "Buscando clube...", err_login_first: "Faça login primeiro", err_not_enough_cookies: "Você não tem cookies suficientes", err_invalid_amount: "Quantidade inválida", err_corrupted_recipient: "Os dados do destinatário estão corrompidos — não é possível doar agora", info_transferring: "Transferindo...", success_donated: "Doado com sucesso!", err_invalid_name: "Nome inválido", err_enter_password_verify: "Digite sua senha para verificar", err_already_your_name: "Esse já é o seu nome", info_updating: "Atualizando...", success_changed: "Alterado com sucesso!", err_fill_all_fields: "Preencha todos os campos", err_passwords_mismatch: "As senhas não coincidem", success_password_changed: "Senha alterada!", err_wrong_current_password: "Senha atual incorreta", err_select_gender: "Selecione o gênero", success_updated: "Atualizado!", err_enter_password_confirm: "Digite a senha para confirmar", info_deleting_account: "Excluindo conta...", err_wrong_password: "Senha incorreta", err_not_enough_for_bet: "Você não tem cookies suficientes para esta aposta", info_creating_duel: "Criando duelo...", err_invalid_duration: "Digite uma duração válida", err_invalid_bet: "Valor de aposta inválido", err_enter_code: "Digite um código", info_checking_code: "Verificando código...", err_code_not_found: "O código não existe", err_already_redeemed: "Você já resgatou este código antes", err_unknown_reward_type: "Tipo de recompensa desconhecido neste código", success_redeemed_cookies: "Você recebeu {amount} cookies! 🎁", success_redeemed_title: "Você recebeu o título '{title}'! 🏅", info_loading: "Carregando...", err_enter_message_content: "Digite o conteúdo da mensagem", success_broadcast_sent: "Mensagem enviada a todos!", success_broadcast_cleared: "Mensagem removida para todos!", err_enter_player_name: "Digite o nome do jogador", err_player_not_found: "Jogador '{name}' não encontrado", err_no_players_found: "Nenhum jogador encontrado", info_deleting_player: "Excluindo jogador...", info_searching_player: "Buscando jogador...", err_enter_bonus: "Digite um bônus válido", err_choose_duration: "Escolha uma duração", err_invalid_discount: "Digite uma porcentagem de desconto válida (1-99)", success_event_started: "Evento iniciado!", success_event_stopped: "Evento interrompido!", success_all_events_stopped: "Todos os eventos interrompidos!", err_enter_competition_name: "Digite um nome para a competição", err_invalid_prize_amount: "Valor do prêmio inválido", success_competition_started: "Competição iniciada!", err_competition_not_found: "Competição não encontrada (já terminou?)", success_competition_ending: "A competição está terminando e distribuindo prêmios...", err_enter_title_text2: "Digite o texto do título", success_title_given: "Título '{title}' dado a {name}!", success_title_removed: "O título de {name} foi removido!", success_code_created: "Código '{code}' criado com sucesso!", err_code_already_exists: "Já existe um código chamado '{code}'", success_player_data_deleted: "Os dados de '{name}' foram excluídos com sucesso!", err_firebase_down: "Firebase não conectado", err_wrong_credentials: "Usuário ou senha incorretos", err_no_server_response: "Sem resposta do servidor - tente novamente", err_prefix: "Erro:", err_username_short: "Nome muito curto", err_password_short: "A senha deve ter pelo menos 6 caracteres", err_username_taken: "Nome de usuário já em uso", err_weak_password: "Senha muito fraca", login_connecting: "Entrando...", register_registering: "Cadastrando...", register_success: "Cadastrado com sucesso!"
     },
     de: {
@@ -2716,6 +2730,8 @@ close_btn: "Schließen", back_btn: "⬅ Zurück", cancel_btn: "Abbrechen",
         comp_table_players: "👤 Einzelspieler", comp_table_clubs: "🏆 Klubs",
         comp_participants_suffix: "Teilnehmer", comp_no_participants: "Noch keine Teilnehmer",
         err_enter_user_pass: "Benutzername und Passwort eingeben",
+        ai_search_username_ph: "Nach Benutzername suchen", ai_search_text_ph: "Nach Nachrichteninhalt suchen",
+        store_btn: "🛒 Shop", store_modal_title: "🛒 Keks-Shop", store_order_title_prefix: "🛒 Bestellung", store_order_name_ph: "Dein Name", store_order_phone_ph: "Telefonnummer", store_send_btn: "📤 Senden", titles_modal_title: "🏅 Titel wählen", ai_chat_input_ph: "Frag mich etwas...", global_chat_input_ph: "Nachricht eingeben...", send_btn: "Senden", escape_camp_btn: "🏕️ Flucht aus dem Camp", warning_modal_title: "⚠️ Warnung!", ai_chat_title_default: "🤖 Chat", debug_mode_title: "🐛 Debug-Modus", delete_message_title: "🗑️ Nachricht löschen", join_club_title: "🏆 Klub beitreten", create_club_title: "⭐ Klub erstellen", my_club_title: "🏆 Mein Klub", members_label: "Mitglieder:", donate_pick_player_title: "🎁 Spieler für Spende wählen", donate_title: "🎁 Kekse spenden", gender_section_title: "👫 Geschlecht", delete_account_title: "🗑️ Konto löschen", creator_screen_title: "👑 Ersteller-Bildschirm", auth_section_title: "🔐 Authentifizierung", broadcast_section_title: "📢 Nachricht an alle Spieler", transfer_cookies_title: "💰 Kekse übertragen", give_remove_prestige_title: "⭐ Prestige geben/entfernen", cheat_mode_title: "🎮 Cheat-Modus in Spielen", delete_player_title: "🗑️ Spieler löschen", players_list_title: "📋 Spielerliste", community_mgmt_title: "📋 Community-Verwaltung", events_mgmt_title: "🎉 Event-Verwaltung (mehrere gleichzeitig möglich)", cookies_for_all_title: "🎁 Kekse für alle Spieler", competitions_mgmt_title: "🏁 Wettbewerbsverwaltung", codes_mgmt_title: "🎁 Code-Verwaltung", ai_chats_admin_title: "🤖 KI-Chats", store_orders_admin_title: "🛒 Shop-Bestellungen", mod_action_title: "🛡️ Moderator-Aktion", ban_section_title: "🚫 Spielsperre (Bann)", mute_section_title: "🔇 Chat stummschalten", warning_section_title: "⚠️ Warnung senden", delete_selected_msg_title: "🗑️ Ausgewählte Nachricht löschen", leave_club_btn: "Klub verlassen", delete_permanent_btn: "Endgültig löschen", confirm_btn: "Bestätigen", create_btn: "Erstellen", confirm_donation_btn: "Spende bestätigen", change_password_btn: "Passwort ändern", update_gender_btn: "Geschlecht aktualisieren", delete_my_account_btn: "Mein Konto endgültig löschen", logout_btn: "🚪 Abmelden", verify_access_btn: "Zugriff bestätigen", send_to_all_btn: "An alle senden", clear_message_all_btn: "Nachricht für alle entfernen", add_cookies_btn: "➕ Kekse hinzufügen", remove_cookies_btn: "➖ Kekse entfernen", add_prestige_btn: "➕ Prestige hinzufügen", remove_prestige_btn: "➖ Prestige entfernen", delete_player_btn: "Spieler löschen", refresh_list_btn: "🔄 Liste aktualisieren", refresh_lists_btn: "🔄 Listen aktualisieren", start_btn2: "Starten", stop_btn2: "Stoppen", stop_all_events_btn: "⏹️ Alle Events stoppen", add_to_all_btn: "➕ Zu allen hinzufügen", remove_from_all_btn: "➖ Von allen entfernen", start_new_competition_btn: "🏁 Neuen Wettbewerb starten", give_title_btn: "Titel geben", remove_title_btn: "Titel entfernen", create_code_btn: "🎁 Code erstellen", refresh_btn: "🔄 Aktualisieren", search_btn: "🔍 Suchen", ban_for_duration_btn: "Für gewählte Dauer sperren", ban_permanent_btn: "Dauerhaft sperren", remove_ban_btn: "Sperre aufheben", mute_chat_duration_btn: "Chat für gewählte Dauer stummschalten", mute_chat_permanent_btn: "Chat dauerhaft stummschalten", remove_mute_btn: "Stummschaltung aufheben", send_warning_btn: "Warnung senden", delete_this_message_btn: "Diese Nachricht löschen", understood_btn: "Verstanden", stop_this_competition_btn: "⏹️ Diesen Wettbewerb stoppen", delete_code_btn: "Code löschen", no_name_competition_fallback: "Unbenannter Wettbewerb", club_code_ph: "Klub-Code (4 Ziffern)", club_name_ph: "Klubname", cookie_amount_ph: "Keksmenge", current_password_ph: "Aktuelles Passwort", new_password_ph: "Neues Passwort", confirm_new_password_ph: "Neues Passwort bestätigen", confirm_password_field_ph: "Passwort zur Bestätigung eingeben", creator_password_ph: "Ersteller-Passwort", player_name_ph: "Spielername", prestige_amount_ph: "Anzahl Prestige-Level", player_name_delete_ph: "Zu löschender Spielername", search_player_ph: "Spieler nach Namen suchen...", duration_minutes_ph: "Dauer in Minuten", golden_bonus_ph: "Fester Bonus pro goldenem Keks", discount_percent_ph: "Rabattprozentsatz", cookies_per_player_ph: "Keksmenge pro Spieler", competition_name_example_ph: "z. B.: Frühlingswettbewerb 2026", enter_title_ph: "Titel eingeben", days_ph: "Tage", hours_ph: "Stunden", mins_ph: "Minuten", secs_ph: "Sekunden", code_example_ph: "z. B.: WELCOME2026", warning_content_ph: "Warnungsinhalt",
         err_already_in_club: "Du bist bereits in einem Klub", err_club_not_found: "Klub nicht gefunden", err_invalid_club_code: "Ungültiger Code", success_left_club: "Du hast den Klub erfolgreich verlassen!", success_joined_club: "Erfolgreich beigetreten!", success_club_created_prefix: "Erstellt! Code:", info_searching_club: "Klub wird gesucht...", err_login_first: "Zuerst anmelden", err_not_enough_cookies: "Du hast nicht genug Kekse", err_invalid_amount: "Ungültige Menge", err_corrupted_recipient: "Die Daten des Empfängers sind beschädigt — momentan keine Spende möglich", info_transferring: "Übertragung...", success_donated: "Erfolgreich gespendet!", err_invalid_name: "Ungültiger Name", err_enter_password_verify: "Gib dein Passwort zur Bestätigung ein", err_already_your_name: "Das ist bereits dein Name", info_updating: "Aktualisierung...", success_changed: "Erfolgreich geändert!", err_fill_all_fields: "Alle Felder ausfüllen", err_passwords_mismatch: "Passwörter stimmen nicht überein", success_password_changed: "Passwort geändert!", err_wrong_current_password: "Aktuelles Passwort ist falsch", err_select_gender: "Geschlecht auswählen", success_updated: "Aktualisiert!", err_enter_password_confirm: "Passwort zur Bestätigung eingeben", info_deleting_account: "Konto wird gelöscht...", err_wrong_password: "Falsches Passwort", err_not_enough_for_bet: "Du hast nicht genug Kekse für diesen Einsatz", info_creating_duel: "Duell wird erstellt...", err_invalid_duration: "Gib eine gültige Dauer ein", err_invalid_bet: "Ungültiger Einsatzbetrag", err_enter_code: "Code eingeben", info_checking_code: "Code wird geprüft...", err_code_not_found: "Code existiert nicht", err_already_redeemed: "Du hast diesen Code bereits eingelöst", err_unknown_reward_type: "Unbekannter Belohnungstyp bei diesem Code", success_redeemed_cookies: "Du hast {amount} Kekse erhalten! 🎁", success_redeemed_title: "Du hast den Titel „{title}“ erhalten! 🏅", info_loading: "Wird geladen...", err_enter_message_content: "Nachrichteninhalt eingeben", success_broadcast_sent: "Nachricht an alle gesendet!", success_broadcast_cleared: "Nachricht für alle entfernt!", err_enter_player_name: "Spielernamen eingeben", err_player_not_found: "Spieler „{name}“ nicht gefunden", err_no_players_found: "Keine Spieler gefunden", info_deleting_player: "Spieler wird gelöscht...", info_searching_player: "Spieler wird gesucht...", err_enter_bonus: "Gültigen Bonus eingeben", err_choose_duration: "Dauer wählen", err_invalid_discount: "Gültigen Rabattprozentsatz eingeben (1-99)", success_event_started: "Event gestartet!", success_event_stopped: "Event gestoppt!", success_all_events_stopped: "Alle Events gestoppt!", err_enter_competition_name: "Wettbewerbsnamen eingeben", err_invalid_prize_amount: "Ungültiger Preisbetrag", success_competition_started: "Wettbewerb gestartet!", err_competition_not_found: "Wettbewerb nicht gefunden (bereits beendet?)", success_competition_ending: "Wettbewerb endet und vergibt Preise...", err_enter_title_text2: "Titeltext eingeben", success_title_given: "Titel „{title}“ an {name} vergeben!", success_title_removed: "Titel von {name} wurde entfernt!", success_code_created: "Code „{code}“ erfolgreich erstellt!", err_code_already_exists: "Ein Code namens „{code}“ existiert bereits", success_player_data_deleted: "Daten von „{name}“ erfolgreich gelöscht!", err_firebase_down: "Firebase nicht verbunden", err_wrong_credentials: "Falscher Benutzername oder falsches Passwort", err_no_server_response: "Keine Antwort vom Server - erneut versuchen", err_prefix: "Fehler:", err_username_short: "Name zu kurz", err_password_short: "Passwort muss mindestens 6 Zeichen haben", err_username_taken: "Benutzername bereits vergeben", err_weak_password: "Passwort zu schwach", login_connecting: "Anmeldung...", register_registering: "Registrierung...", register_success: "Erfolgreich registriert!"
     },
     zh: {
@@ -2771,6 +2787,8 @@ close_btn: "关闭", back_btn: "⬅ 返回", cancel_btn: "取消",
         comp_table_players: "👤 个人玩家", comp_table_clubs: "🏆 俱乐部",
         comp_participants_suffix: "参与者", comp_no_participants: "暂无参与者",
         err_enter_user_pass: "请输入用户名和密码",
+        ai_search_username_ph: "按用户名搜索", ai_search_text_ph: "按消息内容搜索",
+        store_btn: "🛒 商店", store_modal_title: "🛒 饼干商店", store_order_title_prefix: "🛒 订单", store_order_name_ph: "你的名字", store_order_phone_ph: "电话号码", store_send_btn: "📤 发送", titles_modal_title: "🏅 选择称号", ai_chat_input_ph: "问我点什么...", global_chat_input_ph: "输入消息...", send_btn: "发送", escape_camp_btn: "🏕️ 逃离营地", warning_modal_title: "⚠️ 警告！", ai_chat_title_default: "🤖 聊天", debug_mode_title: "🐛 调试模式", delete_message_title: "🗑️ 删除消息", join_club_title: "🏆 加入俱乐部", create_club_title: "⭐ 创建俱乐部", my_club_title: "🏆 我的俱乐部", members_label: "成员：", donate_pick_player_title: "🎁 选择要捐赠的玩家", donate_title: "🎁 捐赠饼干", gender_section_title: "👫 性别", delete_account_title: "🗑️ 删除账户", creator_screen_title: "👑 创建者面板", auth_section_title: "🔐 验证", broadcast_section_title: "📢 给所有玩家的消息", transfer_cookies_title: "💰 转移饼干", give_remove_prestige_title: "⭐ 给予/移除声望", cheat_mode_title: "🎮 游戏作弊模式", delete_player_title: "🗑️ 删除玩家", players_list_title: "📋 玩家列表", community_mgmt_title: "📋 社区管理", events_mgmt_title: "🎉 活动管理（可同时运行多个）", cookies_for_all_title: "🎁 给所有玩家的饼干", competitions_mgmt_title: "🏁 比赛管理", codes_mgmt_title: "🎁 代码管理", ai_chats_admin_title: "🤖 AI 聊天", store_orders_admin_title: "🛒 商店订单", mod_action_title: "🛡️ 管理员操作", ban_section_title: "🚫 游戏封禁", mute_section_title: "🔇 聊天禁言", warning_section_title: "⚠️ 发送警告", delete_selected_msg_title: "🗑️ 删除所选消息", leave_club_btn: "离开俱乐部", delete_permanent_btn: "永久删除", confirm_btn: "确认", create_btn: "创建", confirm_donation_btn: "确认捐赠", change_password_btn: "更改密码", update_gender_btn: "更新性别", delete_my_account_btn: "永久删除我的账户", logout_btn: "🚪 登出", verify_access_btn: "验证访问", send_to_all_btn: "发送给所有人", clear_message_all_btn: "为所有人清除消息", add_cookies_btn: "➕ 添加饼干", remove_cookies_btn: "➖ 移除饼干", add_prestige_btn: "➕ 添加声望", remove_prestige_btn: "➖ 移除声望", delete_player_btn: "删除玩家", refresh_list_btn: "🔄 刷新列表", refresh_lists_btn: "🔄 刷新列表", start_btn2: "启动", stop_btn2: "停止", stop_all_events_btn: "⏹️ 停止所有活动", add_to_all_btn: "➕ 添加给所有人", remove_from_all_btn: "➖ 从所有人移除", start_new_competition_btn: "🏁 开始新比赛", give_title_btn: "授予称号", remove_title_btn: "移除称号", create_code_btn: "🎁 创建代码", refresh_btn: "🔄 刷新", search_btn: "🔍 搜索", ban_for_duration_btn: "按所选时长封禁", ban_permanent_btn: "永久封禁", remove_ban_btn: "移除封禁", mute_chat_duration_btn: "按所选时长禁言", mute_chat_permanent_btn: "永久禁言", remove_mute_btn: "移除聊天禁言", send_warning_btn: "发送警告", delete_this_message_btn: "删除此消息", understood_btn: "知道了", stop_this_competition_btn: "⏹️ 停止此比赛", delete_code_btn: "删除代码", no_name_competition_fallback: "未命名比赛", club_code_ph: "俱乐部代码（4位数字）", club_name_ph: "俱乐部名称", cookie_amount_ph: "饼干数量", current_password_ph: "当前密码", new_password_ph: "新密码", confirm_new_password_ph: "确认新密码", confirm_password_field_ph: "输入密码以确认", creator_password_ph: "创建者密码", player_name_ph: "玩家名称", prestige_amount_ph: "声望等级数量", player_name_delete_ph: "要删除的玩家名称", search_player_ph: "按名称搜索玩家...", duration_minutes_ph: "时长（分钟）", golden_bonus_ph: "每个金饼干的固定奖励", discount_percent_ph: "折扣百分比", cookies_per_player_ph: "每位玩家的饼干数量", competition_name_example_ph: "例如：2026年春季比赛", enter_title_ph: "输入称号", days_ph: "天", hours_ph: "小时", mins_ph: "分钟", secs_ph: "秒", code_example_ph: "例如：WELCOME2026", warning_content_ph: "警告内容",
         err_already_in_club: "你已经在一个俱乐部中", err_club_not_found: "找不到俱乐部", err_invalid_club_code: "代码无效", success_left_club: "你已成功离开俱乐部！", success_joined_club: "加入成功！", success_club_created_prefix: "已创建！代码：", info_searching_club: "正在搜索俱乐部...", err_login_first: "请先登录", err_not_enough_cookies: "你的饼干不够", err_invalid_amount: "数量无效", err_corrupted_recipient: "接收者的数据已损坏 — 目前无法捐赠", info_transferring: "转账中...", success_donated: "捐赠成功！", err_invalid_name: "名称无效", err_enter_password_verify: "输入密码以验证", err_already_your_name: "这已经是你的名字了", info_updating: "更新中...", success_changed: "更改成功！", err_fill_all_fields: "填写所有字段", err_passwords_mismatch: "密码不匹配", success_password_changed: "密码已更改！", err_wrong_current_password: "当前密码不正确", err_select_gender: "选择性别", success_updated: "已更新！", err_enter_password_confirm: "输入密码以确认", info_deleting_account: "正在删除账户...", err_wrong_password: "密码错误", err_not_enough_for_bet: "你的饼干不足以进行这次赌注", info_creating_duel: "正在创建对决...", err_invalid_duration: "输入有效的时长", err_invalid_bet: "赌注金额无效", err_enter_code: "输入代码", info_checking_code: "正在检查代码...", err_code_not_found: "代码不存在", err_already_redeemed: "你之前已经兑换过此代码", err_unknown_reward_type: "此代码的奖励类型未知", success_redeemed_cookies: "你获得了{amount}块饼干！🎁", success_redeemed_title: "你获得了称号「{title}」！🏅", info_loading: "加载中...", err_enter_message_content: "输入消息内容", success_broadcast_sent: "消息已发送给所有人！", success_broadcast_cleared: "消息已为所有人清除！", err_enter_player_name: "输入玩家名称", err_player_not_found: "未找到玩家「{name}」", err_no_players_found: "未找到玩家", info_deleting_player: "正在删除玩家...", info_searching_player: "正在搜索玩家...", err_enter_bonus: "输入有效的奖励", err_choose_duration: "选择时长", err_invalid_discount: "输入有效的折扣百分比（1-99）", success_event_started: "活动已开始！", success_event_stopped: "活动已停止！", success_all_events_stopped: "所有活动已停止！", err_enter_competition_name: "输入比赛名称", err_invalid_prize_amount: "奖金金额无效", success_competition_started: "比赛已开始！", err_competition_not_found: "未找到比赛（已经结束？）", success_competition_ending: "比赛结束，正在颁发奖品...", err_enter_title_text2: "输入称号文本", success_title_given: "称号「{title}」已授予{name}！", success_title_removed: "{name}的称号已被移除！", success_code_created: "代码「{code}」创建成功！", err_code_already_exists: "名为「{code}」的代码已存在", success_player_data_deleted: "「{name}」的数据已成功删除！", err_firebase_down: "Firebase 未连接", err_wrong_credentials: "用户名或密码错误", err_no_server_response: "服务器无响应 - 请重试", err_prefix: "错误：", err_username_short: "用户名太短", err_password_short: "密码至少需要6个字符", err_username_taken: "用户名已被使用", err_weak_password: "密码太弱", login_connecting: "登录中...", register_registering: "注册中...", register_success: "注册成功！"
     },
     hi: {
@@ -2826,6 +2844,8 @@ close_btn: "बंद करें", back_btn: "⬅ वापस", cancel_btn: "
         comp_table_players: "👤 व्यक्तिगत खिलाड़ी", comp_table_clubs: "🏆 क्लब",
         comp_participants_suffix: "प्रतिभागी", comp_no_participants: "अभी तक कोई प्रतिभागी नहीं",
         err_enter_user_pass: "उपयोगकर्ता नाम और पासवर्ड दर्ज करें",
+        ai_search_username_ph: "उपयोगकर्ता नाम से खोजें", ai_search_text_ph: "संदेश सामग्री से खोजें",
+        store_btn: "🛒 दुकान", store_modal_title: "🛒 कुकी दुकान", store_order_title_prefix: "🛒 ऑर्डर", store_order_name_ph: "आपका नाम", store_order_phone_ph: "फ़ोन नंबर", store_send_btn: "📤 भेजें", titles_modal_title: "🏅 उपाधि चुनें", ai_chat_input_ph: "मुझसे कुछ पूछें...", global_chat_input_ph: "संदेश टाइप करें...", send_btn: "भेजें", escape_camp_btn: "🏕️ कैंप से बचें", warning_modal_title: "⚠️ चेतावनी!", ai_chat_title_default: "🤖 चैट", debug_mode_title: "🐛 डिबग मोड", delete_message_title: "🗑️ संदेश हटाएं", join_club_title: "🏆 क्लब से जुड़ें", create_club_title: "⭐ क्लब बनाएं", my_club_title: "🏆 मेरा क्लब", members_label: "सदस्य:", donate_pick_player_title: "🎁 दान के लिए खिलाड़ी चुनें", donate_title: "🎁 कुकीज़ दान करें", gender_section_title: "👫 लिंग", delete_account_title: "🗑️ खाता हटाएं", creator_screen_title: "👑 क्रिएटर स्क्रीन", auth_section_title: "🔐 प्रमाणीकरण", broadcast_section_title: "📢 सभी खिलाड़ियों को संदेश", transfer_cookies_title: "💰 कुकीज़ स्थानांतरित करें", give_remove_prestige_title: "⭐ प्रतिष्ठा दें/हटाएं", cheat_mode_title: "🎮 गेम्स चीट मोड", delete_player_title: "🗑️ खिलाड़ी हटाएं", players_list_title: "📋 खिलाड़ी सूची", community_mgmt_title: "📋 समुदाय प्रबंधन", events_mgmt_title: "🎉 इवेंट प्रबंधन (कई एक साथ चल सकते हैं)", cookies_for_all_title: "🎁 सभी खिलाड़ियों के लिए कुकीज़", competitions_mgmt_title: "🏁 प्रतियोगिता प्रबंधन", codes_mgmt_title: "🎁 कोड प्रबंधन", ai_chats_admin_title: "🤖 AI चैट", store_orders_admin_title: "🛒 दुकान के ऑर्डर", mod_action_title: "🛡️ मॉडरेटर कार्रवाई", ban_section_title: "🚫 गेम बैन", mute_section_title: "🔇 चैट म्यूट", warning_section_title: "⚠️ चेतावनी भेजें", delete_selected_msg_title: "🗑️ चयनित संदेश हटाएं", leave_club_btn: "क्लब छोड़ें", delete_permanent_btn: "स्थायी रूप से हटाएं", confirm_btn: "पुष्टि करें", create_btn: "बनाएं", confirm_donation_btn: "दान की पुष्टि करें", change_password_btn: "पासवर्ड बदलें", update_gender_btn: "लिंग अपडेट करें", delete_my_account_btn: "मेरा खाता स्थायी रूप से हटाएं", logout_btn: "🚪 लॉग आउट", verify_access_btn: "पहुंच सत्यापित करें", send_to_all_btn: "सभी को भेजें", clear_message_all_btn: "सभी के लिए संदेश साफ़ करें", add_cookies_btn: "➕ कुकीज़ जोड़ें", remove_cookies_btn: "➖ कुकीज़ हटाएं", add_prestige_btn: "➕ प्रतिष्ठा जोड़ें", remove_prestige_btn: "➖ प्रतिष्ठा हटाएं", delete_player_btn: "खिलाड़ी हटाएं", refresh_list_btn: "🔄 सूची रीफ्रेश करें", refresh_lists_btn: "🔄 सूचियां रीफ्रेश करें", start_btn2: "शुरू करें", stop_btn2: "रोकें", stop_all_events_btn: "⏹️ सभी इवेंट रोकें", add_to_all_btn: "➕ सभी में जोड़ें", remove_from_all_btn: "➖ सभी से हटाएं", start_new_competition_btn: "🏁 नई प्रतियोगिता शुरू करें", give_title_btn: "उपाधि दें", remove_title_btn: "उपाधि हटाएं", create_code_btn: "🎁 कोड बनाएं", refresh_btn: "🔄 रीफ्रेश करें", search_btn: "🔍 खोजें", ban_for_duration_btn: "चयनित अवधि के लिए बैन करें", ban_permanent_btn: "स्थायी रूप से बैन करें", remove_ban_btn: "बैन हटाएं", mute_chat_duration_btn: "चयनित अवधि के लिए चैट म्यूट करें", mute_chat_permanent_btn: "स्थायी रूप से चैट म्यूट करें", remove_mute_btn: "चैट म्यूट हटाएं", send_warning_btn: "चेतावनी भेजें", delete_this_message_btn: "यह संदेश हटाएं", understood_btn: "समझ गया", stop_this_competition_btn: "⏹️ यह प्रतियोगिता रोकें", delete_code_btn: "कोड हटाएं", no_name_competition_fallback: "अनाम प्रतियोगिता", club_code_ph: "क्लब कोड (4 अंक)", club_name_ph: "क्लब का नाम", cookie_amount_ph: "कुकी मात्रा", current_password_ph: "वर्तमान पासवर्ड", new_password_ph: "नया पासवर्ड", confirm_new_password_ph: "नए पासवर्ड की पुष्टि करें", confirm_password_field_ph: "पुष्टि के लिए पासवर्ड दर्ज करें", creator_password_ph: "क्रिएटर पासवर्ड", player_name_ph: "खिलाड़ी का नाम", prestige_amount_ph: "प्रतिष्ठा स्तरों की संख्या", player_name_delete_ph: "हटाने के लिए खिलाड़ी का नाम", search_player_ph: "नाम से खिलाड़ी खोजें...", duration_minutes_ph: "अवधि (मिनट)", golden_bonus_ph: "प्रति गोल्डन कुकी निश्चित बोनस", discount_percent_ph: "छूट प्रतिशत", cookies_per_player_ph: "प्रति खिलाड़ी कुकी मात्रा", competition_name_example_ph: "उदा.: वसंत प्रतियोगिता 2026", enter_title_ph: "उपाधि टाइप करें", days_ph: "दिन", hours_ph: "घंटे", mins_ph: "मिनट", secs_ph: "सेकंड", code_example_ph: "उदा.: WELCOME2026", warning_content_ph: "चेतावनी सामग्री",
         err_already_in_club: "आप पहले से ही एक क्लब में हैं", err_club_not_found: "क्लब नहीं मिला", err_invalid_club_code: "अमान्य कोड", success_left_club: "आपने क्लब सफलतापूर्वक छोड़ दिया!", success_joined_club: "सफलतापूर्वक जुड़ गए!", success_club_created_prefix: "बनाया गया! कोड:", info_searching_club: "क्लब खोजा जा रहा है...", err_login_first: "पहले लॉग इन करें", err_not_enough_cookies: "आपके पास पर्याप्त कुकीज़ नहीं हैं", err_invalid_amount: "अमान्य मात्रा", err_corrupted_recipient: "प्राप्तकर्ता का डेटा क्षतिग्रस्त है — अभी दान नहीं किया जा सकता", info_transferring: "स्थानांतरित हो रहा है...", success_donated: "सफलतापूर्वक दान किया गया!", err_invalid_name: "अमान्य नाम", err_enter_password_verify: "सत्यापन के लिए अपना पासवर्ड दर्ज करें", err_already_your_name: "यह पहले से ही आपका नाम है", info_updating: "अपडेट हो रहा है...", success_changed: "सफलतापूर्वक बदला गया!", err_fill_all_fields: "सभी फ़ील्ड भरें", err_passwords_mismatch: "पासवर्ड मेल नहीं खाते", success_password_changed: "पासवर्ड बदल दिया गया!", err_wrong_current_password: "वर्तमान पासवर्ड गलत है", err_select_gender: "लिंग चुनें", success_updated: "अपडेट किया गया!", err_enter_password_confirm: "पुष्टि के लिए पासवर्ड दर्ज करें", info_deleting_account: "खाता हटाया जा रहा है...", err_wrong_password: "गलत पासवर्ड", err_not_enough_for_bet: "इस दांव के लिए आपके पास पर्याप्त कुकीज़ नहीं हैं", info_creating_duel: "द्वंद्व बनाया जा रहा है...", err_invalid_duration: "वैध अवधि दर्ज करें", err_invalid_bet: "अमान्य दांव राशि", err_enter_code: "एक कोड दर्ज करें", info_checking_code: "कोड जांचा जा रहा है...", err_code_not_found: "कोड मौजूद नहीं है", err_already_redeemed: "आपने पहले ही यह कोड रिडीम कर लिया है", err_unknown_reward_type: "इस कोड पर अज्ञात इनाम प्रकार", success_redeemed_cookies: "आपको {amount} कुकीज़ मिलीं! 🎁", success_redeemed_title: "आपको '{title}' उपाधि मिली! 🏅", info_loading: "लोड हो रहा है...", err_enter_message_content: "संदेश सामग्री दर्ज करें", success_broadcast_sent: "संदेश सभी को भेजा गया!", success_broadcast_cleared: "संदेश सभी के लिए हटाया गया!", err_enter_player_name: "खिलाड़ी का नाम दर्ज करें", err_player_not_found: "खिलाड़ी '{name}' नहीं मिला", err_no_players_found: "कोई खिलाड़ी नहीं मिला", info_deleting_player: "खिलाड़ी हटाया जा रहा है...", info_searching_player: "खिलाड़ी खोजा जा रहा है...", err_enter_bonus: "वैध बोनस दर्ज करें", err_choose_duration: "अवधि चुनें", err_invalid_discount: "वैध छूट प्रतिशत दर्ज करें (1-99)", success_event_started: "इवेंट शुरू हुआ!", success_event_stopped: "इवेंट रोका गया!", success_all_events_stopped: "सभी इवेंट रोके गए!", err_enter_competition_name: "प्रतियोगिता का नाम दर्ज करें", err_invalid_prize_amount: "अमान्य पुरस्कार राशि", success_competition_started: "प्रतियोगिता शुरू हुई!", err_competition_not_found: "प्रतियोगिता नहीं मिली (क्या पहले ही समाप्त हो गई?)", success_competition_ending: "प्रतियोगिता समाप्त हो रही है और पुरस्कार दिए जा रहे हैं...", err_enter_title_text2: "उपाधि पाठ दर्ज करें", success_title_given: "'{title}' उपाधि {name} को दी गई!", success_title_removed: "{name} की उपाधि हटा दी गई!", success_code_created: "कोड '{code}' सफलतापूर्वक बनाया गया!", err_code_already_exists: "'{code}' नाम का कोड पहले से मौजूद है", success_player_data_deleted: "'{name}' का डेटा सफलतापूर्वक हटाया गया!", err_firebase_down: "Firebase कनेक्ट नहीं है", err_wrong_credentials: "गलत उपयोगकर्ता नाम या पासवर्ड", err_no_server_response: "सर्वर से कोई प्रतिक्रिया नहीं - पुनः प्रयास करें", err_prefix: "त्रुटि:", err_username_short: "नाम बहुत छोटा है", err_password_short: "पासवर्ड कम से कम 6 अक्षरों का होना चाहिए", err_username_taken: "उपयोगकर्ता नाम पहले से लिया गया है", err_weak_password: "पासवर्ड बहुत कमज़ोर है", login_connecting: "लॉग इन हो रहा है...", register_registering: "साइन अप हो रहा है...", register_success: "सफलतापूर्वक साइन अप हुआ!"
     }
 };
@@ -3764,7 +3784,7 @@ function renderCompetitionsScreen() {
     list.forEach(function(c) {
         var isSelected = String(c.id) === String(selectedCompetitionId);
         tabsHtml += "<button onclick='selectCompetitionTab(" + c.id + ")' style='padding:8px 16px; border-radius:15px; border:2px solid rgba(255,255,255,0.6); cursor:pointer; font-weight:bold; font-size:0.9rem; " +
-            (isSelected ? "background:rgba(255,255,255,0.95); color:#203A43;" : "background:rgba(255,255,255,0.15); color:white;") + "'>" + (c.name || "תחרות ללא שם") + "</button>";
+            (isSelected ? "background:rgba(255,255,255,0.95); color:#203A43;" : "background:rgba(255,255,255,0.15); color:white;") + "'>" + (c.name || t("no_name_competition_fallback")) + "</button>";
     });
     tabsHtml += "</div>";
 
@@ -4150,10 +4170,10 @@ function renderCompetitionAdminStatus() {
         if (comp.prizeCookiesClub > 0) prizeParts.push("🏆 " + formatNum(comp.prizeCookiesClub) + " עוגיות לכל חבר מועדון");
         if (comp.prizeBadgeEnabled && comp.prizeBadgeText) prizeParts.push("🏅 " + comp.prizeBadgeText);
         var prizeLine = prizeParts.length ? ("<div style='font-size:0.85rem; color:#8E44AD; margin-top:4px;'>פרס: " + prizeParts.join(" · ") + "</div>") : "";
-        html += "<div class='player-item'><span class='event-active-tag'>פעיל</span><strong>" + (comp.name || "תחרות ללא שם") + "</strong><br>" +
+        html += "<div class='player-item'><span class='event-active-tag'>פעיל</span><strong>" + (comp.name || t("no_name_competition_fallback")) + "</strong><br>" +
             getCompetitionTypeLabel(comp.type) + " · " + getCompetitionScopeLabel(comp.scope) +
             " · נותרו " + formatDurationHebrew(remainingMs) + prizeLine +
-            "<button class='danger-button' style='margin-top:6px;' onclick='endCompetition(" + comp.id + ")'>⏹️ עצור תחרות זו</button></div>";
+            "<button class='danger-button' style='margin-top:6px;' onclick='endCompetition(" + comp.id + ")'>" + t("stop_this_competition_btn") + "</button></div>";
     });
     el.innerHTML = html;
 }
@@ -4791,7 +4811,7 @@ function loadAdminCodesList() {
             html += "<div class='code-item'>" +
                 "<div class='code-item-text'>" + child.key + "</div>" +
                 "<div style='font-size:0.85rem; color:#555; margin-top:3px;'>" + rewardText + " · מומש " + redeemCount + " פעמים</div>" +
-                "<button class='danger-button' style='margin-top:6px; padding:4px 12px; font-size:0.85rem;' onclick=\"deleteRedeemCode('" + child.key + "')\">מחק קוד</button>" +
+                "<button class='danger-button' style='margin-top:6px; padding:4px 12px; font-size:0.85rem;' onclick=\"deleteRedeemCode('" + child.key + "')\">" + t("delete_code_btn") + "</button>" +
                 "</div>";
         });
         listDiv.innerHTML = html;
@@ -4831,7 +4851,7 @@ function renderGamesMenu() {
     content.innerHTML =
         "<div style='text-align:center;'>" +
         "<button class='games-menu-btn' onclick='showTracksScreen()'>" + t("games_tracks_btn") + "</button>" +
-        "<button class='games-menu-btn' onclick='showEscapeCampScreen()'>🏕️ לברוח מהקייטנה</button>" +
+        "<button class='games-menu-btn' onclick='showEscapeCampScreen()'>" + t("escape_camp_btn") + "</button>" +
         "</div>";
 }
 
@@ -4840,7 +4860,7 @@ function showEscapeCampScreen() {
     var content = document.getElementById("gamesContent");
     content.innerHTML =
         "<div class='games-card'>" +
-        "<h3>🏕️ לברוח מהקייטנה</h3>" +
+        "<h3>" + t("escape_camp_btn") + "</h3>" +
         "<p style='color:#555; margin-bottom:16px;'>20 חדרי בריחה תלת-ממדיים! פתרו חידות, מנעולי קוד, כספות וסמלים כדי לצאת. כל חדר שעוברים = פרס עוגיות כפול מהקודם (מתחיל ב-1B).</p>" +
         "<button onclick='launchEscapeCamp()'>" + t("games_start_btn") + "</button>" +
         "<button class='close-button' onclick='renderGamesMenu()'>" + t("back_btn") + "</button>" +
